@@ -1,5 +1,5 @@
 -- ============================================================================
--- 🌸さくらhubV0.7🌸 (v0.7.2.135)
+-- 🌸さくらhubV0.7🌸 (v0.7.2.138)
 -- ============================================================================
 
 -- ============================================================================
@@ -70,19 +70,16 @@ end
 do
     local SoundService = game:GetService("SoundService")
 
-    -- 音声ID定義
     local ACTION_SOUND_ID = "rbxassetid://137505070991597"
     local ERROR_SOUND_ID = "rbxassetid://82845990304289"
     local OPEN_CLOSE_SOUND_ID = "rbxassetid://87437544236708"
 
-    -- 音量設定（絶対に変更禁止）
     local VOLUME_CONFIG = {
         ACTION = 2.5,
         ERROR = 5.0,
         OPEN_CLOSE = 10.0
     }
 
-    -- 音声再生関数
     function PlaySound(soundId, volume)
         pcall(function()
             local sound = Instance.new("Sound")
@@ -110,7 +107,6 @@ do
         end)
     end
 
-    -- 用途別ラッパー関数
     function PlayActionSound()
         PlaySound(ACTION_SOUND_ID, VOLUME_CONFIG.ACTION)
     end
@@ -123,7 +119,6 @@ do
         PlaySound(OPEN_CLOSE_SOUND_ID, VOLUME_CONFIG.OPEN_CLOSE)
     end
 
-    -- グローバル公開
     _G.PlaySound = PlaySound
     _G.PlayActionSound = PlayActionSound
     _G.PlayErrorSound = PlayErrorSound
@@ -156,7 +151,6 @@ end
 -- ============================================================================
 do
     local RunService = _G.RunService
-    local Players = _G.Players
     local LocalPlayer = _G.LocalPlayer
 
     local function applyPinkGradientEffect()
@@ -287,13 +281,27 @@ do
         FollowPlayer = true,
         HeartScale = 2.0
     }
+
+    -- ★ スーパーリング（竜巻）設定
+    SH.SuperRingConfig = {
+        Enabled = false,
+        BaseHeight = 2.0,
+        Height = 10.0,
+        Radius = 3.0,
+        ObjectCount = 16,
+        RotationSpeed = 2.0,
+        SpiralSpeed = 1.0,
+        WaveSpeed = 1.5,
+        WaveAmplitude = 0.5,
+        FollowPlayer = true,
+        TornadoEffect = true,
+    }
 end
 
 -- ============================================================================
 -- ブロック7: 土星用設定
 -- ============================================================================
 do
-    local SH = _G.SH
     local PhysicsService = _G.PhysicsService
 
     local SATURN_GROUP_NAME = "SparklerGroup"
@@ -326,6 +334,13 @@ do
     SH.saturnList = {}; SH.saturnLoopConn = nil; SH.saturnCachedHRP = nil; SH.saturnTAccum = 0
     SH.verticalHeartToys = {}; SH.verticalHeartPoints = {}; SH.verticalHeartAssignedToys = {}; SH.verticalHeartLoopConn = nil; SH.verticalHeartTime = 0
     SH.verticalBigHeartToys = {}; SH.verticalBigHeartPoints = {}; SH.verticalBigHeartAssignedToys = {}; SH.verticalBigHeartLoopConn = nil; SH.verticalBigHeartTime = 0
+
+    -- ★ SuperRing 状態変数
+    SH.superRingToys = {}
+    SH.superRingPoints = {}
+    SH.superRingAssignedToys = {}
+    SH.superRingLoopConn = nil
+    SH.superRingTime = 0
 end
 
 -- ============================================================================
@@ -333,7 +348,6 @@ end
 -- ============================================================================
 do
     local ReplicatedStorage = _G.ReplicatedStorage
-    local SH = _G.SH
 
     local GrabEvents = ReplicatedStorage:WaitForChild("GrabEvents")
     local SetNetworkOwner = GrabEvents:WaitForChild("SetNetworkOwner")
@@ -345,7 +359,6 @@ end
 -- ============================================================================
 do
     local SH = _G.SH
-    local Workspace = _G.Workspace
     local OrionLib = _G.OrionLib
 
     function findObjects()
@@ -409,6 +422,7 @@ do
         if SH.PianoConfig.Enabled then table.insert(activeFunctions, _G.togglePiano) end
         if SH.VerticalHeartConfig.Enabled then table.insert(activeFunctions, _G.toggleVerticalHeart) end
         if SH.VerticalBigHeartConfig.Enabled then table.insert(activeFunctions, _G.toggleVerticalBigHeart) end
+        if SH.SuperRingConfig.Enabled then table.insert(activeFunctions, _G.toggleSuperRing) end
         for _, func in ipairs(activeFunctions) do if func then func(false) end end
         task.wait(0.5)
         for _, func in ipairs(activeFunctions) do if func then func(true) end end
@@ -657,11 +671,10 @@ do
 end
 
 -- ============================================================================
--- ブロック12: フェザー機能（エラー音追加）
+-- ブロック12: フェザー機能
 -- ============================================================================
 do
     local SH = _G.SH
-    local Workspace = _G.Workspace
     local LocalPlayer = _G.LocalPlayer
     local RunService = _G.RunService
     local OrionLib = _G.OrionLib
@@ -689,6 +702,7 @@ do
             if SH.PianoConfig.Enabled then _G.togglePiano(false) end
             if SH.VerticalHeartConfig.Enabled then _G.toggleVerticalHeart(false) end
             if SH.VerticalBigHeartConfig.Enabled then _G.toggleVerticalBigHeart(false) end
+            if SH.SuperRingConfig.Enabled then _G.toggleSuperRing(false) end
             
             SH.featherToys = findObjects()
             if #SH.featherToys == 0 then
@@ -785,11 +799,10 @@ do
 end
 
 -- ============================================================================
--- ブロック13: 魔法陣機能（エラー音追加）
+-- ブロック13: 魔法陣機能
 -- ============================================================================
 do
     local SH = _G.SH
-    local Workspace = _G.Workspace
     local LocalPlayer = _G.LocalPlayer
     local RunService = _G.RunService
     local OrionLib = _G.OrionLib
@@ -815,6 +828,7 @@ do
             if SH.PianoConfig.Enabled then _G.togglePiano(false) end
             if SH.VerticalHeartConfig.Enabled then _G.toggleVerticalHeart(false) end
             if SH.VerticalBigHeartConfig.Enabled then _G.toggleVerticalBigHeart(false) end
+            if SH.SuperRingConfig.Enabled then _G.toggleSuperRing(false) end
             
             for _, r in ipairs(SH.magicCircleList) do
                 if r.part then
@@ -895,11 +909,10 @@ do
 end
 
 -- ============================================================================
--- ブロック14: ハート機能（エラー音追加）
+-- ブロック14: ハート機能
 -- ============================================================================
 do
     local SH = _G.SH
-    local Workspace = _G.Workspace
     local LocalPlayer = _G.LocalPlayer
     local RunService = _G.RunService
     local OrionLib = _G.OrionLib
@@ -927,6 +940,7 @@ do
             if SH.PianoConfig.Enabled then _G.togglePiano(false) end
             if SH.VerticalHeartConfig.Enabled then _G.toggleVerticalHeart(false) end
             if SH.VerticalBigHeartConfig.Enabled then _G.toggleVerticalBigHeart(false) end
+            if SH.SuperRingConfig.Enabled then _G.toggleSuperRing(false) end
             
             SH.heartToys = findObjects()
             if #SH.heartToys == 0 then
@@ -1003,11 +1017,10 @@ do
 end
 
 -- ============================================================================
--- ブロック15: ビッグハート機能（エラー音追加）
+-- ブロック15: ビッグハート機能
 -- ============================================================================
 do
     local SH = _G.SH
-    local Workspace = _G.Workspace
     local LocalPlayer = _G.LocalPlayer
     local RunService = _G.RunService
     local OrionLib = _G.OrionLib
@@ -1035,6 +1048,7 @@ do
             if SH.PianoConfig.Enabled then _G.togglePiano(false) end
             if SH.VerticalHeartConfig.Enabled then _G.toggleVerticalHeart(false) end
             if SH.VerticalBigHeartConfig.Enabled then _G.toggleVerticalBigHeart(false) end
+            if SH.SuperRingConfig.Enabled then _G.toggleSuperRing(false) end
             
             SH.bigHeartToys = findObjects()
             if #SH.bigHeartToys == 0 then
@@ -1111,11 +1125,10 @@ do
 end
 
 -- ============================================================================
--- ブロック16: ダビデの星機能（エラー音追加）
+-- ブロック16: ダビデの星機能
 -- ============================================================================
 do
     local SH = _G.SH
-    local Workspace = _G.Workspace
     local LocalPlayer = _G.LocalPlayer
     local RunService = _G.RunService
     local OrionLib = _G.OrionLib
@@ -1143,6 +1156,7 @@ do
             if SH.PianoConfig.Enabled then _G.togglePiano(false) end
             if SH.VerticalHeartConfig.Enabled then _G.toggleVerticalHeart(false) end
             if SH.VerticalBigHeartConfig.Enabled then _G.toggleVerticalBigHeart(false) end
+            if SH.SuperRingConfig.Enabled then _G.toggleSuperRing(false) end
             
             SH.starOfDavidToys = findObjects()
             if #SH.starOfDavidToys == 0 then
@@ -1219,11 +1233,10 @@ do
 end
 
 -- ============================================================================
--- ブロック17: スター機能（エラー音追加）
+-- ブロック17: スター機能
 -- ============================================================================
 do
     local SH = _G.SH
-    local Workspace = _G.Workspace
     local LocalPlayer = _G.LocalPlayer
     local RunService = _G.RunService
     local OrionLib = _G.OrionLib
@@ -1251,6 +1264,7 @@ do
             if SH.PianoConfig.Enabled then _G.togglePiano(false) end
             if SH.VerticalHeartConfig.Enabled then _G.toggleVerticalHeart(false) end
             if SH.VerticalBigHeartConfig.Enabled then _G.toggleVerticalBigHeart(false) end
+            if SH.SuperRingConfig.Enabled then _G.toggleSuperRing(false) end
             
             SH.starToys = findObjects()
             if #SH.starToys == 0 then
@@ -1328,11 +1342,10 @@ do
 end
 
 -- ============================================================================
--- ブロック18: スター2機能（エラー音追加）
+-- ブロック18: スター2機能
 -- ============================================================================
 do
     local SH = _G.SH
-    local Workspace = _G.Workspace
     local LocalPlayer = _G.LocalPlayer
     local RunService = _G.RunService
     local OrionLib = _G.OrionLib
@@ -1360,6 +1373,7 @@ do
             if SH.PianoConfig.Enabled then _G.togglePiano(false) end
             if SH.VerticalHeartConfig.Enabled then _G.toggleVerticalHeart(false) end
             if SH.VerticalBigHeartConfig.Enabled then _G.toggleVerticalBigHeart(false) end
+            if SH.SuperRingConfig.Enabled then _G.toggleSuperRing(false) end
             
             SH.star2Toys = findObjects()
             if #SH.star2Toys == 0 then
@@ -1446,11 +1460,10 @@ do
 end
 
 -- ============================================================================
--- ブロック19: 球体機能（エラー音追加）
+-- ブロック19: 球体機能
 -- ============================================================================
 do
     local SH = _G.SH
-    local Workspace = _G.Workspace
     local LocalPlayer = _G.LocalPlayer
     local RunService = _G.RunService
     local OrionLib = _G.OrionLib
@@ -1478,6 +1491,7 @@ do
             if SH.PianoConfig.Enabled then _G.togglePiano(false) end
             if SH.VerticalHeartConfig.Enabled then _G.toggleVerticalHeart(false) end
             if SH.VerticalBigHeartConfig.Enabled then _G.toggleVerticalBigHeart(false) end
+            if SH.SuperRingConfig.Enabled then _G.toggleSuperRing(false) end
             
             SH.sphereToys = findObjects()
             if #SH.sphereToys == 0 then
@@ -1560,11 +1574,10 @@ do
 end
 
 -- ============================================================================
--- ブロック20: 観覧車機能（エラー音追加）
+-- ブロック20: 観覧車機能
 -- ============================================================================
 do
     local SH = _G.SH
-    local Workspace = _G.Workspace
     local LocalPlayer = _G.LocalPlayer
     local RunService = _G.RunService
     local OrionLib = _G.OrionLib
@@ -1592,6 +1605,7 @@ do
             if SH.PianoConfig.Enabled then _G.togglePiano(false) end
             if SH.VerticalHeartConfig.Enabled then _G.toggleVerticalHeart(false) end
             if SH.VerticalBigHeartConfig.Enabled then _G.toggleVerticalBigHeart(false) end
+            if SH.SuperRingConfig.Enabled then _G.toggleSuperRing(false) end
             
             SH.ferrisWheelToys = findObjects()
             if #SH.ferrisWheelToys == 0 then
@@ -1679,11 +1693,10 @@ do
 end
 
 -- ============================================================================
--- ブロック21: アニメーションN1,N2,N3（エラー音追加）
+-- ブロック21: アニメーションN1,N2,N3
 -- ============================================================================
 do
     local SH = _G.SH
-    local Workspace = _G.Workspace
     local LocalPlayer = _G.LocalPlayer
     local RunService = _G.RunService
     local OrionLib = _G.OrionLib
@@ -1711,6 +1724,7 @@ do
             if SH.PianoConfig.Enabled then _G.togglePiano(false) end
             if SH.VerticalHeartConfig.Enabled then _G.toggleVerticalHeart(false) end
             if SH.VerticalBigHeartConfig.Enabled then _G.toggleVerticalBigHeart(false) end
+            if SH.SuperRingConfig.Enabled then _G.toggleSuperRing(false) end
             
             SH.animN1Toys = findObjects()
             if #SH.animN1Toys == 0 then
@@ -1810,6 +1824,7 @@ do
             if SH.PianoConfig.Enabled then _G.togglePiano(false) end
             if SH.VerticalHeartConfig.Enabled then _G.toggleVerticalHeart(false) end
             if SH.VerticalBigHeartConfig.Enabled then _G.toggleVerticalBigHeart(false) end
+            if SH.SuperRingConfig.Enabled then _G.toggleSuperRing(false) end
             
             SH.animN2Toys = findObjects()
             if #SH.animN2Toys == 0 then
@@ -1906,6 +1921,7 @@ do
             if SH.PianoConfig.Enabled then _G.togglePiano(false) end
             if SH.VerticalHeartConfig.Enabled then _G.toggleVerticalHeart(false) end
             if SH.VerticalBigHeartConfig.Enabled then _G.toggleVerticalBigHeart(false) end
+            if SH.SuperRingConfig.Enabled then _G.toggleSuperRing(false) end
             
             SH.animN3Toys = findObjects()
             if #SH.animN3Toys == 0 then
@@ -1982,7 +1998,7 @@ do
 end
 
 -- ============================================================================
--- ブロック22: 羽V2機能（エラー音追加）
+-- ブロック22: 羽V2機能
 -- ============================================================================
 do
     local SH = _G.SH
@@ -2012,6 +2028,7 @@ do
             if SH.PianoConfig.Enabled then _G.togglePiano(false) end
             if SH.VerticalHeartConfig.Enabled then _G.toggleVerticalHeart(false) end
             if SH.VerticalBigHeartConfig.Enabled then _G.toggleVerticalBigHeart(false) end
+            if SH.SuperRingConfig.Enabled then _G.toggleSuperRing(false) end
             
             SH.wingList = {}
             local maxObjects = SH.WingConfig.ObjectCount * 2
@@ -2143,7 +2160,7 @@ do
 end
 
 -- ============================================================================
--- ブロック23: 土星スパークラー機能（エラー音追加）
+-- ブロック23: 土星スパークラー機能
 -- ============================================================================
 do
     local SH = _G.SH
@@ -2222,6 +2239,7 @@ do
             attachSaturnPhysics(SH.saturnList[i].part)
         end
     end
+    _G.rescanSaturn = rescanSaturn
 
     local function saturnTarget(i, count, t, rootCf)
         local center = rootCf.Position + Vector3.new(0, SH.SaturnConfig.BaseHeight, 0)
@@ -2233,28 +2251,15 @@ do
             local layer = math.min(math.floor((i - 1) / math.max(perLayer, 1)), LAYERS - 1)
             local indexInLayer = (i - 1) - layer * perLayer
             local countInLayer = (layer == LAYERS - 1) and (count - layer * perLayer) or perLayer
-
             local yFrac = layer / (LAYERS - 1)
             local y = (yFrac - 0.5) * SH.SaturnConfig.SphereRadius * 2
             local layerRadius = SH.SaturnConfig.SphereRadius * math.sin(math.acos(math.clamp(1 - 2 * yFrac, -1, 1)))
-
             local baseAngle = (indexInLayer / math.max(countInLayer, 1)) * math.pi * 2
             local rotAngle = (layer == 0) and baseAngle or (baseAngle + t * SH.SaturnConfig.SphereSpeed)
-
-            return Vector3.new(
-                layerRadius * 1.3 * math.cos(rotAngle),
-                y,
-                layerRadius * 1.3 * math.sin(rotAngle)
-            )
-
+            return Vector3.new(layerRadius * 1.3 * math.cos(rotAngle), y, layerRadius * 1.3 * math.sin(rotAngle))
         elseif mode == "ring" then
             local angle = (i / count) * math.pi * 2 + t * SH.SaturnConfig.RingSpeed
-            return Vector3.new(
-                SH.SaturnConfig.RingRadius * math.cos(angle),
-                0,
-                SH.SaturnConfig.RingRadius * math.sin(angle)
-            )
-
+            return Vector3.new(SH.SaturnConfig.RingRadius * math.cos(angle), 0, SH.SaturnConfig.RingRadius * math.sin(angle))
         elseif mode == "plot" then
             local angle = (i / count) * math.pi * 2 + t * SH.SaturnConfig.RingSpeed
             local radius = SH.SaturnConfig.PlotRadius * math.sqrt((i - 1) / count)
@@ -2262,8 +2267,7 @@ do
             local z = radius * math.sin(angle)
             local wave = math.sin(angle * 3 + t * 2) * 1.5
             return Vector3.new(x, SH.SaturnConfig.PlotHeight + wave, z)
-
-        else -- "saturn"
+        else
             local sphereCount = math.floor(count * 0.6)
             local ringCount = count - sphereCount
             if i <= sphereCount then
@@ -2306,6 +2310,7 @@ do
             if SH.PianoConfig.Enabled then _G.togglePiano(false) end
             if SH.VerticalHeartConfig.Enabled then _G.toggleVerticalHeart(false) end
             if SH.VerticalBigHeartConfig.Enabled then _G.toggleVerticalBigHeart(false) end
+            if SH.SuperRingConfig.Enabled then _G.toggleSuperRing(false) end
 
             rescanSaturn()
             
@@ -2321,28 +2326,22 @@ do
 
             SH.saturnLoopConn = RunService.Heartbeat:Connect(function(dt)
                 if not SH.SaturnConfig.Enabled then return end
-
                 for i = #SH.saturnList, 1, -1 do
                     if not SH.saturnList[i].part or not SH.saturnList[i].part.Parent then
                         table.remove(SH.saturnList, i)
                     end
                 end
-
                 if #SH.saturnList == 0 then return end
-
                 local root = getSaturnHRP()
                 if not root then return end
-
                 SH.saturnTAccum = SH.saturnTAccum + dt
                 local rootCf = root.CFrame
                 local center = rootCf.Position + Vector3.new(0, SH.SaturnConfig.BaseHeight, 0)
                 local listCount = #SH.saturnList
-
                 local targets = table.create(listCount)
                 for i = 1, listCount do
                     targets[i] = center + saturnTarget(i, listCount, SH.saturnTAccum, rootCf)
                 end
-
                 for i = 1, listCount do
                     local rec = SH.saturnList[i]
                     local p = rec.part
@@ -2350,7 +2349,6 @@ do
                         local target = targets[i]
                         local dir = target - p.Position
                         local d = dir.Magnitude
-
                         local bv = p:FindFirstChild("SaturnBodyVelocity")
                         if bv then
                             if d > 0.05 then
@@ -2360,7 +2358,6 @@ do
                                 bv.Velocity = Vector3.new()
                             end
                         end
-
                         local bg = p:FindFirstChild("SaturnBodyGyro")
                         if bg then
                             local nextTarget = targets[(i % listCount) + 1]
@@ -2382,7 +2379,6 @@ do
         else
             PlayOpenCloseSound()
             if SH.saturnLoopConn then SH.saturnLoopConn:Disconnect(); SH.saturnLoopConn = nil end
-
             for _, rec in ipairs(SH.saturnList) do
                 local p = rec.part
                 if p and p.Parent then
@@ -2391,13 +2387,8 @@ do
                     detachSaturnPhysics(p)
                 end
             end
-
             SH.saturnList = {}
-            OrionLib:MakeNotification({
-                Name = "土星スパークラー",
-                Content = "無効化",
-                Time = 2
-            })
+            OrionLib:MakeNotification({ Name = "土星スパークラー", Content = "無効化", Time = 2 })
         end
     end
     _G.toggleSaturn = toggleSaturn
@@ -2419,7 +2410,7 @@ do
 end
 
 -- ============================================================================
--- ブロック24: ピアノ機能トグル（エラー音追加済み）
+-- ブロック24: ピアノ機能トグル
 -- ============================================================================
 do
     local SH = _G.SH
@@ -2449,6 +2440,7 @@ do
             if SH.SaturnConfig.Enabled then _G.toggleSaturn(false) end
             if SH.VerticalHeartConfig.Enabled then _G.toggleVerticalHeart(false) end
             if SH.VerticalBigHeartConfig.Enabled then _G.toggleVerticalBigHeart(false) end
+            if SH.SuperRingConfig.Enabled then _G.toggleSuperRing(false) end
             
             SH.PianoConfig.Keyboard = getMusicKeyboard()
             
@@ -2479,11 +2471,10 @@ do
 end
 
 -- ============================================================================
--- ブロック25: 縦ハート機能（エラー音追加）
+-- ブロック25: 縦ハート機能
 -- ============================================================================
 do
     local SH = _G.SH
-    local Workspace = _G.Workspace
     local LocalPlayer = _G.LocalPlayer
     local RunService = _G.RunService
     local OrionLib = _G.OrionLib
@@ -2511,6 +2502,7 @@ do
             if SH.SaturnConfig.Enabled then _G.toggleSaturn(false) end
             if SH.PianoConfig.Enabled then _G.togglePiano(false) end
             if SH.VerticalBigHeartConfig.Enabled then _G.toggleVerticalBigHeart(false) end
+            if SH.SuperRingConfig.Enabled then _G.toggleSuperRing(false) end
             
             SH.verticalHeartToys = findObjects()
             if #SH.verticalHeartToys == 0 then
@@ -2587,11 +2579,10 @@ do
 end
 
 -- ============================================================================
--- ブロック26: 縦ビッグハート機能（エラー音追加）
+-- ブロック26: 縦ビッグハート機能
 -- ============================================================================
 do
     local SH = _G.SH
-    local Workspace = _G.Workspace
     local LocalPlayer = _G.LocalPlayer
     local RunService = _G.RunService
     local OrionLib = _G.OrionLib
@@ -2619,6 +2610,7 @@ do
             if SH.SaturnConfig.Enabled then _G.toggleSaturn(false) end
             if SH.PianoConfig.Enabled then _G.togglePiano(false) end
             if SH.VerticalHeartConfig.Enabled then _G.toggleVerticalHeart(false) end
+            if SH.SuperRingConfig.Enabled then _G.toggleSuperRing(false) end
             
             SH.verticalBigHeartToys = findObjects()
             if #SH.verticalBigHeartToys == 0 then
@@ -2695,7 +2687,197 @@ do
 end
 
 -- ============================================================================
--- ブロック27: Me(=^・^=)タブ
+-- ブロック27: SuperRing（竜巻トイMOD）機能
+-- ============================================================================
+do
+    local SH = _G.SH
+    local LocalPlayer = _G.LocalPlayer
+    local RunService = _G.RunService
+    local OrionLib = _G.OrionLib
+    local findObjects = _G.findObjects
+    local getPrimaryPart = _G.getPrimaryPart
+
+    local function createSuperRingPoints(count)
+        local points = {}
+        if count == 0 then return points end
+        for i = 1, count do
+            local angle = (i - 1) * (2 * math.pi / count)
+            local part = Instance.new("Part")
+            part.CanCollide = false; part.Anchored = true; part.Transparency = 1
+            part.Size = Vector3.new(4, 1, 4); part.Parent = workspace
+            points[i] = {
+                angle = angle,
+                part = part,
+                assignedToy = nil,
+                heightOffset = (i - 1) * (SH.SuperRingConfig.Height / count),
+            }
+        end
+        return points
+    end
+
+    local function getSuperRingPosition(angle, radius, heightOffset, time, rotationSpeed, spiralSpeed, waveSpeed, waveAmplitude, tornadoEffect)
+        local rotationAngle = angle + (time * rotationSpeed)
+        local x = math.cos(rotationAngle) * radius
+        local z = math.sin(rotationAngle) * radius
+        local spiralOffset = 0
+        if spiralSpeed > 0 then spiralOffset = math.sin(time * spiralSpeed + angle) * 0.5 end
+        local waveOffset = 0
+        if waveSpeed > 0 then waveOffset = math.sin(time * waveSpeed + angle * 2) * waveAmplitude end
+        local currentRadius = radius
+        if tornadoEffect then
+            local heightFactor = 1 - (heightOffset / SH.SuperRingConfig.Height) * 0.5
+            currentRadius = radius * heightFactor
+            x = math.cos(rotationAngle) * currentRadius
+            z = math.sin(rotationAngle) * currentRadius
+        end
+        local finalHeight = SH.SuperRingConfig.BaseHeight + heightOffset + spiralOffset + waveOffset
+        return x, z, finalHeight, currentRadius
+    end
+
+    local function attachSuperRingPhysics(part)
+        if not part then return nil, nil end
+        local existingBG = part:FindFirstChildOfClass("BodyGyro")
+        local existingBP = part:FindFirstChildOfClass("BodyPosition")
+        if existingBG and existingBP then return existingBG, existingBP end
+        if existingBG then existingBG:Destroy() end
+        if existingBP then existingBP:Destroy() end
+        local BP = Instance.new("BodyPosition")
+        local BG = Instance.new("BodyGyro")
+        BP.P = 15000; BP.D = 200; BP.MaxForce = Vector3.new(1, 1, 1) * 1e10; BP.Parent = part
+        BG.P = 15000; BG.D = 200; BG.MaxTorque = Vector3.new(1, 1, 1) * 1e10; BG.Parent = part
+        return BG, BP
+    end
+
+    local function assignSuperRingToysToPoints()
+        SH.superRingAssignedToys = {}
+        for i = 1, math.min(#SH.superRingToys, #SH.superRingPoints) do
+            local toy = SH.superRingToys[i]
+            if toy and toy:IsA("Model") and toy.Name == SH.ObjectIDConfig.CurrentObjectID then
+                local primaryPart = getPrimaryPart(toy)
+                if primaryPart then
+                    for _, child in ipairs(toy:GetChildren()) do
+                        if child:IsA("BasePart") then child.CanCollide = false; child.CanTouch = false; child.Anchored = false end
+                    end
+                    local BG, BP = attachSuperRingPhysics(primaryPart)
+                    local toyTable = {
+                        BG = BG, BP = BP, Pallet = primaryPart, Model = toy,
+                        PointIndex = i,
+                        baseAngle = SH.superRingPoints[i].angle,
+                        baseHeightOffset = SH.superRingPoints[i].heightOffset,
+                    }
+                    SH.superRingPoints[i].assignedToy = toyTable
+                    table.insert(SH.superRingAssignedToys, toyTable)
+                end
+            end
+        end
+        return SH.superRingAssignedToys
+    end
+
+    local function startSuperRingLoop()
+        if SH.superRingLoopConn then SH.superRingLoopConn:Disconnect(); SH.superRingLoopConn = nil end
+        SH.superRingTime = 0
+        SH.superRingLoopConn = RunService.RenderStepped:Connect(function(dt)
+            if not SH.SuperRingConfig.Enabled or not LocalPlayer.Character then return end
+            local hrp = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+            local torso = LocalPlayer.Character:FindFirstChild("Torso") or LocalPlayer.Character:FindFirstChild("UpperTorso")
+            if not hrp or not torso then return end
+            SH.superRingTime = SH.superRingTime + dt
+            local basePosition = torso.Position
+            for i, point in ipairs(SH.superRingPoints) do
+                if point.assignedToy and point.assignedToy.BP and point.assignedToy.BG then
+                    local toy = point.assignedToy
+                    local currentAngle = toy.baseAngle + (SH.superRingTime * SH.SuperRingConfig.RotationSpeed * 0.5)
+                    local x, z, height, radius = getSuperRingPosition(
+                        currentAngle, SH.SuperRingConfig.Radius, toy.baseHeightOffset,
+                        SH.superRingTime, SH.SuperRingConfig.RotationSpeed, SH.SuperRingConfig.SpiralSpeed,
+                        SH.SuperRingConfig.WaveSpeed, SH.SuperRingConfig.WaveAmplitude, SH.SuperRingConfig.TornadoEffect
+                    )
+                    local localPos = Vector3.new(x, height, z)
+                    local targetPosition = basePosition + localPos
+                    if point.part then point.part.Position = targetPosition end
+                    toy.BP.Position = targetPosition
+                    if SH.SuperRingConfig.TornadoEffect then
+                        local direction = (targetPosition - basePosition).Unit
+                        if direction.Magnitude > 0 then
+                            toy.BG.CFrame = CFrame.lookAt(targetPosition, targetPosition + direction)
+                        end
+                    else
+                        toy.BG.CFrame = CFrame.new(targetPosition) * CFrame.Angles(-math.rad(90), 0, 0)
+                    end
+                end
+            end
+        end)
+    end
+
+    local function stopSuperRingLoop()
+        if SH.superRingLoopConn then SH.superRingLoopConn:Disconnect(); SH.superRingLoopConn = nil end
+        for _, point in ipairs(SH.superRingPoints) do
+            if point.part then point.part:Destroy() end
+            if point.assignedToy then
+                if point.assignedToy.BG then point.assignedToy.BG:Destroy() end
+                if point.assignedToy.BP then point.assignedToy.BP:Destroy() end
+            end
+        end
+        SH.superRingPoints = {}
+        SH.superRingAssignedToys = {}
+    end
+
+    function toggleSuperRing(state)
+        SH.SuperRingConfig.Enabled = state
+        if state then
+            PlayActionSound()
+            if SH.FeatherConfig.Enabled then _G.toggleFeather(false) end
+            if SH.MagicCircleConfig.Enabled then _G.toggleMagicCircle(false) end
+            if SH.HeartConfig.Enabled then _G.toggleHeart(false) end
+            if SH.BigHeartConfig.Enabled then _G.toggleBigHeart(false) end
+            if SH.StarOfDavidConfig.Enabled then _G.toggleStarOfDavid(false) end
+            if SH.StarConfig.Enabled then _G.toggleStar(false) end
+            if SH.Star2Config.Enabled then _G.toggleStar2(false) end
+            if SH.SphereConfig.Enabled then _G.toggleSphere(false) end
+            if SH.FerrisWheelConfig.Enabled then _G.toggleFerrisWheel(false) end
+            if SH.AnimN1Config.Enabled then _G.toggleAnimN1(false) end
+            if SH.AnimN2Config.Enabled then _G.toggleAnimN2(false) end
+            if SH.AnimN3Config.Enabled then _G.toggleAnimN3(false) end
+            if SH.WingConfig.Enabled then _G.toggleWing(false) end
+            if SH.SaturnConfig.Enabled then _G.toggleSaturn(false) end
+            if SH.PianoConfig.Enabled then _G.togglePiano(false) end
+            if SH.VerticalHeartConfig.Enabled then _G.toggleVerticalHeart(false) end
+            if SH.VerticalBigHeartConfig.Enabled then _G.toggleVerticalBigHeart(false) end
+
+            SH.superRingToys = findObjects()
+            if #SH.superRingToys == 0 then
+                PlayErrorSound()
+                OrionLib:MakeNotification({ Name = "エラー", Content = "オブジェクトが見つかりません", Time = 3 })
+                SH.SuperRingConfig.Enabled = false
+                return
+            end
+
+            SH.superRingPoints = createSuperRingPoints(math.min(#SH.superRingToys, SH.SuperRingConfig.ObjectCount))
+            assignSuperRingToysToPoints()
+            startSuperRingLoop()
+
+            OrionLib:MakeNotification({
+                Name = "竜巻トイMOD 起動",
+                Content = "半径: " .. SH.SuperRingConfig.Radius .. " / 高さ: " .. SH.SuperRingConfig.Height .. " / 数: " .. SH.SuperRingConfig.ObjectCount,
+                Image = "rbxassetid://4483362458",
+                Time = 3
+            })
+        else
+            PlayOpenCloseSound()
+            stopSuperRingLoop()
+            OrionLib:MakeNotification({
+                Name = "竜巻トイMOD 停止",
+                Content = "スーパーリング配置を解除しました",
+                Image = "rbxassetid://4483362458",
+                Time = 2
+            })
+        end
+    end
+    _G.toggleSuperRing = toggleSuperRing
+end
+
+-- ============================================================================
+-- ブロック28: Me(=^・^=)タブ
 -- ============================================================================
 do
     local Window = _G.Window
@@ -2929,8 +3111,7 @@ do
     MITab:AddToggle({ Name = "TPWalk", Default = false, Callback = toggleTPWalk })
     MITab:AddSlider({
         Name = "TPWalk速度",
-        Min = 16,
-        Max = 500,
+        Min = 16, Max = 500,
         Default = UtilityConfig.TPWalkSpeed,
         Color = Theme.SliderColor,
         Increment = 5,
@@ -2943,8 +3124,7 @@ do
     MITab:AddToggle({ Name = "三人称視点", Default = false, Callback = toggleThirdPerson })
     MITab:AddSlider({
         Name = "FOV",
-        Min = -5,
-        Max = 180,
+        Min = -5, Max = 180,
         Default = UtilityConfig.FOV,
         Color = Theme.SliderColor,
         Increment = 1,
@@ -2985,6 +3165,7 @@ do
             if SH.PianoConfig.Enabled then _G.togglePiano(false) end
             if SH.VerticalHeartConfig.Enabled then _G.toggleVerticalHeart(false) end
             if SH.VerticalBigHeartConfig.Enabled then _G.toggleVerticalBigHeart(false) end
+            if SH.SuperRingConfig.Enabled then _G.toggleSuperRing(false) end
             if UtilityConfig.TPWalk then toggleTPWalk(false) end
             if UtilityConfig.Noclip then toggleNoclip(false) end
             if UtilityConfig.ESP then toggleESP(false) end
@@ -2998,7 +3179,7 @@ do
 end
 
 -- ============================================================================
--- ブロック28: GUIタブ
+-- ブロック29: GUIタブ
 -- ============================================================================
 do
     local Window = _G.Window
@@ -3007,7 +3188,6 @@ do
     local Camera = _G.Camera
     local RunService = _G.RunService
     local UserInputService = _G.UserInputService
-    local Workspace = _G.Workspace
 
     local GUITab = Window:MakeTab({ Name = "GUI", Icon = "rbxassetid://4483362458", PremiumOnly = false })
     
@@ -3176,25 +3356,17 @@ do
                 loadstring(game:HttpGet("https://pastefy.app/PWUVVdb3/raw"))()
             end)
             if success then
-                OrionLib:MakeNotification({
-                    Name = "SaluraHUB-keyboard.GUI",
-                    Content = "読み込み成功！",
-                    Time = 3
-                })
+                OrionLib:MakeNotification({ Name = "SaluraHUB-keyboard.GUI", Content = "読み込み成功！", Time = 3 })
             else
                 PlayErrorSound()
-                OrionLib:MakeNotification({
-                    Name = "SaluraHUB-keyboard.GUI",
-                    Content = "読み込み失敗: " .. tostring(err),
-                    Time = 5
-                })
+                OrionLib:MakeNotification({ Name = "SaluraHUB-keyboard.GUI", Content = "読み込み失敗: " .. tostring(err), Time = 5 })
             end
         end
     })
 end
 
 -- ============================================================================
--- ブロック29: アンチタブ
+-- ブロック30: アンチタブ
 -- ============================================================================
 do
     local Window = _G.Window
@@ -3205,11 +3377,7 @@ do
     local Players = _G.Players
     local Workspace = _G.Workspace
 
-    local AntiTab = Window:MakeTab({ 
-        Name = "アンチ", 
-        Icon = "rbxassetid://4483362458", 
-        PremiumOnly = false 
-    })
+    local AntiTab = Window:MakeTab({ Name = "アンチ", Icon = "rbxassetid://4483362458", PremiumOnly = false })
 
     local RS = ReplicatedStorage
     local GE = RS:FindFirstChild("GrabEvents") or RS:WaitForChild("GrabEvents", 5)
@@ -3227,9 +3395,7 @@ do
     AntiTab:AddToggle({
         Name = "掴まれても脱出 (シンプル)",
         Default = false,
-        Callback = function(Value)
-            AntiGrabEnabled = Value
-        end
+        Callback = function(Value) AntiGrabEnabled = Value end
     })
 
     RunService.Heartbeat:Connect(function()
@@ -3446,9 +3612,7 @@ do
                 task.wait(0.3)
                 GucciThing:PivotTo(CFrame.new(0, 1e6, 0))
                 for _, p in pairs(GucciThing:GetDescendants()) do
-                    if p:IsA("BasePart") then
-                        p.Anchored = true
-                    end
+                    if p:IsA("BasePart") then p.Anchored = true end
                 end
             end)
             
@@ -3524,7 +3688,7 @@ do
 end
 
 -- ============================================================================
--- ブロック30: 攻撃系タブ（日本語化 + スフィアオービットキックV1追加）
+-- ブロック31: 攻撃系タブ（Theme修正 + 日本語化 + スフィアオービットキックV1）
 -- ============================================================================
 do
     local Window = _G.Window
@@ -3535,6 +3699,7 @@ do
     local RunService = _G.RunService
     local Workspace = _G.Workspace
     local UserInputService = _G.UserInputService
+    local Theme = _G.Theme   -- ★ Line 4906 エラー修正のため追加
 
     -- ============================================================================
     -- スフィアオービットキックV1 (Sphere Orbit Kick V1)
@@ -3598,9 +3763,7 @@ do
             local inv = Workspace:FindFirstChild(LocalPlayer.Name .. "SpawnedInToys")
             if inv then
                 local blob = inv:FindFirstChild("CreatureBlobman")
-                if blob and blob:FindFirstChild("VehicleSeat") then
-                    return blob
-                end
+                if blob and blob:FindFirstChild("VehicleSeat") then return blob end
             end
             return nil
         end
@@ -3615,9 +3778,7 @@ do
             local root = char:FindFirstChild("HumanoidRootPart")
             if not root then return nil end
             local spawnCF = root.CFrame + Vector3.new(0, 5, 0)
-            pcall(function()
-                st:InvokeServer("CreatureBlobman", spawnCF, Vector3.zero)
-            end)
+            pcall(function() st:InvokeServer("CreatureBlobman", spawnCF, Vector3.zero) end)
             task.wait(0.8)
             return getBlobman()
         end
@@ -3652,7 +3813,6 @@ do
                 OrionLib:MakeNotification({ Name = "エラー", Content = "自分自身はターゲットにできません", Time = 3 })
                 return false
             end
-
             if orbitRunning then
                 PlayErrorSound()
                 OrionLib:MakeNotification({ Name = "エラー", Content = "既に実行中です", Time = 3 })
@@ -3891,10 +4051,7 @@ do
             OrionLib:MakeNotification({ Name = "スフィアオービットキック", Content = "停止しました", Time = 2 })
         end
 
-        function SphereOrbitKick.isRunning()
-            return orbitRunning
-        end
-
+        function SphereOrbitKick.isRunning() return orbitRunning end
         function SphereOrbitKick.setRadius(v) ORBIT_RADIUS = v or 12 end
         function SphereOrbitKick.setSpeed(v) ORBIT_SPEED = v or 60 end
         function SphereOrbitKick.setHeight(v) ORBIT_HEIGHT = v or 10 end
@@ -3912,11 +4069,7 @@ do
     -- ============================================================================
     -- 攻撃系タブ UI
     -- ============================================================================
-    local AttackTab = Window:MakeTab({ 
-        Name = "攻撃系", 
-        Icon = "rbxassetid://4483345998", 
-        PremiumOnly = false 
-    })
+    local AttackTab = Window:MakeTab({ Name = "攻撃系", Icon = "rbxassetid://4483345998", PremiumOnly = false })
     
     AttackTab:AddParagraph("⚠️ 注意！", "悪用厳禁！")
     
@@ -3941,14 +4094,8 @@ do
         Options = getPlayerTable(),
         Callback = function(value)
             selectedKickPlayer = Players:FindFirstChild(value)
-            if not selectedKickPlayer then
-                PlayErrorSound()
-            end
-            OrionLib:MakeNotification({ 
-                Name = "プレイヤー選択", 
-                Content = "ターゲット: " .. value, 
-                Time = 2 
-            })
+            if not selectedKickPlayer then PlayErrorSound() end
+            OrionLib:MakeNotification({ Name = "プレイヤー選択", Content = "ターゲット: " .. value, Time = 2 })
         end
     })
 
@@ -3956,11 +4103,7 @@ do
         Name = "プレイヤーリスト更新",
         Callback = function()
             playerDropdown:Refresh(getPlayerTable())
-            OrionLib:MakeNotification({ 
-                Name = "プレイヤーリスト", 
-                Content = "リストを更新しました！", 
-                Time = 1 
-            })
+            OrionLib:MakeNotification({ Name = "プレイヤーリスト", Content = "リストを更新しました！", Time = 1 })
         end
     })
 
@@ -3971,11 +4114,7 @@ do
             kickLoopEnabled = on
             if on and not selectedKickPlayer then
                 PlayErrorSound()
-                OrionLib:MakeNotification({ 
-                    Name = "エラー", 
-                    Content = "先にターゲットプレイヤーを選択してください！", 
-                    Time = 2 
-                })
+                OrionLib:MakeNotification({ Name = "エラー", Content = "先にターゲットプレイヤーを選択してください！", Time = 2 })
                 kickToggle:SetValue(false)
                 return
             end
@@ -3984,29 +4123,17 @@ do
             local seat = hum and hum.SeatPart
             if on and (not seat or seat.Parent.Name ~= "CreatureBlobman") then
                 PlayErrorSound()
-                OrionLib:MakeNotification({ 
-                    Name = "エラー", 
-                    Content = "ブロブクリーチャーに座っている必要があります！", 
-                    Time = 2 
-                })
+                OrionLib:MakeNotification({ Name = "エラー", Content = "ブロブクリーチャーに座っている必要があります！", Time = 2 })
                 kickToggle:SetValue(false)
                 return
             end
             if not on then
                 kickLoopEnabled = false
-                OrionLib:MakeNotification({ 
-                    Name = "ループキックV1", 
-                    Content = "ループキックを停止しました", 
-                    Time = 1.5 
-                })
+                OrionLib:MakeNotification({ Name = "ループキックV1", Content = "ループキックを停止しました", Time = 1.5 })
                 return
             end
 
-            OrionLib:MakeNotification({ 
-                Name = "ループキックV1", 
-                Content = "開始: " .. selectedKickPlayer.Name, 
-                Time = 2 
-            })
+            OrionLib:MakeNotification({ Name = "ループキックV1", Content = "開始: " .. selectedKickPlayer.Name, Time = 2 })
 
             task.spawn(function()
                 local RS = ReplicatedStorage
@@ -4095,11 +4222,7 @@ do
                     blobRoot.Velocity = Vector3.zero
                 end
 
-                OrionLib:MakeNotification({ 
-                    Name = "ループキックV1", 
-                    Content = "停止しました", 
-                    Time = 1.5 
-                })
+                OrionLib:MakeNotification({ Name = "ループキックV1", Content = "停止しました", Time = 1.5 })
             end)
         end
     })
@@ -4134,9 +4257,7 @@ do
         Options = getOrbitPlayerNamesV2(),
         Callback = function(Value)
             selectedOrbitTargetName = orbitPlayerMap[Value] or ""
-            if selectedOrbitTargetName == "" then
-                PlayErrorSound()
-            end
+            if selectedOrbitTargetName == "" then PlayErrorSound() end
         end
     })
 
@@ -4211,11 +4332,7 @@ do
                     local GE = ReplicatedStorage:FindFirstChild("GrabEvents")
                     
                     if GE and grabRemote and dropRemote and ((lDet and lWeld) or (rDet and rWeld)) then
-                        OrionLib:MakeNotification({
-                            Name = "実行",
-                            Content = "ドリフトキックV2を開始します",
-                            Time = 3
-                        })
+                        OrionLib:MakeNotification({ Name = "実行", Content = "ドリフトキックV2を開始します", Time = 3 })
 
                         task.spawn(function()
                             local blobRoot = blobman:FindFirstChild("HumanoidRootPart") or blobman.PrimaryPart
@@ -4229,7 +4346,6 @@ do
                                     local tRoot = target.Character.HumanoidRootPart
                                     blobRoot.CFrame = tRoot.CFrame
                                     blobRoot.AssemblyLinearVelocity = Vector3.zero
-                                    
                                     pcall(function()
                                         if Det then grabRemote:FireServer(Det, tRoot, Weld) end
                                         GE.CreateGrabLine:FireServer(tRoot, Vector3.zero, tRoot.Position, false)
@@ -4258,18 +4374,13 @@ do
                                 
                                 if dropCount < 2 and (tick() - lastDropTime) > 0.8 then
                                     dropCount = dropCount + 1
-                                    
                                     pcall(function()
                                         local currentWeld = Det:FindFirstChild("RightWeld") or Det:FindFirstChild("LeftWeld") or Det:FindFirstChildWhichIsA("Weld") or Det:FindFirstChild("RigidConstraint")
-                                        if currentWeld then
-                                            dropRemote:FireServer(currentWeld)
-                                        end
+                                        if currentWeld then dropRemote:FireServer(currentWeld) end
                                         GE.DestroyGrabLine:FireServer(tRoot)
                                     end)
-                                    
                                     blobRoot.CFrame = SavedPos
                                     blobRoot.AssemblyLinearVelocity = Vector3.zero
-                                    
                                     task.wait(0.1)
                                     
                                     local reCaptureStart = tick()
@@ -4279,7 +4390,6 @@ do
                                             local currentTRoot = target.Character.HumanoidRootPart
                                             blobRoot.CFrame = currentTRoot.CFrame
                                             blobRoot.AssemblyLinearVelocity = Vector3.zero
-                                            
                                             pcall(function()
                                                 if Det then grabRemote:FireServer(Det, currentTRoot, Weld) end
                                                 GE.CreateGrabLine:FireServer(currentTRoot, Vector3.zero, currentTRoot.Position, false)
@@ -4288,7 +4398,6 @@ do
                                         end
                                         RunService.Heartbeat:Wait()
                                     end
-                                    
                                     lastTime = tick()
                                     lastDropTime = tick()
                                 end
@@ -4315,12 +4424,8 @@ do
                                         tHum.PlatformStand = true
                                         tHum.Sit = true
                                         GE.SetNetworkOwner:FireServer(tRoot, targetCenterCFrame)
-                                        
                                         local currentWeld = Det:FindFirstChild("RightWeld") or Det:FindFirstChild("LeftWeld") or Det:FindFirstChildWhichIsA("Weld") or Det:FindFirstChild("RigidConstraint")
-                                        if currentWeld then
-                                            dropRemote:FireServer(currentWeld)
-                                        end
-                                        
+                                        if currentWeld then dropRemote:FireServer(currentWeld) end
                                         GE.DestroyGrabLine:FireServer(tRoot)
                                         if Det then grabRemote:FireServer(Det, tRoot, Weld) end
                                         GE.CreateGrabLine:FireServer(tRoot, Vector3.zero, targetCenterCFrame.Position, false)
@@ -4345,37 +4450,22 @@ do
                         end)
                     else
                         PlayErrorSound()
-                        OrionLib:MakeNotification({
-                            Name = "エラー",
-                            Content = "必要なRemoteEventや検出器が見つかりません",
-                            Time = 5
-                        })
+                        OrionLib:MakeNotification({ Name = "エラー", Content = "必要なRemoteEventや検出器が見つかりません", Time = 5 })
                         orbitRunningV2 = false
                     end
                 else
                     PlayErrorSound()
-                    OrionLib:MakeNotification({
-                        Name = "エラー",
-                        Content = "ブロブマンの取得・生成に失敗しました",
-                        Time = 3
-                    })
+                    OrionLib:MakeNotification({ Name = "エラー", Content = "ブロブマンの取得・生成に失敗しました", Time = 3 })
                     orbitRunningV2 = false
                 end
             else
                 PlayErrorSound()
-                OrionLib:MakeNotification({
-                    Name = "エラー",
-                    Content = "ターゲットが無効です",
-                    Time = 3
-                })
+                OrionLib:MakeNotification({ Name = "エラー", Content = "ターゲットが無効です", Time = 3 })
                 orbitRunningV2 = false
             end
         end
     })
 
-    -- ============================================================================
-    -- ふっとばすセクション（日本語化）
-    -- ============================================================================
     AttackTab:AddSection({ Name = "ふっとばす" })
 
     local BlobmanBeta = {}
@@ -4389,9 +4479,7 @@ do
         local char = BlobmanBeta.getLocalChar()
         return char and char:FindFirstChildOfClass("Humanoid")
     end
-    function BlobmanBeta.getInv()
-        return Workspace:FindFirstChild(LocalPlayer.Name .. "SpawnedInToys")
-    end
+    function BlobmanBeta.getInv() return Workspace:FindFirstChild(LocalPlayer.Name .. "SpawnedInToys") end
 
     function BlobmanBeta.SetNetworkOwner(part)
         ReplicatedStorage.GrabEvents.SetNetworkOwner:FireServer(part, BlobmanBeta.getLocalRoot().CFrame)
@@ -4424,9 +4512,7 @@ do
 
     function BlobmanBeta.destroyBlobman()
         local blob = BlobmanBeta.getBlobman()
-        if blob then
-            ReplicatedStorage.MenuToys.DestroyToy:FireServer(blob)
-        end
+        if blob then ReplicatedStorage.MenuToys.DestroyToy:FireServer(blob) end
     end
 
     function BlobmanBeta.isSittingOnBlobman()
@@ -4458,9 +4544,7 @@ do
         local script = blob:FindFirstChild("BlobmanSeatAndOwnerScript", true)
         if not script then return end
         local remote = script:FindFirstChild("CreatureGrab")
-        if remote then
-            pcall(function() remote:FireServer(detector, target, weld) end)
-        end
+        if remote then pcall(function() remote:FireServer(detector, target, weld) end) end
     end
 
     function BlobmanBeta.blobDrop(blob, target, side)
@@ -4470,9 +4554,7 @@ do
         local script = blob:FindFirstChild("BlobmanSeatAndOwnerScript", true)
         if not script then return end
         local remote = script:FindFirstChild("CreatureDrop")
-        if remote then
-            pcall(function() remote:FireServer(detector, target) end)
-        end
+        if remote then pcall(function() remote:FireServer(detector, target) end) end
     end
 
     function BlobmanBeta.blobKick(blob, targetRoot, side)
@@ -4497,9 +4579,7 @@ do
     local function UpdateV3PlayerList(Dropdown)
         local playerNames = {}
         for _, plr in Players:GetPlayers() do
-            if plr ~= LocalPlayer then
-                table.insert(playerNames, plr.Name)
-            end
+            if plr ~= LocalPlayer then table.insert(playerNames, plr.Name) end
         end
         Dropdown:Refresh(playerNames, true)
     end
@@ -4510,27 +4590,23 @@ do
             OrionLib:MakeNotification({Name = "エラー", Content = "既に実行中です...", Time = 3})
             return
         end
-        
         if not selectedV3Player then
             PlayErrorSound()
             OrionLib:MakeNotification({Name = "エラー", Content = "先にプレイヤーを選択してください", Time = 3})
             return
         end
-        
         local targetPlayer = Players:FindFirstChild(selectedV3Player)
         if not targetPlayer then
             PlayErrorSound()
             OrionLib:MakeNotification({Name = "エラー", Content = "プレイヤーが見つかりません", Time = 3})
             return
         end
-        
         local targetChar = targetPlayer.Character
         if not targetChar then
             PlayErrorSound()
             OrionLib:MakeNotification({Name = "エラー", Content = "ターゲットにキャラクターがありません", Time = 3})
             return
         end
-        
         local targetRoot = targetChar:FindFirstChild("HumanoidRootPart")
         if not targetRoot then
             PlayErrorSound()
@@ -4550,7 +4626,6 @@ do
                     return false
                 end
             end
-            
             if not BlobmanBeta.isSittingOnBlobman() then
                 BlobmanBeta.ensureSitBlobman()
                 if not BlobmanBeta.isSittingOnBlobman() then
@@ -4559,7 +4634,6 @@ do
                     return false
                 end
             end
-            
             local myRoot = BlobmanBeta.getLocalRoot()
             if myRoot and targetRoot then
                 local oldPos = myRoot.CFrame
@@ -4569,7 +4643,6 @@ do
                 task.wait(0.25)
                 myRoot.CFrame = oldPos
             end
-            
             BlobmanBeta.destroyBlobman()
             OrionLib:MakeNotification({Name = "成功", Content = targetPlayer.Name .. " をふっとばしました！", Time = 5})
             return true
@@ -4582,16 +4655,12 @@ do
     local V3PlayerDropdown = AttackTab:AddDropdown({
         Name = "プレイヤーを選択",
         Options = {},
-        Callback = function(value)
-            selectedV3Player = value
-        end
+        Callback = function(value) selectedV3Player = value end
     })
 
     AttackTab:AddButton({
         Name = "プレイヤーリスト更新",
-        Callback = function()
-            UpdateV3PlayerList(V3PlayerDropdown)
-        end
+        Callback = function() UpdateV3PlayerList(V3PlayerDropdown) end
     })
 
     AttackTab:AddButton({
@@ -4605,18 +4674,14 @@ do
     UserInputService.JumpRequest:Connect(function()
         if InfiniteJumpV3Enabled then
             local hum = BlobmanBeta.getLocalHum()
-            if hum then
-                hum:ChangeState(Enum.HumanoidStateType.Jumping)
-            end
+            if hum then hum:ChangeState(Enum.HumanoidStateType.Jumping) end
         end
     end)
 
     AttackTab:AddToggle({
         Name = "無限ジャンプ",
         Default = false,
-        Callback = function(Value)
-            InfiniteJumpV3Enabled = Value
-        end
+        Callback = function(Value) InfiniteJumpV3Enabled = Value end
     })
 
     AttackTab:AddToggle({
@@ -4633,9 +4698,6 @@ do
         end
     })
 
-    -- ============================================================================
-    -- 全員キック（日本語化）
-    -- ============================================================================
     AttackTab:AddSection({ Name = "全員キック" })
 
     local currentBlob = nil
@@ -4649,13 +4711,9 @@ do
             if player ~= LocalPlayer then
                 local isFriend = false
                 if whitelistFriends then
-                    pcall(function()
-                        isFriend = LocalPlayer:IsFriendsWith(player.UserId)
-                    end)
+                    pcall(function() isFriend = LocalPlayer:IsFriendsWith(player.UserId) end)
                 end
-                if not isFriend then
-                    table.insert(players, player)
-                end
+                if not isFriend then table.insert(players, player) end
             end
         end
         return players
@@ -4727,12 +4785,9 @@ do
             if targetRoot then
                 myRoot.CFrame = targetRoot.CFrame
                 task.wait(0.02)
-                
                 for i = 1, 5 do
                     pcall(function()
-                        currentBlob.BlobmanSeatAndOwnerScript.CreatureGrab:FireServer(
-                            currentBlob.LeftDetector, targetRoot, currentBlob.LeftDetector.LeftWeld
-                        )
+                        currentBlob.BlobmanSeatAndOwnerScript.CreatureGrab:FireServer(currentBlob.LeftDetector, targetRoot, currentBlob.LeftDetector.LeftWeld)
                         currentBlob.BlobmanSeatAndOwnerScript.CreatureRelease:FireServer(currentBlob.LeftDetector.LeftWeld)
                     end)
                     if i < 5 then task.wait(0.08) end
@@ -4782,12 +4837,8 @@ do
             if targetRoot then
                 task.spawn(function()
                     pcall(function()
-                        currentBlob.BlobmanSeatAndOwnerScript.CreatureGrab:FireServer(
-                            currentBlob.LeftDetector, targetRoot, currentBlob.LeftDetector.LeftWeld
-                        )
-                        currentBlob.BlobmanSeatAndOwnerScript.CreatureGrab:FireServer(
-                            currentBlob.RightDetector, targetRoot, currentBlob.RightDetector.RightWeld
-                        )
+                        currentBlob.BlobmanSeatAndOwnerScript.CreatureGrab:FireServer(currentBlob.LeftDetector, targetRoot, currentBlob.LeftDetector.LeftWeld)
+                        currentBlob.BlobmanSeatAndOwnerScript.CreatureGrab:FireServer(currentBlob.RightDetector, targetRoot, currentBlob.RightDetector.RightWeld)
                     end)
                 end)
             end
@@ -4811,17 +4862,12 @@ do
         isKickAllActive = false
     end
 
-    AttackTab:AddButton({
-        Name = "全員キック",
-        Callback = KickAll
-    })
+    AttackTab:AddButton({ Name = "全員キック", Callback = KickAll })
 
     AttackTab:AddToggle({
         Name = "フレンドを除外",
         Default = false,
-        Callback = function(Value)
-            whitelistFriends = Value
-        end    
+        Callback = function(Value) whitelistFriends = Value end    
     })
 
     AttackTab:AddParagraph("ステータス", "現在の状態情報")
@@ -4864,9 +4910,7 @@ do
         Options = getSpherePlayerNames(),
         Callback = function(value)
             local name = sphereTargetMap[value] or ""
-            if name == "" then
-                PlayErrorSound()
-            end
+            if name == "" then PlayErrorSound() end
             _G._SphereOrbitTarget = name
         end
     })
@@ -4893,15 +4937,12 @@ do
 
     AttackTab:AddButton({
         Name = "⏹ 停止",
-        Callback = function()
-            SphereOrbitKick.stop()
-        end
+        Callback = function() SphereOrbitKick.stop() end
     })
 
     AttackTab:AddSlider({
         Name = "軌道半径",
-        Min = 5,
-        Max = 30,
+        Min = 5, Max = 30,
         Default = 12,
         Color = Theme.SliderColor,
         Increment = 1,
@@ -4911,8 +4952,7 @@ do
 
     AttackTab:AddSlider({
         Name = "軌道速度",
-        Min = 10,
-        Max = 150,
+        Min = 10, Max = 150,
         Default = 60,
         Color = Theme.SliderColor,
         Increment = 5,
@@ -4922,8 +4962,7 @@ do
 
     AttackTab:AddSlider({
         Name = "浮遊高さ",
-        Min = 2,
-        Max = 30,
+        Min = 2, Max = 30,
         Default = 10,
         Color = Theme.SliderColor,
         Increment = 1,
@@ -4933,8 +4972,7 @@ do
 
     AttackTab:AddSlider({
         Name = "球体傾き",
-        Min = 0.1,
-        Max = 1.5,
+        Min = 0.1, Max = 1.5,
         Default = 0.9,
         Color = Theme.SliderColor,
         Increment = 0.1,
@@ -4944,8 +4982,7 @@ do
 
     AttackTab:AddSlider({
         Name = "軌道複雑さ",
-        Min = 0.1,
-        Max = 2.0,
+        Min = 0.1, Max = 2.0,
         Default = 0.7,
         Color = Theme.SliderColor,
         Increment = 0.1,
@@ -4968,16 +5005,15 @@ do
 end
 
 -- ============================================================================
--- ブロック31: 汽車を乗っ取るタブ
+-- ブロック32: 汽車を乗っ取るタブ
 -- ============================================================================
 do
     local Window = _G.Window
     local OrionLib = _G.OrionLib
-    local ReplicatedStorage = _G.ReplicatedStorage or game:GetService("ReplicatedStorage")
-    local Players = _G.Players or game:GetService("Players")
-    local Workspace = _G.Workspace or game:GetService("Workspace")
-    local UserInputService = _G.UserInputService or game:GetService("UserInputService")
-    local LocalPlayer = _G.LocalPlayer or Players.LocalPlayer
+    local ReplicatedStorage = _G.ReplicatedStorage
+    local Players = _G.Players
+    local Workspace = _G.Workspace
+    local LocalPlayer = _G.LocalPlayer
 
     local TrainTab = Window:MakeTab({
         Name = "汽車を乗っ取る",
@@ -5026,9 +5062,7 @@ do
     local function holdItem(itemData)
         local char = getPlayerCharacter()
         if char and itemData and itemData.RemoteFunction then
-            pcall(function()
-                itemData.RemoteFunction:InvokeServer(itemData.Object, char)
-            end)
+            pcall(function() itemData.RemoteFunction:InvokeServer(itemData.Object, char) end)
         end
     end
 
@@ -5037,9 +5071,7 @@ do
             local UseRemote = ReplicatedStorage:FindFirstChild("HoldEvents")
             if UseRemote then
                 local Use = UseRemote:FindFirstChild("Use")
-                if Use then
-                    Use:FireServer(itemData.Object)
-                end
+                if Use then Use:FireServer(itemData.Object) end
             end
         end)
     end
@@ -5133,9 +5165,7 @@ do
                     occupiedSeats[seat] = player
                     if AutomationEnabled then
                         local isFirst = not firstTimeRiders[player.UserId]
-                        if isFirst then
-                            firstTimeRiders[player.UserId] = true
-                        end
+                        if isFirst then firstTimeRiders[player.UserId] = true end
                         performAutoAction(isFirst)
                     end
                 end
@@ -5143,9 +5173,7 @@ do
                 sitConn = humanoid:GetPropertyChangedSignal("Sit"):Connect(function()
                     if not humanoid.Sit and player then
                         occupiedSeats[seat] = nil
-                        if AutomationEnabled then
-                            performAutoAction(false)
-                        end
+                        if AutomationEnabled then performAutoAction(false) end
                         if sitConn then sitConn:Disconnect() end
                     end
                 end)
@@ -5157,14 +5185,10 @@ do
 
     local function startSeatDetection()
         for _, obj in pairs(Workspace:GetDescendants()) do
-            if obj:IsA("Seat") and obj.Name == "Seat" then
-                setupSeat(obj)
-            end
+            if obj:IsA("Seat") and obj.Name == "Seat" then setupSeat(obj) end
         end
         Workspace.DescendantAdded:Connect(function(obj)
-            if obj:IsA("Seat") and obj.Name == "Seat" then
-                setupSeat(obj)
-            end
+            if obj:IsA("Seat") and obj.Name == "Seat" then setupSeat(obj) end
         end)
     end
 
@@ -5177,11 +5201,7 @@ do
         end
         if #empty == 0 then
             PlayErrorSound()
-            OrionLib:MakeNotification({
-                Name = "座席なし",
-                Content = "空いている座席がありません",
-                Time = 2
-            })
+            OrionLib:MakeNotification({ Name = "座席なし", Content = "空いている座席がありません", Time = 2 })
             return
         end
 
@@ -5196,11 +5216,7 @@ do
                 root.CFrame = seat.CFrame + Vector3.new(0, 3, 0)
                 task.wait(0.2)
                 seat:Sit(hum)
-                OrionLib:MakeNotification({
-                    Name = "着席",
-                    Content = "ランダムな空席に座りました",
-                    Time = 2
-                })
+                OrionLib:MakeNotification({ Name = "着席", Content = "ランダムな空席に座りました", Time = 2 })
             end
         end
     end
@@ -5219,9 +5235,7 @@ do
             end
         end)
 
-        if AutomationEnabled and hum.SeatPart then
-            performAutoAction(true)
-        end
+        if AutomationEnabled and hum.SeatPart then performAutoAction(true) end
     end
 
     local function stopAutomation()
@@ -5243,18 +5257,10 @@ do
             if value then
                 startAutomation()
                 startSeatDetection()
-                OrionLib:MakeNotification({
-                    Name = "自動化ON",
-                    Content = "乗車/降車時に" .. TargetItemName .. "を自動操作",
-                    Time = 3
-                })
+                OrionLib:MakeNotification({ Name = "自動化ON", Content = "乗車/降車時に" .. TargetItemName .. "を自動操作", Time = 3 })
             else
                 stopAutomation()
-                OrionLib:MakeNotification({
-                    Name = "自動化OFF",
-                    Content = "停止しました",
-                    Time = 2
-                })
+                OrionLib:MakeNotification({ Name = "自動化OFF", Content = "停止しました", Time = 2 })
             end
         end
     })
@@ -5283,9 +5289,7 @@ do
             antiExplosionConn = ragdolled:GetPropertyChangedSignal("Value"):Connect(function()
                 local anchored = ragdolled.Value
                 for _, part in ipairs(char:GetChildren()) do
-                    if part:IsA("BasePart") then
-                        part.Anchored = anchored
-                    end
+                    if part:IsA("BasePart") then part.Anchored = anchored end
                 end
             end)
         end
@@ -5306,7 +5310,7 @@ do
 end
 
 -- ============================================================================
--- ブロック32: 楽譜演奏タブ
+-- ブロック33: 楽譜演奏タブ
 -- ============================================================================
 do
     local Window = _G.Window
@@ -5366,25 +5370,16 @@ do
 end
 
 -- ============================================================================
--- ブロック33: SRBMタブ
+-- ブロック34: SRBMタブ
 -- ============================================================================
 do
     local Window = _G.Window
     local OrionLib = _G.OrionLib
-    local Players = _G.Players
-    local ReplicatedStorage = _G.ReplicatedStorage
-    local Debris = _G.Debris
-    local UserInputService = _G.UserInputService
     local LocalPlayer = _G.LocalPlayer
-    local Workspace = _G.Workspace
+    local UserInputService = _G.UserInputService
     local RunService = _G.RunService
 
-    local SRBMTab = Window:MakeTab({
-        Name = "SRBM",
-        Icon = "rbxassetid://4483345998",
-        PremiumOnly = false
-    })
-
+    local SRBMTab = Window:MakeTab({ Name = "SRBM", Icon = "rbxassetid://4483345998", PremiumOnly = false })
     SRBMTab:AddParagraph("注意", "SRBM機能は自分のオブジェクトしか取得できません！")
 
     SRBMTab:AddSection({ Name = "HUD表示" })
@@ -5397,14 +5392,8 @@ do
     local hudVisible = true
 
     local function CreateHUD()
-        if hudScreenGui then
-            hudScreenGui:Destroy()
-            hudScreenGui = nil
-        end
-        if hudCoordGui then
-            hudCoordGui:Destroy()
-            hudCoordGui = nil
-        end
+        if hudScreenGui then hudScreenGui:Destroy(); hudScreenGui = nil end
+        if hudCoordGui then hudCoordGui:Destroy(); hudCoordGui = nil end
 
         hudScreenGui = Instance.new("ScreenGui")
         hudScreenGui.Name = "SRBM_HUD"
@@ -5446,7 +5435,6 @@ do
     local function StartHUD()
         if hudActive then return end
         hudActive = true
-
         CreateHUD()
 
         if coordUpdateConnection then coordUpdateConnection:Disconnect() end
@@ -5459,9 +5447,7 @@ do
                     hudCoordLabel.Text = string.format("座標: %.1f, %.1f, %.1f", pos.X, pos.Y, pos.Z)
                 end
             else
-                if hudCoordLabel then
-                    hudCoordLabel.Text = "座標: 取得中..."
-                end
+                if hudCoordLabel then hudCoordLabel.Text = "座標: 取得中..." end
             end
         end)
 
@@ -5469,64 +5455,35 @@ do
             if gameProcessed then return end
             if input.KeyCode == Enum.KeyCode.P then
                 ToggleHUDVisibility()
-                OrionLib:MakeNotification({
-                    Name = "HUD",
-                    Content = hudVisible and "表示" or "非表示",
-                    Time = 1
-                })
+                OrionLib:MakeNotification({ Name = "HUD", Content = hudVisible and "表示" or "非表示", Time = 1 })
             end
         end)
 
-        OrionLib:MakeNotification({
-            Name = "HUD表示",
-            Content = "有効化 (Pキーで表示切替)",
-            Time = 3
-        })
+        OrionLib:MakeNotification({ Name = "HUD表示", Content = "有効化 (Pキーで表示切替)", Time = 3 })
     end
 
     local function StopHUD()
         hudActive = false
-        if coordUpdateConnection then
-            coordUpdateConnection:Disconnect()
-            coordUpdateConnection = nil
-        end
-        if hudScreenGui then
-            hudScreenGui:Destroy()
-            hudScreenGui = nil
-        end
-        if hudCoordGui then
-            hudCoordGui:Destroy()
-            hudCoordGui = nil
-        end
+        if coordUpdateConnection then coordUpdateConnection:Disconnect(); coordUpdateConnection = nil end
+        if hudScreenGui then hudScreenGui:Destroy(); hudScreenGui = nil end
+        if hudCoordGui then hudCoordGui:Destroy(); hudCoordGui = nil end
         hudImageLabel = nil
         hudCoordLabel = nil
-        OrionLib:MakeNotification({
-            Name = "HUD表示",
-            Content = "無効化",
-            Time = 2
-        })
+        OrionLib:MakeNotification({ Name = "HUD表示", Content = "無効化", Time = 2 })
     end
 
     SRBMTab:AddToggle({
         Name = "HUD表示 (画像+座標)",
         Default = false,
         Callback = function(Value)
-            if Value then
-                StartHUD()
-            else
-                StopHUD()
-            end
+            if Value then StartHUD() else StopHUD() end
         end
     })
 
     SRBMTab:AddButton({
         Name = "Pキーで表示切替 (説明)",
         Callback = function()
-            OrionLib:MakeNotification({
-                Name = "操作方法",
-                Content = "Pキーで画像と座標の表示/非表示を切り替え",
-                Time = 4
-            })
+            OrionLib:MakeNotification({ Name = "操作方法", Content = "Pキーで画像と座標の表示/非表示を切り替え", Time = 4 })
         end
     })
 
@@ -5556,20 +5513,14 @@ do
 
     local function createBodyMovers(part)
         local bp = part:FindFirstChild("BP") or Instance.new("BodyPosition")
-        bp.Name = "BP"
-        bp.P = 20000
-        bp.D = 200
+        bp.Name = "BP"; bp.P = 20000; bp.D = 200
         bp.MaxForce = Vector3.new(5e6, 5e6, 5e6)
-        bp.Position = part.Position
-        bp.Parent = part
+        bp.Position = part.Position; bp.Parent = part
 
         local bg = part:FindFirstChild("BG") or Instance.new("BodyGyro")
-        bg.Name = "BG"
-        bg.P = 20000
-        bg.D = 200
+        bg.Name = "BG"; bg.P = 20000; bg.D = 200
         bg.MaxTorque = Vector3.new(5e6, 5e6, 5e6)
-        bg.CFrame = part.CFrame
-        bg.Parent = part
+        bg.CFrame = part.CFrame; bg.Parent = part
 
         part.Anchored = false
     end
@@ -5577,9 +5528,7 @@ do
     local function enableCollision(model)
         for _, p in pairs(model:GetDescendants()) do
             if p:IsA("BasePart") then
-                if originalCollides[p] == nil then
-                    originalCollides[p] = p.CanCollide
-                end
+                if originalCollides[p] == nil then originalCollides[p] = p.CanCollide end
                 p.CanCollide = originalCollides[p]
             end
         end
@@ -5590,10 +5539,7 @@ do
             if toy:IsA("Model") then
                 local part = toy:FindFirstChildWhichIsA("BasePart")
                 if part and not activeToys[toy] then
-                    activeToys[toy] = {
-                        part = part,
-                        index = math.random(1, 1000)
-                    }
+                    activeToys[toy] = { part = part, index = math.random(1, 1000) }
                     enableCollision(toy)
                     createBodyMovers(part)
                 end
@@ -5604,9 +5550,7 @@ do
     local function addToysToAura(target)
         if target == "meobject" then
             local meFolder = workspace:FindFirstChild(LocalPlayer.Name .. "SpawnedInToys")
-            if meFolder then
-                collectModelsInFolder(meFolder)
-            end
+            if meFolder then collectModelsInFolder(meFolder) end
 
             local plotsFolder = workspace:FindFirstChild("Plots")
             if plotsFolder then
@@ -5633,9 +5577,7 @@ do
     function clearEffects()
         for toy, _ in pairs(activeToys) do
             for _, child in ipairs(toy:GetDescendants()) do
-                if child:IsA("BodyMover") or child:IsA("BodyGyro") then
-                    child:Destroy()
-                end
+                if child:IsA("BodyMover") or child:IsA("BodyGyro") then child:Destroy() end
             end
             enableCollision(toy)
         end
@@ -5644,15 +5586,10 @@ do
 
     local function bombMissileEffect()
         local camera = workspace.CurrentCamera
-        
         local missile = nil
         for toy, data in pairs(activeToys) do
-            if toy.Name == "BombMissile" then
-                missile = toy
-                break
-            end
+            if toy.Name == "BombMissile" then missile = toy; break end
         end
-        
         if not missile then
             if originalCameraSubject then
                 camera.CameraSubject = originalCameraSubject
@@ -5662,20 +5599,16 @@ do
             end
             return
         end
-        
         local part = missile:FindFirstChildWhichIsA("BasePart")
         if not part or not part:FindFirstChild("BP") or not part:FindFirstChild("BG") then return end
-        
         if not bombMissileStartTime then
             bombMissileStartTime = os.clock()
             originalCameraSubject = camera.CameraSubject
             originalCameraType = camera.CameraType
             camera.CameraSubject = part
         end
-        
         local elapsed = os.clock() - bombMissileStartTime
         local speed = 2
-
         if elapsed < 5 then
             part.BP.Position = part.Position + Vector3.new(0, speed, 0)
         else
@@ -5688,12 +5621,8 @@ do
         local camera = workspace.CurrentCamera
         local heli = nil
         for toy, data in pairs(activeToys) do
-            if toy.Name == "FlyingToyHelicopter" then
-                heli = toy
-                break
-            end
+            if toy.Name == "FlyingToyHelicopter" then heli = toy; break end
         end
-
         if not heli then
             if originalCameraSubject then
                 camera.CameraSubject = originalCameraSubject
@@ -5705,52 +5634,29 @@ do
             end
             return
         end
-
         local part = heli:FindFirstChildWhichIsA("BasePart")
         if not part or not part:FindFirstChild("BP") or not part:FindFirstChild("BG") then return end
-
         if not originalCameraSubject then
             originalCameraSubject = camera.CameraSubject
             originalCameraType = camera.CameraType
-            
             local cameraTarget = heli:FindFirstChild("Body") or part
             camera.CameraSubject = cameraTarget
-            
             if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
                 LocalPlayer.Character.HumanoidRootPart.Anchored = true
             end
         end
-
         local moveSpeed = 0.3
         local rotateSpeed = 1.5
         local verticalSpeed = 0.3
-
         local moveDir = Vector3.new(0, 0, 0)
         local rotationChange = 0
-
-        if keysDown[Enum.KeyCode.W] then
-            moveDir = moveDir - part.CFrame.LookVector * moveSpeed
-        end
-        if keysDown[Enum.KeyCode.S] then
-            moveDir = moveDir + part.CFrame.LookVector * moveSpeed
-        end
-        if keysDown[Enum.KeyCode.A] then
-            rotationChange = rotationChange + rotateSpeed
-        end
-        if keysDown[Enum.KeyCode.D] then
-            rotationChange = rotationChange - rotateSpeed
-        end
-        if keysDown[Enum.KeyCode.Z] then
-            moveDir = moveDir + Vector3.new(0, verticalSpeed, 0)
-        end
-        if keysDown[Enum.KeyCode.X] then
-            moveDir = moveDir - Vector3.new(0, verticalSpeed, 0)
-        end
-
-        if moveDir.Magnitude > 0 then
-            part.BP.Position = part.Position + moveDir
-        end
-
+        if keysDown[Enum.KeyCode.W] then moveDir = moveDir - part.CFrame.LookVector * moveSpeed end
+        if keysDown[Enum.KeyCode.S] then moveDir = moveDir + part.CFrame.LookVector * moveSpeed end
+        if keysDown[Enum.KeyCode.A] then rotationChange = rotationChange + rotateSpeed end
+        if keysDown[Enum.KeyCode.D] then rotationChange = rotationChange - rotateSpeed end
+        if keysDown[Enum.KeyCode.Z] then moveDir = moveDir + Vector3.new(0, verticalSpeed, 0) end
+        if keysDown[Enum.KeyCode.X] then moveDir = moveDir - Vector3.new(0, verticalSpeed, 0) end
+        if moveDir.Magnitude > 0 then part.BP.Position = part.Position + moveDir end
         if rotationChange ~= 0 then
             local x, y, z = part.BG.CFrame:ToEulerAnglesYXZ()
             part.BG.CFrame = CFrame.fromEulerAnglesYXZ(x, y + math.rad(rotationChange), z)
@@ -5758,21 +5664,14 @@ do
     end
 
     local function combinedEffect()
-        if toys.mod == "BombMissile" then
-            bombMissileEffect()
-        elseif toys.mod == "Helicopter" then
-            helicopterEffect()
-        end
+        if toys.mod == "BombMissile" then bombMissileEffect()
+        elseif toys.mod == "Helicopter" then helicopterEffect() end
     end
 
     function toggleEffect()
         if toys.isMoving then
             addToysToAura(selectedTarget)
-
-            if effectCoroutine then
-                coroutine.close(effectCoroutine)
-            end
-
+            if effectCoroutine then coroutine.close(effectCoroutine) end
             effectCoroutine = coroutine.create(function()
                 while toys.isMoving do
                     combinedEffect()
@@ -5786,14 +5685,12 @@ do
                 effectCoroutine = nil
             end
             clearEffects()
-            
             if originalCameraSubject then
                 local camera = workspace.CurrentCamera
                 camera.CameraSubject = originalCameraSubject
                 camera.CameraType = originalCameraType
                 originalCameraSubject = nil
                 bombMissileStartTime = nil
-                
                 if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
                     LocalPlayer.Character.HumanoidRootPart.Anchored = false
                 end
@@ -5851,18 +5748,13 @@ do
 end
 
 -- ============================================================================
--- ブロック34: リソースパックタブ
+-- ブロック35: リソースパックタブ
 -- ============================================================================
 do
     local Window = _G.Window
     local OrionLib = _G.OrionLib
 
-    local ResourcePackTab = Window:MakeTab({ 
-        Name = "リソースパック", 
-        Icon = "rbxassetid://4483362458", 
-        PremiumOnly = false 
-    })
-
+    local ResourcePackTab = Window:MakeTab({ Name = "リソースパック", Icon = "rbxassetid://4483362458", PremiumOnly = false })
     ResourcePackTab:AddSection({ Name = "リソースパック読み込み" })
 
     ResourcePackTab:AddButton({
@@ -5872,18 +5764,10 @@ do
                 loadstring(game:HttpGet("https://pastefy.app/XNJSi96W/raw"))()
             end)
             if success then
-                OrionLib:MakeNotification({
-                    Name = "リソースパックV1",
-                    Content = "読み込み成功！ TractorGreenの見た目を置き換えました",
-                    Time = 4
-                })
+                OrionLib:MakeNotification({ Name = "リソースパックV1", Content = "読み込み成功！ TractorGreenの見た目を置き換えました", Time = 4 })
             else
                 PlayErrorSound()
-                OrionLib:MakeNotification({
-                    Name = "リソースパックV1",
-                    Content = "読み込み失敗: " .. tostring(err),
-                    Time = 5
-                })
+                OrionLib:MakeNotification({ Name = "リソースパックV1", Content = "読み込み失敗: " .. tostring(err), Time = 5 })
             end
         end
     })
@@ -5895,7 +5779,7 @@ do
 end
 
 -- ============================================================================
--- ブロック35: スクリプトhubタブ（樱花AI と かめはめ波GUI を削除）
+-- ブロック36: スクリプトhubタブ（樱花AI と かめはめ波GUI 削除済み）
 -- ============================================================================
 do
     local Window = _G.Window
@@ -5923,29 +5807,17 @@ do
     ScriptHubTab:AddButton({ Name = "空変え", Callback = function() executeScript("https://rawscripts.net/raw/Universal-Script-SkyBoxinjectHUB-80671", "空変え") end })
     ScriptHubTab:AddButton({ Name = "テトリス", Callback = function() executeScript("https://rawscripts.net/raw/Universal-Script-RTetris-76191", "テトリス") end })
     ScriptHubTab:AddButton({ Name = "クロスケ作v式飛行", Callback = function() executeScript("https://rawscripts.net/raw/Universal-Script-VFly-gui-and-noclip-78112", "クロスケ作v式飛行") end })
-    ScriptHubTab:AddButton({ 
-        Name = "HokutoHUB", 
-        Callback = function() 
-            executeScript("https://raw.githubusercontent.com/SaturnGroup02/Sakurahub-SabuHUB/06bb272eb235d0cee619c2d78355f62cdbe512da/HokutoHUB", "HokutoHUB") 
-        end 
-    })
-    ScriptHubTab:AddButton({ Name = "uiを日本語に翻訳", Callback = function() 
-        executeScript("https://pastefy.app/HCUekFMV/raw", "uiを日本語に翻訳") 
-    end })
-    ScriptHubTab:AddButton({ Name = "FTAP TP", Callback = function() 
-        executeScript("https://pastefy.app/pAbXnxgr/raw", "FTAP TP") 
-    end })
-    -- 樱花AI と かめはめ波GUI は削除されました
+    ScriptHubTab:AddButton({ Name = "HokutoHUB", Callback = function() executeScript("https://raw.githubusercontent.com/SaturnGroup02/Sakurahub-SabuHUB/06bb272eb235d0cee619c2d78355f62cdbe512da/HokutoHUB", "HokutoHUB") end })
+    ScriptHubTab:AddButton({ Name = "uiを日本語に翻訳", Callback = function() executeScript("https://pastefy.app/HCUekFMV/raw", "uiを日本語に翻訳") end })
+    ScriptHubTab:AddButton({ Name = "FTAP TP", Callback = function() executeScript("https://pastefy.app/pAbXnxgr/raw", "FTAP TP") end })
 end
 
 -- ============================================================================
--- ブロック36: オブジェクト設定タブ
+-- ブロック37: オブジェクト設定タブ
 -- ============================================================================
 do
     local Window = _G.Window
-    local OrionLib = _G.OrionLib
     local SH = _G.SH
-    local Theme = _G.Theme
     local changeObjectID = _G.changeObjectID
 
     local ObjectIDTab = Window:MakeTab({ Name = "オブジェクト設定", Icon = "rbxassetid://4483362458", PremiumOnly = false })
@@ -5962,14 +5834,13 @@ do
 end
 
 -- ============================================================================
--- ブロック37: バリア破壊タブ
+-- ブロック38: バリア破壊タブ
 -- ============================================================================
 do
     local Window = _G.Window
     local OrionLib = _G.OrionLib
     local LocalPlayer = _G.LocalPlayer
     local ReplicatedStorage = _G.ReplicatedStorage
-    local Workspace = _G.Workspace
 
     local BarrierBreakTab = Window:MakeTab({ Name = "バリア破壊", Icon = "rbxassetid://4483362458", PremiumOnly = false })
     BarrierBreakTab:AddSection({ Name = "バリア破壊機能" })
@@ -6064,11 +5935,10 @@ do
 end
 
 -- ============================================================================
--- ブロック38: フェザータブ
+-- ブロック39: フェザータブ
 -- ============================================================================
 do
     local Window = _G.Window
-    local OrionLib = _G.OrionLib
     local SH = _G.SH
     local Theme = _G.Theme
 
@@ -6084,11 +5954,10 @@ do
 end
 
 -- ============================================================================
--- ブロック39: 羽V2タブ
+-- ブロック40: 羽V2タブ
 -- ============================================================================
 do
     local Window = _G.Window
-    local OrionLib = _G.OrionLib
     local SH = _G.SH
     local Theme = _G.Theme
 
@@ -6105,7 +5974,7 @@ do
 end
 
 -- ============================================================================
--- ブロック40: 土星スパークラータブ
+-- ブロック41: 土星スパークラータブ
 -- ============================================================================
 do
     local Window = _G.Window
@@ -6144,11 +6013,10 @@ do
 end
 
 -- ============================================================================
--- ブロック41: 魔法陣タブ
+-- ブロック42: 魔法陣タブ
 -- ============================================================================
 do
     local Window = _G.Window
-    local OrionLib = _G.OrionLib
     local SH = _G.SH
     local Theme = _G.Theme
 
@@ -6163,11 +6031,81 @@ do
 end
 
 -- ============================================================================
--- ブロック42: 観覧車タブ
+-- ブロック43: 竜巻トイMOD（SuperRing）タブ - 魔法陣の次
 -- ============================================================================
 do
     local Window = _G.Window
     local OrionLib = _G.OrionLib
+    local SH = _G.SH
+    local Theme = _G.Theme
+
+    local SuperRingTab = Window:MakeTab({
+        Name = "竜巻トイMOD",
+        Icon = "rbxassetid://4483362458",
+        PremiumOnly = false
+    })
+
+    SuperRingTab:AddSection({ Name = "基本設定" })
+    SuperRingTab:AddToggle({ Name = "竜巻トイMOD 起動", Default = false, Callback = _G.toggleSuperRing })
+    SuperRingTab:AddToggle({ Name = "プレイヤー追従", Default = SH.SuperRingConfig.FollowPlayer, Callback = function(v) SH.SuperRingConfig.FollowPlayer = v end })
+    SuperRingTab:AddToggle({ Name = "竜巻効果（渦巻き）", Default = SH.SuperRingConfig.TornadoEffect, Callback = function(v) SH.SuperRingConfig.TornadoEffect = v end })
+
+    SuperRingTab:AddSection({ Name = "サイズ設定" })
+    SuperRingTab:AddSlider({ Name = "基本半径", Min = 1, Max = 10, Default = SH.SuperRingConfig.Radius, Color = Theme.SliderColor, Increment = 0.5, ValueName = "スタッド", Callback = function(v) SH.SuperRingConfig.Radius = v end })
+    SuperRingTab:AddSlider({ Name = "基本高さ", Min = 0, Max = 10, Default = SH.SuperRingConfig.BaseHeight, Color = Theme.SliderColor, Increment = 0.5, ValueName = "スタッド", Callback = function(v) SH.SuperRingConfig.BaseHeight = v end })
+    SuperRingTab:AddSlider({
+        Name = "全体の高さ",
+        Min = 5, Max = 30,
+        Default = SH.SuperRingConfig.Height,
+        Color = Theme.SliderColor,
+        Increment = 1,
+        ValueName = "スタッド",
+        Callback = function(v)
+            SH.SuperRingConfig.Height = v
+            if SH.SuperRingConfig.Enabled then _G.toggleSuperRing(false); task.wait(0.1); _G.toggleSuperRing(true) end
+        end
+    })
+    SuperRingTab:AddSlider({
+        Name = "花火の数",
+        Min = 8, Max = 32,
+        Default = SH.SuperRingConfig.ObjectCount,
+        Color = Theme.SliderColor,
+        Increment = 2,
+        ValueName = "個",
+        Callback = function(v)
+            SH.SuperRingConfig.ObjectCount = v
+            if SH.SuperRingConfig.Enabled then _G.toggleSuperRing(false); task.wait(0.1); _G.toggleSuperRing(true) end
+        end
+    })
+
+    SuperRingTab:AddSection({ Name = "動き設定" })
+    SuperRingTab:AddSlider({ Name = "回転速度", Min = 0, Max = 5, Default = SH.SuperRingConfig.RotationSpeed, Color = Theme.SliderColor, Increment = 0.1, ValueName = "速度", Callback = function(v) SH.SuperRingConfig.RotationSpeed = v end })
+    SuperRingTab:AddSlider({ Name = "らせん速度", Min = 0, Max = 3, Default = SH.SuperRingConfig.SpiralSpeed, Color = Theme.SliderColor, Increment = 0.1, ValueName = "速度", Callback = function(v) SH.SuperRingConfig.SpiralSpeed = v end })
+    SuperRingTab:AddSlider({ Name = "波の速度", Min = 0, Max = 3, Default = SH.SuperRingConfig.WaveSpeed, Color = Theme.SliderColor, Increment = 0.1, ValueName = "速度", Callback = function(v) SH.SuperRingConfig.WaveSpeed = v end })
+    SuperRingTab:AddSlider({ Name = "波の振幅", Min = 0, Max = 2, Default = SH.SuperRingConfig.WaveAmplitude, Color = Theme.SliderColor, Increment = 0.1, ValueName = "スタッド", Callback = function(v) SH.SuperRingConfig.WaveAmplitude = v end })
+
+    SuperRingTab:AddSection({ Name = "制御" })
+    SuperRingTab:AddButton({
+        Name = "花火を再検出",
+        Callback = function()
+            if SH.SuperRingConfig.Enabled then
+                _G.toggleSuperRing(false)
+                task.wait(0.1)
+                _G.toggleSuperRing(true)
+                OrionLib:MakeNotification({ Name = "再検出完了", Content = "花火を再検出しました", Time = 3 })
+            else
+                PlayErrorSound()
+                OrionLib:MakeNotification({ Name = "エラー", Content = "先に起動してください", Time = 3 })
+            end
+        end
+    })
+end
+
+-- ============================================================================
+-- ブロック44: 観覧車タブ
+-- ============================================================================
+do
+    local Window = _G.Window
     local SH = _G.SH
     local Theme = _G.Theme
 
@@ -6186,11 +6124,10 @@ do
 end
 
 -- ============================================================================
--- ブロック43: ♡ハート//タブ
+-- ブロック45: ♡ハート//タブ
 -- ============================================================================
 do
     local Window = _G.Window
-    local OrionLib = _G.OrionLib
     local SH = _G.SH
     local Theme = _G.Theme
 
@@ -6206,11 +6143,10 @@ do
 end
 
 -- ============================================================================
--- ブロック44: 縦ハート//タブ
+-- ブロック46: 縦ハート//タブ
 -- ============================================================================
 do
     local Window = _G.Window
-    local OrionLib = _G.OrionLib
     local SH = _G.SH
     local Theme = _G.Theme
 
@@ -6226,11 +6162,10 @@ do
 end
 
 -- ============================================================================
--- ブロック45: おっきぃ♡タブ
+-- ブロック47: おっきぃ♡タブ
 -- ============================================================================
 do
     local Window = _G.Window
-    local OrionLib = _G.OrionLib
     local SH = _G.SH
     local Theme = _G.Theme
 
@@ -6248,11 +6183,10 @@ do
 end
 
 -- ============================================================================
--- ブロック46: 縦おっきぃ♡タブ
+-- ブロック48: 縦おっきぃ♡タブ
 -- ============================================================================
 do
     local Window = _G.Window
-    local OrionLib = _G.OrionLib
     local SH = _G.SH
     local Theme = _G.Theme
 
@@ -6269,22 +6203,15 @@ do
 end
 
 -- ============================================================================
--- ブロック47: 卍タブ
+-- ブロック49: 卍タブ
 -- ============================================================================
 do
     local Window = _G.Window
     local OrionLib = _G.OrionLib
-    local Players = _G.Players
-    local Workspace = _G.Workspace
-    local RunService = _G.RunService
     local LocalPlayer = _G.LocalPlayer
+    local Workspace = _G.Workspace
 
-    local ManjiTab = Window:MakeTab({ 
-        Name = "卍", 
-        Icon = "rbxassetid://4483362458", 
-        PremiumOnly = false 
-    })
-
+    local ManjiTab = Window:MakeTab({ Name = "卍", Icon = "rbxassetid://4483362458", PremiumOnly = false })
     ManjiTab:AddSection({ Name = "コントロール" })
 
     local isRunning = false
@@ -6304,9 +6231,7 @@ do
         for _, v in pairs(folder:GetChildren()) do
             if v:IsA("Model") and v.Name == "FireworkSparkler" then
                 local base = v:FindFirstChild("Base")
-                if base then
-                    table.insert(result, base)
-                end
+                if base then table.insert(result, base) end
             end
         end
         return result
@@ -6349,20 +6274,11 @@ do
         sparklers = GetSparklers()
         if #sparklers < 2 then
             PlayErrorSound()
-            OrionLib:MakeNotification({
-                Name = "エラー",
-                Content = "スパークラーが2つ必要です",
-                Time = 3
-            })
+            OrionLib:MakeNotification({ Name = "エラー", Content = "スパークラーが2つ必要です", Time = 3 })
             return
         end
-
         isRunning = true
-        OrionLib:MakeNotification({
-            Name = "卍",
-            Content = "開始（両方往復）",
-            Time = 2
-        })
+        OrionLib:MakeNotification({ Name = "卍", Content = "開始（両方往復）", Time = 2 })
 
         loopTask = task.spawn(function()
             local total = 20
@@ -6372,24 +6288,12 @@ do
                     local root = char:FindFirstChild("HumanoidRootPart")
                     if root then
                         local centerPos = root.Position + Vector3.new(0, 5, 0)
-
                         step1 = step1 + speed * dir1
-                        if step1 >= total then
-                            step1 = total
-                            dir1 = -1
-                        elseif step1 <= 0 then
-                            step1 = 0
-                            dir1 = 1
-                        end
-
+                        if step1 >= total then step1 = total; dir1 = -1
+                        elseif step1 <= 0 then step1 = 0; dir1 = 1 end
                         step2 = step2 + speed * dir2
-                        if step2 >= total then
-                            step2 = total
-                            dir2 = -1
-                        elseif step2 <= 0 then
-                            step2 = 0
-                            dir2 = 1
-                        end
+                        if step2 >= total then step2 = total; dir2 = -1
+                        elseif step2 <= 0 then step2 = 0; dir2 = 1 end
 
                         local p1 = sparklers[1]
                         if p1 and p1.Parent then
@@ -6397,7 +6301,6 @@ do
                             p1.CFrame = CFrame.new(centerPos + pos1, centerPos + pos1 + Vector3.new(0, 1, 0))
                             p1.AssemblyLinearVelocity = Vector3.zero
                         end
-
                         local p2 = sparklers[2]
                         if p2 and p2.Parent then
                             local pos2 = GetHalfManjiRotated(step2, size)
@@ -6408,72 +6311,32 @@ do
                 end
                 task.wait()
             end
-            OrionLib:MakeNotification({
-                Name = "卍",
-                Content = "終了",
-                Time = 2
-            })
         end)
     end
 
     local function StopManjiLoop()
         isRunning = false
-        if loopTask then
-            task.cancel(loopTask)
-            loopTask = nil
-        end
-        OrionLib:MakeNotification({
-            Name = "卍",
-            Content = "停止",
-            Time = 2
-        })
+        if loopTask then task.cancel(loopTask); loopTask = nil end
+        OrionLib:MakeNotification({ Name = "卍", Content = "停止", Time = 2 })
     end
 
     ManjiTab:AddToggle({
         Name = "🔄 卍（両方往復）",
         Default = false,
         Callback = function(Value)
-            if Value then
-                StartManjiLoop()
-            else
-                StopManjiLoop()
-            end
+            if Value then StartManjiLoop() else StopManjiLoop() end
         end
     })
 
     ManjiTab:AddSection({ Name = "設定" })
-
-    ManjiTab:AddSlider({
-        Name = "卍の大きさ",
-        Min = 1,
-        Max = 10,
-        Default = 3,
-        Color = _G.Theme.SliderColor,
-        Increment = 1,
-        ValueName = "スタッド",
-        Callback = function(v) size = v end
-    })
-
-    ManjiTab:AddSlider({
-        Name = "描く速さ",
-        Min = 5,
-        Max = 300,
-        Default = 30,
-        Color = _G.Theme.SliderColor,
-        Increment = 5,
-        ValueName = "速度",
-        Callback = function(v) speed = v / 100 end
-    })
+    ManjiTab:AddSlider({ Name = "卍の大きさ", Min = 1, Max = 10, Default = 3, Color = _G.Theme.SliderColor, Increment = 1, ValueName = "スタッド", Callback = function(v) size = v end })
+    ManjiTab:AddSlider({ Name = "描く速さ", Min = 5, Max = 300, Default = 30, Color = _G.Theme.SliderColor, Increment = 5, ValueName = "速度", Callback = function(v) speed = v / 100 end })
 
     ManjiTab:AddButton({
         Name = "スパークラーを再スキャン",
         Callback = function()
             sparklers = GetSparklers()
-            OrionLib:MakeNotification({
-                Name = "再スキャン",
-                Content = string.format("スパークラーを %d 個検出しました", #sparklers),
-                Time = 2
-            })
+            OrionLib:MakeNotification({ Name = "再スキャン", Content = string.format("スパークラーを %d 個検出しました", #sparklers), Time = 2 })
         end
     })
 
@@ -6485,11 +6348,10 @@ do
 end
 
 -- ============================================================================
--- ブロック48: 球体◯タブ
+-- ブロック50: 球体◯タブ
 -- ============================================================================
 do
     local Window = _G.Window
-    local OrionLib = _G.OrionLib
     local SH = _G.SH
     local Theme = _G.Theme
 
@@ -6507,11 +6369,10 @@ do
 end
 
 -- ============================================================================
--- ブロック49: ダビデの星✡タブ
+-- ブロック51: ダビデの星✡タブ
 -- ============================================================================
 do
     local Window = _G.Window
-    local OrionLib = _G.OrionLib
     local SH = _G.SH
     local Theme = _G.Theme
 
@@ -6527,11 +6388,10 @@ do
 end
 
 -- ============================================================================
--- ブロック50: スター★タブ
+-- ブロック52: スター★タブ
 -- ============================================================================
 do
     local Window = _G.Window
-    local OrionLib = _G.OrionLib
     local SH = _G.SH
     local Theme = _G.Theme
 
@@ -6547,11 +6407,10 @@ do
 end
 
 -- ============================================================================
--- ブロック51: スター2✫タブ
+-- ブロック53: スター2✫タブ
 -- ============================================================================
 do
     local Window = _G.Window
-    local OrionLib = _G.OrionLib
     local SH = _G.SH
     local Theme = _G.Theme
 
@@ -6571,11 +6430,10 @@ do
 end
 
 -- ============================================================================
--- ブロック52: N1,N2,N3タブ
+-- ブロック54: N1,N2,N3タブ
 -- ============================================================================
 do
     local Window = _G.Window
-    local OrionLib = _G.OrionLib
     local SH = _G.SH
     local Theme = _G.Theme
 
@@ -6609,7 +6467,7 @@ do
 end
 
 -- ============================================================================
--- ブロック53: 情報とサポートタブ
+-- ブロック55: 情報とサポートタブ
 -- ============================================================================
 do
     local Window = _G.Window
@@ -6617,7 +6475,7 @@ do
 
     local InfoTab = Window:MakeTab({ Name = "情報とサポート", Icon = "rbxassetid://4483362458", PremiumOnly = false })
     InfoTab:AddSection({ Name = "詳細" })
-    InfoTab:AddLabel("バージョン: V0.7.2.135")
+    InfoTab:AddLabel("バージョン: V0.7.2.138")
     InfoTab:AddLabel("開発グループ: 土星グループ")
     InfoTab:AddSection({ Name = "リンク" })
     InfoTab:AddButton({ Name = "サポートサーバーに参加[ディスコードグローバル]", Callback = function()
@@ -6631,28 +6489,19 @@ do
 end
 
 -- ============================================================================
--- ブロック54: 完了通知
+-- ブロック56: 完了通知
 -- ============================================================================
 do
     local OrionLib = _G.OrionLib
-
     task.wait(1)
-    
-    -- 起動時効果音（ACTION_SOUND）
     PlayActionSound()
-    
     OrionLib:MakeNotification({
         Name = "🌸さくらhubV0.7🌸起動完了",
-        Content = "v0.7.2.135",
+        Content = "v0.7.2.138",
         Image = "rbxassetid://4483362458",
         Time = 5
     })
-
     print("==========================================")
-    print("🌸さくらhubV0.7🌸 v0.7.2.135")
-    print("✅ エラー音実装完了")
-    print("✅ スフィアオービットキックV1追加")
-    print("✅ 攻撃タブ日本語化")
-    print("✅ スクリプトhubから樱花AI/かめはめ波削除")
+    print("🌸さくらhubV0.7🌸 v0.7.2.138")
     print("==========================================")
 end
