@@ -1,5 +1,5 @@
 -- ============================================================================
--- 🌸さくらhubV0.7🌸 (v0.7.2.138)
+-- 🌸さくらhubV0.7🌸 (v0.7.2.139)
 -- ============================================================================
 
 -- ============================================================================
@@ -86,38 +86,22 @@ do
             sound.SoundId = soundId
             sound.Volume = volume or 1.0
             sound.Parent = game:GetService("SoundService")
-            
-            if not sound.IsLoaded then
-                sound.Loaded:Wait()
-            end
-            
+            if not sound.IsLoaded then sound.Loaded:Wait() end
             sound:Play()
-            
             local conn
             conn = sound.Ended:Connect(function()
                 if conn then conn:Disconnect() end
                 sound:Destroy()
             end)
-            
             task.delay(6, function()
-                if sound and sound.Parent then
-                    sound:Destroy()
-                end
+                if sound and sound.Parent then sound:Destroy() end
             end)
         end)
     end
 
-    function PlayActionSound()
-        PlaySound(ACTION_SOUND_ID, VOLUME_CONFIG.ACTION)
-    end
-
-    function PlayErrorSound()
-        PlaySound(ERROR_SOUND_ID, VOLUME_CONFIG.ERROR)
-    end
-
-    function PlayOpenCloseSound()
-        PlaySound(OPEN_CLOSE_SOUND_ID, VOLUME_CONFIG.OPEN_CLOSE)
-    end
+    function PlayActionSound() PlaySound(ACTION_SOUND_ID, VOLUME_CONFIG.ACTION) end
+    function PlayErrorSound() PlaySound(ERROR_SOUND_ID, VOLUME_CONFIG.ERROR) end
+    function PlayOpenCloseSound() PlaySound(OPEN_CLOSE_SOUND_ID, VOLUME_CONFIG.OPEN_CLOSE) end
 
     _G.PlaySound = PlaySound
     _G.PlayActionSound = PlayActionSound
@@ -177,7 +161,6 @@ end
 -- ============================================================================
 do
     local SH = _G.SH
-
     SH.ObjectIDConfig = {
         CurrentObjectID = "FireworkSparkler",
         AvailableObjects = {
@@ -211,40 +194,19 @@ do
     SH.AnimN3Config = { Enabled = false, Height = 8.0, ExplosionRadius = 25.0, ObjectCount = 80, CycleSpeed = 2.0, Randomness = 5.0, FollowPlayer = true }
 
     SH.WingConfig = {
-        Enabled = false,
-        VerticalOffset = 2.0,
-        Spread = 5.0,
-        ObjectCount = 10,
-        FlapShape = 2.0,
-        FlapSpeed = 1.0,
-        FlapAmount = 3.0,
-        ChainDelay = 0.01
+        Enabled = false, VerticalOffset = 2.0, Spread = 5.0, ObjectCount = 10,
+        FlapShape = 2.0, FlapSpeed = 1.0, FlapAmount = 3.0, ChainDelay = 0.01
     }
 
     SH.SaturnConfig = {
-        Enabled = false,
-        Mode = "saturn",
-        MaxVel = 700,
-        Strength = 16,
-        BaseHeight = 6,
-        RingRadius = 12,
-        RingSpeed = 1.5,
-        SphereRadius = 5,
-        SphereSpeed = 1,
-        SphereLayers = 5,
-        PlotRadius = 15,
-        PlotHeight = 0.5,
-        ModelName = "FireworkSparkler"
+        Enabled = false, Mode = "saturn", MaxVel = 700, Strength = 16, BaseHeight = 6,
+        RingRadius = 12, RingSpeed = 1.5, SphereRadius = 5, SphereSpeed = 1,
+        SphereLayers = 5, PlotRadius = 15, PlotHeight = 0.5, ModelName = "FireworkSparkler"
     }
 
     SH.PianoConfig = {
-        Enabled = false,
-        FollowPlayer = true,
-        SongData = nil,
-        IsPlaying = false,
-        Keyboard = nil,
-        UpdateConnection = nil,
-        OriginalCollisions = {},
+        Enabled = false, FollowPlayer = true, SongData = nil, IsPlaying = false,
+        Keyboard = nil, UpdateConnection = nil, OriginalCollisions = {},
         KeyMap = {
             ["1"] = "Key1C", ["2"] = "Key1D", ["3"] = "Key1E", ["4"] = "Key1F", 
             ["5"] = "Key1G", ["6"] = "Key1A", ["7"] = "Key1B", ["8"] = "Key2C",
@@ -258,43 +220,20 @@ do
     }
 
     SH.VerticalHeartConfig = {
-        Enabled = false,
-        Height = 5.0,
-        Size = 5.0,
-        ObjectCount = 12,
-        RotationSpeed = 1.0,
-        PulseSpeed = 2.0,
-        PulseAmplitude = 0.5,
-        FollowPlayer = true
+        Enabled = false, Height = 5.0, Size = 5.0, ObjectCount = 12,
+        RotationSpeed = 1.0, PulseSpeed = 2.0, PulseAmplitude = 0.5, FollowPlayer = true
     }
 
     SH.VerticalBigHeartConfig = {
-        Enabled = false,
-        Height = 8.0,
-        Size = 10.0,
-        ObjectCount = 20,
-        RotationSpeed = 0.5,
-        RotationSpeedMax = 10.0,
-        PulseSpeed = 1.0,
-        PulseSpeedMax = 10.0,
-        PulseAmplitude = 1.0,
-        FollowPlayer = true,
-        HeartScale = 2.0
+        Enabled = false, Height = 8.0, Size = 10.0, ObjectCount = 20,
+        RotationSpeed = 0.5, RotationSpeedMax = 10.0, PulseSpeed = 1.0, PulseSpeedMax = 10.0,
+        PulseAmplitude = 1.0, FollowPlayer = true, HeartScale = 2.0
     }
 
-    -- ★ スーパーリング（竜巻）設定
     SH.SuperRingConfig = {
-        Enabled = false,
-        BaseHeight = 2.0,
-        Height = 10.0,
-        Radius = 3.0,
-        ObjectCount = 16,
-        RotationSpeed = 2.0,
-        SpiralSpeed = 1.0,
-        WaveSpeed = 1.5,
-        WaveAmplitude = 0.5,
-        FollowPlayer = true,
-        TornadoEffect = true,
+        Enabled = false, BaseHeight = 2.0, Height = 10.0, Radius = 3.0,
+        ObjectCount = 16, RotationSpeed = 2.0, SpiralSpeed = 1.0, WaveSpeed = 1.5,
+        WaveAmplitude = 0.5, FollowPlayer = true, TornadoEffect = true,
     }
 end
 
@@ -303,7 +242,6 @@ end
 -- ============================================================================
 do
     local PhysicsService = _G.PhysicsService
-
     local SATURN_GROUP_NAME = "SparklerGroup"
     pcall(function()
         PhysicsService:RegisterCollisionGroup(SATURN_GROUP_NAME)
@@ -317,7 +255,6 @@ end
 -- ============================================================================
 do
     local SH = _G.SH
-
     SH.featherToys = {}; SH.featherRowPoints = {}; SH.featherAssignedToys = {}; SH.featherLoopConn = nil; SH.featherTime = 0
     SH.magicCircleList = {}; SH.magicCircleLoopConn = nil; SH.magicCircleTAccum = 0
     SH.heartToys = {}; SH.heartPoints = {}; SH.heartAssignedToys = {}; SH.heartLoopConn = nil; SH.heartTime = 0
@@ -334,13 +271,7 @@ do
     SH.saturnList = {}; SH.saturnLoopConn = nil; SH.saturnCachedHRP = nil; SH.saturnTAccum = 0
     SH.verticalHeartToys = {}; SH.verticalHeartPoints = {}; SH.verticalHeartAssignedToys = {}; SH.verticalHeartLoopConn = nil; SH.verticalHeartTime = 0
     SH.verticalBigHeartToys = {}; SH.verticalBigHeartPoints = {}; SH.verticalBigHeartAssignedToys = {}; SH.verticalBigHeartLoopConn = nil; SH.verticalBigHeartTime = 0
-
-    -- ★ SuperRing 状態変数
-    SH.superRingToys = {}
-    SH.superRingPoints = {}
-    SH.superRingAssignedToys = {}
-    SH.superRingLoopConn = nil
-    SH.superRingTime = 0
+    SH.superRingToys = {}; SH.superRingPoints = {}; SH.superRingAssignedToys = {}; SH.superRingLoopConn = nil; SH.superRingTime = 0
 end
 
 -- ============================================================================
@@ -348,7 +279,6 @@ end
 -- ============================================================================
 do
     local ReplicatedStorage = _G.ReplicatedStorage
-
     local GrabEvents = ReplicatedStorage:WaitForChild("GrabEvents")
     local SetNetworkOwner = GrabEvents:WaitForChild("SetNetworkOwner")
     _G.SetNetworkOwner = SetNetworkOwner
@@ -403,6 +333,7 @@ do
 
     function changeObjectID(id)
         if id == SH.ObjectIDConfig.CurrentObjectID then return end
+        PlayActionSound()
         SH.ObjectIDConfig.CurrentObjectID = id
         local activeFunctions = {}
         if SH.FeatherConfig.Enabled then table.insert(activeFunctions, _G.toggleFeather) end
@@ -445,16 +376,13 @@ do
 
     function getMusicKeyboard()
         local myName = LocalPlayer.Name
-        
         local spawnedToys = Workspace:FindFirstChild(myName .. "SpawnedInToys")
         if spawnedToys then
             local kb = spawnedToys:FindFirstChild("MusicKeyboard")
             if kb then return kb end
         end
-
         local plots = Workspace:FindFirstChild("Plots")
         local plotItems = Workspace:FindFirstChild("PlotItems")
-
         if plots and plotItems then
             for _, plot in ipairs(plots:GetChildren()) do
                 local sign = plot:FindFirstChild("PlotSign")
@@ -475,7 +403,6 @@ do
                 end
             end
         end
-
         for _, item in ipairs(Workspace:GetChildren()) do
             if item.Name == "MusicKeyboard" and item:IsA("Model") then
                 local ownerValue = item:FindFirstChild("Owner") or item:FindFirstChild("PartOwner")
@@ -484,7 +411,6 @@ do
                 end
             end
         end
-
         return nil
     end
     _G.getMusicKeyboard = getMusicKeyboard
@@ -504,50 +430,31 @@ do
                 end
             end
         end
-        
         for part, canCollide in pairs(SH.PianoConfig.OriginalCollisions) do
-            if part and part.Parent then
-                part.CanCollide = canCollide
-            end
+            if part and part.Parent then part.CanCollide = canCollide end
         end
         SH.PianoConfig.OriginalCollisions = {} 
     end
     _G.stopPiano = stopPiano
 
     function setupPianoFollow()
-        if not SH.PianoConfig.Keyboard then 
-            SH.PianoConfig.Keyboard = getMusicKeyboard() 
-        end
-        if not SH.PianoConfig.Keyboard then 
-            PlayErrorSound()
-            return 
-        end
-        
+        if not SH.PianoConfig.Keyboard then SH.PianoConfig.Keyboard = getMusicKeyboard() end
+        if not SH.PianoConfig.Keyboard then PlayErrorSound() return end
         if SH.PianoConfig.UpdateConnection then return end
-
         local mainPart = SH.PianoConfig.Keyboard:FindFirstChild("Main", true) or SH.PianoConfig.Keyboard.PrimaryPart
-        if not mainPart then 
-            warn("SakuraHub: ピアノのMainパーツが見つかりません")
-            PlayErrorSound()
-            return 
-        end
-        
+        if not mainPart then PlayErrorSound() return end
         for _, part in ipairs(SH.PianoConfig.Keyboard:GetDescendants()) do
             if part:IsA("BasePart") then
                 if SH.PianoConfig.OriginalCollisions[part] == nil then
                     SH.PianoConfig.OriginalCollisions[part] = part.CanCollide
                 end
-                part.CanCollide = false
-                part.CanTouch = false
-                part.CanQuery = false
-                part.Anchored = false
-                part.Massless = true
+                part.CanCollide = false; part.CanTouch = false; part.CanQuery = false
+                part.Anchored = false; part.Massless = true
                 part.AssemblyLinearVelocity = Vector3.zero
                 part.AssemblyAngularVelocity = Vector3.zero
                 pcall(function() part:SetNetworkOwner(LocalPlayer) end)
             end
         end
-        
         local pp = mainPart
         local char = LocalPlayer.Character
         local root = char and char:FindFirstChild("HumanoidRootPart")
@@ -555,32 +462,21 @@ do
             local offset = CFrame.new(0, -1.5, -2) * CFrame.Angles(0, math.rad(180), 0)
             pp.CFrame = root.CFrame * offset
         end
-        
         local a0 = Instance.new("Attachment", pp)
         local ap = Instance.new("AlignPosition", pp)
         ap.Attachment0 = a0
         ap.Mode = Enum.PositionAlignmentMode.OneAttachment
-        ap.MaxForce = 1e9
-        ap.Responsiveness = 200
+        ap.MaxForce = 1e9; ap.Responsiveness = 200
         local ao = Instance.new("AlignOrientation", pp)
         ao.Attachment0 = a0
         ao.Mode = Enum.OrientationAlignmentMode.OneAttachment
-        ao.MaxTorque = 1e9
-        ao.Responsiveness = 200
-        
+        ao.MaxTorque = 1e9; ao.Responsiveness = 200
         SH.PianoConfig.UpdateConnection = RunService.RenderStepped:Connect(function()
             local char = LocalPlayer.Character
             local root = char and char:FindFirstChild("HumanoidRootPart")
             if not root then return end
-            if not SH.PianoConfig.Keyboard or not SH.PianoConfig.Keyboard.Parent then 
-                stopPiano()
-                return 
-            end
-
-            if math.random() < 0.05 then
-                pcall(function() pp:SetNetworkOwner(LocalPlayer) end)
-            end
-
+            if not SH.PianoConfig.Keyboard or not SH.PianoConfig.Keyboard.Parent then stopPiano() return end
+            if math.random() < 0.05 then pcall(function() pp:SetNetworkOwner(LocalPlayer) end) end
             local baseCF = root.CFrame
             local offset = CFrame.new(0, -1.5, -2) * CFrame.Angles(0, math.rad(180), 0)
             local targetCF = baseCF * offset
@@ -592,15 +488,11 @@ do
 
     function pressPianoKey(keyName)
         local targetKeyboard = getMusicKeyboard()
-        if not targetKeyboard then 
+        if not targetKeyboard then
             SH.PianoConfig.Keyboard = nil
             targetKeyboard = getMusicKeyboard()
-            if not targetKeyboard then 
-                PlayErrorSound()
-                return 
-            end
+            if not targetKeyboard then PlayErrorSound() return end
         end
-
         local key = targetKeyboard:FindFirstChild(keyName, true)
         if key and key:IsA("BasePart") then
             SetNetworkOwner:FireServer(key, key.CFrame)
@@ -611,62 +503,35 @@ do
 
     function playSongFromJSONString(jsonString)
         if SH.PianoConfig.IsPlaying then return end
-        
         local songData
-        local success, err = pcall(function()
-            return HttpService:JSONDecode(jsonString)
-        end)
-        
+        local success, err = pcall(function() return HttpService:JSONDecode(jsonString) end)
         if not success or type(err) ~= "table" then
-            warn("JSONデータの読み込みに失敗しました")
             PlayErrorSound()
-            OrionLib:MakeNotification({
-                Name = "エラー",
-                Content = "JSON形式が正しくありません",
-                Time = 5
-            })
+            OrionLib:MakeNotification({ Name = "エラー", Content = "JSON形式が正しくありません", Time = 5 })
             return
         end
         songData = err
-
         SH.PianoConfig.IsPlaying = true
-        
         task.spawn(function()
-            if not SH.PianoConfig.Keyboard then 
-                SH.PianoConfig.Keyboard = getMusicKeyboard() 
-            end
-            
+            if not SH.PianoConfig.Keyboard then SH.PianoConfig.Keyboard = getMusicKeyboard() end
             for i, note in ipairs(songData) do
                 if not SH.PianoConfig.IsPlaying then break end
-                
                 local rawKey = tostring(note.key)
                 local keyName = rawKey
                 if not string.match(rawKey, "^Key") then
                     keyName = SH.PianoConfig.KeyMap[rawKey] or rawKey
                 end
-                
                 local delayTime = note.delay or 0.1
-                
-                task.spawn(function()
-                    pressPianoKey(keyName)
-                end)
-                
+                task.spawn(function() pressPianoKey(keyName) end)
                 task.wait(delayTime)
             end
-            
             SH.PianoConfig.IsPlaying = false
-            OrionLib:MakeNotification({
-                Name = "完了",
-                Content = "演奏が終了しました",
-                Time = 3
-            })
+            OrionLib:MakeNotification({ Name = "完了", Content = "演奏が終了しました", Time = 3 })
         end)
     end
     _G.playSongFromJSONString = playSongFromJSONString
 
-    function stopSong()
-        SH.PianoConfig.IsPlaying = false
-    end
+    function stopSong() SH.PianoConfig.IsPlaying = false end
     _G.stopSong = stopSong
 end
 
@@ -703,7 +568,6 @@ do
             if SH.VerticalHeartConfig.Enabled then _G.toggleVerticalHeart(false) end
             if SH.VerticalBigHeartConfig.Enabled then _G.toggleVerticalBigHeart(false) end
             if SH.SuperRingConfig.Enabled then _G.toggleSuperRing(false) end
-            
             SH.featherToys = findObjects()
             if #SH.featherToys == 0 then
                 PlayErrorSound()
@@ -711,7 +575,6 @@ do
                 SH.FeatherConfig.Enabled = false
                 return
             end
-            
             local count = math.min(#SH.featherToys, SH.FeatherConfig.maxSparklers)
             SH.featherRowPoints = {}
             local halfCount = math.floor(count / 2)
@@ -723,7 +586,6 @@ do
                 part.Size = Vector3.new(4, 1, 4); part.Parent = workspace
                 SH.featherRowPoints[i] = { offsetX = x, part = part, assignedToy = nil }
             end
-            
             local distanceGroups = {}
             for i, point in ipairs(SH.featherRowPoints) do
                 local absDistance = math.abs(point.offsetX)
@@ -736,7 +598,6 @@ do
             for rank, distance in ipairs(sortedDistances) do
                 for _, pointIndex in ipairs(distanceGroups[distance]) do SH.featherRowPoints[pointIndex].distanceRank = rank end
             end
-            
             SH.featherAssignedToys = {}
             for i = 1, math.min(#SH.featherToys, #SH.featherRowPoints) do
                 local toy = SH.featherToys[i]
@@ -753,7 +614,6 @@ do
                     end
                 end
             end
-            
             SH.featherTime = 0
             if SH.featherLoopConn then SH.featherLoopConn:Disconnect() end
             SH.featherLoopConn = RunService.RenderStepped:Connect(function(dt)
@@ -829,7 +689,6 @@ do
             if SH.VerticalHeartConfig.Enabled then _G.toggleVerticalHeart(false) end
             if SH.VerticalBigHeartConfig.Enabled then _G.toggleVerticalBigHeart(false) end
             if SH.SuperRingConfig.Enabled then _G.toggleSuperRing(false) end
-            
             for _, r in ipairs(SH.magicCircleList) do
                 if r.part then
                     local bv = r.part:FindFirstChild("MagicCircleBodyVelocity"); if bv then bv:Destroy() end
@@ -838,7 +697,6 @@ do
                 end
             end
             SH.magicCircleList = {}
-            
             local foundCount = 0
             for _, d in ipairs(workspace:GetDescendants()) do
                 if foundCount >= SH.MagicCircleConfig.ObjectCount then break end
@@ -853,14 +711,12 @@ do
                     end
                 end
             end
-            
             if foundCount == 0 then
                 PlayErrorSound()
                 OrionLib:MakeNotification({ Name = "エラー", Content = "オブジェクトが見つかりません", Time = 3 })
                 SH.MagicCircleConfig.Enabled = false
                 return
             end
-            
             SH.magicCircleTAccum = 0
             if SH.magicCircleLoopConn then SH.magicCircleLoopConn:Disconnect() end
             SH.magicCircleLoopConn = RunService.Heartbeat:Connect(function(dt)
@@ -941,7 +797,6 @@ do
             if SH.VerticalHeartConfig.Enabled then _G.toggleVerticalHeart(false) end
             if SH.VerticalBigHeartConfig.Enabled then _G.toggleVerticalBigHeart(false) end
             if SH.SuperRingConfig.Enabled then _G.toggleSuperRing(false) end
-            
             SH.heartToys = findObjects()
             if #SH.heartToys == 0 then
                 PlayErrorSound()
@@ -949,7 +804,6 @@ do
                 SH.HeartConfig.Enabled = false
                 return
             end
-            
             local count = math.min(#SH.heartToys, SH.HeartConfig.ObjectCount)
             SH.heartPoints = {}
             for i = 1, count do
@@ -958,7 +812,6 @@ do
                 part.Size = Vector3.new(4, 1, 4); part.Parent = workspace
                 SH.heartPoints[i] = { angle = (i - 1) * (2 * math.pi / count), part = part, assignedToy = nil }
             end
-            
             SH.heartAssignedToys = {}
             for i = 1, math.min(#SH.heartToys, #SH.heartPoints) do
                 local toy = SH.heartToys[i]
@@ -973,7 +826,6 @@ do
                     end
                 end
             end
-            
             SH.heartTime = 0
             if SH.heartLoopConn then SH.heartLoopConn:Disconnect() end
             SH.heartLoopConn = RunService.RenderStepped:Connect(function(dt)
@@ -1049,7 +901,6 @@ do
             if SH.VerticalHeartConfig.Enabled then _G.toggleVerticalHeart(false) end
             if SH.VerticalBigHeartConfig.Enabled then _G.toggleVerticalBigHeart(false) end
             if SH.SuperRingConfig.Enabled then _G.toggleSuperRing(false) end
-            
             SH.bigHeartToys = findObjects()
             if #SH.bigHeartToys == 0 then
                 PlayErrorSound()
@@ -1057,7 +908,6 @@ do
                 SH.BigHeartConfig.Enabled = false
                 return
             end
-            
             local count = math.min(#SH.bigHeartToys, SH.BigHeartConfig.ObjectCount)
             SH.bigHeartPoints = {}
             for i = 1, count do
@@ -1066,7 +916,6 @@ do
                 part.Size = Vector3.new(4, 1, 4); part.Parent = workspace
                 SH.bigHeartPoints[i] = { angle = (i - 1) * (2 * math.pi / count), part = part, assignedToy = nil }
             end
-            
             SH.bigHeartAssignedToys = {}
             for i = 1, math.min(#SH.bigHeartToys, #SH.bigHeartPoints) do
                 local toy = SH.bigHeartToys[i]
@@ -1081,7 +930,6 @@ do
                     end
                 end
             end
-            
             SH.bigHeartTime = 0
             if SH.bigHeartLoopConn then SH.bigHeartLoopConn:Disconnect() end
             SH.bigHeartLoopConn = RunService.RenderStepped:Connect(function(dt)
@@ -1157,7 +1005,6 @@ do
             if SH.VerticalHeartConfig.Enabled then _G.toggleVerticalHeart(false) end
             if SH.VerticalBigHeartConfig.Enabled then _G.toggleVerticalBigHeart(false) end
             if SH.SuperRingConfig.Enabled then _G.toggleSuperRing(false) end
-            
             SH.starOfDavidToys = findObjects()
             if #SH.starOfDavidToys == 0 then
                 PlayErrorSound()
@@ -1165,7 +1012,6 @@ do
                 SH.StarOfDavidConfig.Enabled = false
                 return
             end
-            
             local count = math.min(#SH.starOfDavidToys, SH.StarOfDavidConfig.ObjectCount)
             SH.starOfDavidPoints = {}
             for i = 1, count do
@@ -1174,7 +1020,6 @@ do
                 part.Size = Vector3.new(4, 1, 4); part.Parent = workspace
                 SH.starOfDavidPoints[i] = { angle = (i - 1) * (2 * math.pi / 6), part = part, assignedToy = nil, triangleIndex = math.floor((i - 1) / 2) + 1 }
             end
-            
             SH.starOfDavidAssignedToys = {}
             for i = 1, math.min(#SH.starOfDavidToys, #SH.starOfDavidPoints) do
                 local toy = SH.starOfDavidToys[i]
@@ -1189,7 +1034,6 @@ do
                     end
                 end
             end
-            
             SH.starOfDavidTime = 0
             if SH.starOfDavidLoopConn then SH.starOfDavidLoopConn:Disconnect() end
             SH.starOfDavidLoopConn = RunService.RenderStepped:Connect(function(dt)
@@ -1265,7 +1109,6 @@ do
             if SH.VerticalHeartConfig.Enabled then _G.toggleVerticalHeart(false) end
             if SH.VerticalBigHeartConfig.Enabled then _G.toggleVerticalBigHeart(false) end
             if SH.SuperRingConfig.Enabled then _G.toggleSuperRing(false) end
-            
             SH.starToys = findObjects()
             if #SH.starToys == 0 then
                 PlayErrorSound()
@@ -1273,7 +1116,6 @@ do
                 SH.StarConfig.Enabled = false
                 return
             end
-            
             local count = math.min(#SH.starToys, SH.StarConfig.ObjectCount)
             SH.starPoints = {}
             for i = 1, count do
@@ -1283,7 +1125,6 @@ do
                 local starIndex = (i - 1) % 10
                 SH.starPoints[i] = { starIndex = starIndex, isOuter = starIndex % 2 == 0, part = part, assignedToy = nil }
             end
-            
             SH.starAssignedToys = {}
             for i = 1, math.min(#SH.starToys, #SH.starPoints) do
                 local toy = SH.starToys[i]
@@ -1298,7 +1139,6 @@ do
                     end
                 end
             end
-            
             SH.starTime = 0
             if SH.starLoopConn then SH.starLoopConn:Disconnect() end
             SH.starLoopConn = RunService.RenderStepped:Connect(function(dt)
@@ -1374,7 +1214,6 @@ do
             if SH.VerticalHeartConfig.Enabled then _G.toggleVerticalHeart(false) end
             if SH.VerticalBigHeartConfig.Enabled then _G.toggleVerticalBigHeart(false) end
             if SH.SuperRingConfig.Enabled then _G.toggleSuperRing(false) end
-            
             SH.star2Toys = findObjects()
             if #SH.star2Toys == 0 then
                 PlayErrorSound()
@@ -1382,7 +1221,6 @@ do
                 SH.Star2Config.Enabled = false
                 return
             end
-            
             local count = math.min(#SH.star2Toys, SH.Star2Config.ObjectCount)
             SH.star2Points = {}
             for i = 1, count do
@@ -1391,7 +1229,6 @@ do
                 part.Size = Vector3.new(4, 1, 4); part.Parent = workspace
                 SH.star2Points[i] = { angle = (i - 1) * (2 * math.pi / count), part = part, assignedToy = nil, rayIndex = (i - 1) % SH.Star2Config.RayCount }
             end
-            
             SH.star2AssignedToys = {}
             for i = 1, math.min(#SH.star2Toys, #SH.star2Points) do
                 local toy = SH.star2Toys[i]
@@ -1406,7 +1243,6 @@ do
                     end
                 end
             end
-            
             SH.star2Time = 0
             if SH.star2LoopConn then SH.star2LoopConn:Disconnect() end
             SH.star2LoopConn = RunService.RenderStepped:Connect(function(dt)
@@ -1492,7 +1328,6 @@ do
             if SH.VerticalHeartConfig.Enabled then _G.toggleVerticalHeart(false) end
             if SH.VerticalBigHeartConfig.Enabled then _G.toggleVerticalBigHeart(false) end
             if SH.SuperRingConfig.Enabled then _G.toggleSuperRing(false) end
-            
             SH.sphereToys = findObjects()
             if #SH.sphereToys == 0 then
                 PlayErrorSound()
@@ -1500,7 +1335,6 @@ do
                 SH.SphereConfig.Enabled = false
                 return
             end
-            
             local count = math.min(#SH.sphereToys, SH.SphereConfig.ObjectCount)
             SH.spherePoints = {}
             for i = 1, count do
@@ -1511,7 +1345,6 @@ do
                 local lonIndex = ((i - 1) % SH.SphereConfig.Longitudes) + 1
                 SH.spherePoints[i] = { latitudeIndex = latIndex, longitudeIndex = lonIndex, part = part, assignedToy = nil }
             end
-            
             SH.sphereAssignedToys = {}
             for i = 1, math.min(#SH.sphereToys, #SH.spherePoints) do
                 local toy = SH.sphereToys[i]
@@ -1526,7 +1359,6 @@ do
                     end
                 end
             end
-            
             SH.sphereTime = 0
             if SH.sphereLoopConn then SH.sphereLoopConn:Disconnect() end
             SH.sphereLoopConn = RunService.RenderStepped:Connect(function(dt)
@@ -1606,7 +1438,6 @@ do
             if SH.VerticalHeartConfig.Enabled then _G.toggleVerticalHeart(false) end
             if SH.VerticalBigHeartConfig.Enabled then _G.toggleVerticalBigHeart(false) end
             if SH.SuperRingConfig.Enabled then _G.toggleSuperRing(false) end
-            
             SH.ferrisWheelToys = findObjects()
             if #SH.ferrisWheelToys == 0 then
                 PlayErrorSound()
@@ -1614,7 +1445,6 @@ do
                 SH.FerrisWheelConfig.Enabled = false
                 return
             end
-            
             local count = math.min(#SH.ferrisWheelToys, SH.FerrisWheelConfig.ObjectCount)
             local angleStep = (2 * math.pi) / count
             SH.ferrisWheelPoints = {}
@@ -1624,7 +1454,6 @@ do
                 part.Size = Vector3.new(4, 1, 4); part.Parent = workspace
                 SH.ferrisWheelPoints[i] = { baseAngle = (i - 1) * angleStep, part = part, assignedToy = nil }
             end
-            
             SH.ferrisWheelAssignedToys = {}
             for i = 1, math.min(#SH.ferrisWheelToys, #SH.ferrisWheelPoints) do
                 local toy = SH.ferrisWheelToys[i]
@@ -1639,7 +1468,6 @@ do
                     end
                 end
             end
-            
             SH.ferrisWheelTime = 0
             if SH.ferrisWheelLoopConn then SH.ferrisWheelLoopConn:Disconnect() end
             SH.ferrisWheelLoopConn = RunService.RenderStepped:Connect(function(dt)
@@ -1725,7 +1553,6 @@ do
             if SH.VerticalHeartConfig.Enabled then _G.toggleVerticalHeart(false) end
             if SH.VerticalBigHeartConfig.Enabled then _G.toggleVerticalBigHeart(false) end
             if SH.SuperRingConfig.Enabled then _G.toggleSuperRing(false) end
-            
             SH.animN1Toys = findObjects()
             if #SH.animN1Toys == 0 then
                 PlayErrorSound()
@@ -1733,7 +1560,6 @@ do
                 SH.AnimN1Config.Enabled = false
                 return
             end
-            
             local count = math.min(#SH.animN1Toys, SH.AnimN1Config.ObjectCount)
             SH.animN1Points = {}
             for i = 1, count do
@@ -1742,7 +1568,6 @@ do
                 part.Size = Vector3.new(4, 1, 4); part.Parent = workspace
                 SH.animN1Points[i] = { baseAngle = (i - 1) * (2 * math.pi / count), part = part, assignedToy = nil }
             end
-            
             SH.animN1AssignedToys = {}
             for i = 1, math.min(#SH.animN1Toys, #SH.animN1Points) do
                 local toy = SH.animN1Toys[i]
@@ -1757,7 +1582,6 @@ do
                     end
                 end
             end
-            
             SH.animN1Time = 0
             if SH.animN1LoopConn then SH.animN1LoopConn:Disconnect() end
             SH.animN1LoopConn = RunService.RenderStepped:Connect(function(dt)
@@ -1825,7 +1649,6 @@ do
             if SH.VerticalHeartConfig.Enabled then _G.toggleVerticalHeart(false) end
             if SH.VerticalBigHeartConfig.Enabled then _G.toggleVerticalBigHeart(false) end
             if SH.SuperRingConfig.Enabled then _G.toggleSuperRing(false) end
-            
             SH.animN2Toys = findObjects()
             if #SH.animN2Toys == 0 then
                 PlayErrorSound()
@@ -1833,7 +1656,6 @@ do
                 SH.AnimN2Config.Enabled = false
                 return
             end
-            
             local count = math.min(#SH.animN2Toys, SH.AnimN2Config.ObjectCount)
             SH.animN2Points = {}
             for i = 1, count do
@@ -1842,7 +1664,6 @@ do
                 part.Size = Vector3.new(4, 1, 4); part.Parent = workspace
                 SH.animN2Points[i] = { baseAngle = (i - 1) * (2 * math.pi / count), part = part, assignedToy = nil }
             end
-            
             SH.animN2AssignedToys = {}
             for i = 1, math.min(#SH.animN2Toys, #SH.animN2Points) do
                 local toy = SH.animN2Toys[i]
@@ -1857,7 +1678,6 @@ do
                     end
                 end
             end
-            
             SH.animN2Time = 0
             if SH.animN2LoopConn then SH.animN2LoopConn:Disconnect() end
             SH.animN2LoopConn = RunService.RenderStepped:Connect(function(dt)
@@ -1922,7 +1742,6 @@ do
             if SH.VerticalHeartConfig.Enabled then _G.toggleVerticalHeart(false) end
             if SH.VerticalBigHeartConfig.Enabled then _G.toggleVerticalBigHeart(false) end
             if SH.SuperRingConfig.Enabled then _G.toggleSuperRing(false) end
-            
             SH.animN3Toys = findObjects()
             if #SH.animN3Toys == 0 then
                 PlayErrorSound()
@@ -1930,7 +1749,6 @@ do
                 SH.AnimN3Config.Enabled = false
                 return
             end
-            
             local count = math.min(#SH.animN3Toys, SH.AnimN3Config.ObjectCount)
             SH.animN3Points = {}
             for i = 1, count do
@@ -1939,7 +1757,6 @@ do
                 part.Size = Vector3.new(4, 1, 4); part.Parent = workspace
                 SH.animN3Points[i] = { part = part, assignedToy = nil, seed = i }
             end
-            
             SH.animN3AssignedToys = {}
             for i = 1, math.min(#SH.animN3Toys, #SH.animN3Points) do
                 local toy = SH.animN3Toys[i]
@@ -1954,7 +1771,6 @@ do
                     end
                 end
             end
-            
             SH.animN3Time = 0
             if SH.animN3LoopConn then SH.animN3LoopConn:Disconnect() end
             SH.animN3LoopConn = RunService.RenderStepped:Connect(function(dt)
@@ -2029,7 +1845,6 @@ do
             if SH.VerticalHeartConfig.Enabled then _G.toggleVerticalHeart(false) end
             if SH.VerticalBigHeartConfig.Enabled then _G.toggleVerticalBigHeart(false) end
             if SH.SuperRingConfig.Enabled then _G.toggleSuperRing(false) end
-            
             SH.wingList = {}
             local maxObjects = SH.WingConfig.ObjectCount * 2
             local foundCount = 0
@@ -2066,17 +1881,14 @@ do
                     end
                 end
             end
-            
             if foundCount == 0 then
                 PlayErrorSound()
                 OrionLib:MakeNotification({ Name = "エラー", Content = "オブジェクトが見つかりません", Time = 3 })
                 SH.WingConfig.Enabled = false
                 return
             end
-            
             SH.wingTime = 0
             if SH.wingLoopConn then SH.wingLoopConn:Disconnect() end
-            
             local function getWingPosition(index, total, time)
                 local halfTotal = total / 2
                 local isLeftWing = index <= halfTotal
@@ -2092,7 +1904,6 @@ do
                 local sideOffset = isLeftWing and -(3 + rotatedX) or (3 + rotatedX)
                 return Vector3.new(sideOffset, SH.WingConfig.VerticalOffset + rotatedY, 0), isLeftWing, wingIndex
             end
-            
             SH.wingLoopConn = RunService.Heartbeat:Connect(function(dt)
                 if not SH.WingConfig.Enabled then return end
                 local root = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
@@ -2311,19 +2122,15 @@ do
             if SH.VerticalHeartConfig.Enabled then _G.toggleVerticalHeart(false) end
             if SH.VerticalBigHeartConfig.Enabled then _G.toggleVerticalBigHeart(false) end
             if SH.SuperRingConfig.Enabled then _G.toggleSuperRing(false) end
-
             rescanSaturn()
-            
             if #SH.saturnList == 0 then
                 PlayErrorSound()
                 OrionLib:MakeNotification({ Name = "エラー", Content = "オブジェクトが見つかりません", Time = 3 })
                 SH.SaturnConfig.Enabled = false
                 return
             end
-
             if SH.saturnLoopConn then SH.saturnLoopConn:Disconnect(); SH.saturnLoopConn = nil end
             SH.saturnTAccum = 0
-
             SH.saturnLoopConn = RunService.Heartbeat:Connect(function(dt)
                 if not SH.SaturnConfig.Enabled then return end
                 for i = #SH.saturnList, 1, -1 do
@@ -2370,7 +2177,6 @@ do
                     end
                 end
             end)
-
             OrionLib:MakeNotification({
                 Name = "土星スパークラー",
                 Content = "有効化 - オブジェクト数: " .. #SH.saturnList,
@@ -2441,24 +2247,14 @@ do
             if SH.VerticalHeartConfig.Enabled then _G.toggleVerticalHeart(false) end
             if SH.VerticalBigHeartConfig.Enabled then _G.toggleVerticalBigHeart(false) end
             if SH.SuperRingConfig.Enabled then _G.toggleSuperRing(false) end
-            
             SH.PianoConfig.Keyboard = getMusicKeyboard()
-            
             if SH.PianoConfig.Keyboard then
                 if SH.PianoConfig.FollowPlayer then setupPianoFollow() end
-                OrionLib:MakeNotification({
-                    Name = "ピアノ機能",
-                    Content = "MusicKeyboardを検出しました",
-                    Time = 3
-                })
+                OrionLib:MakeNotification({ Name = "ピアノ機能", Content = "MusicKeyboardを検出しました", Time = 3 })
             else
                 PlayErrorSound()
                 SH.PianoConfig.Enabled = false
-                OrionLib:MakeNotification({
-                    Name = "エラー",
-                    Content = "MusicKeyboardが見つかりません",
-                    Time = 5
-                })
+                OrionLib:MakeNotification({ Name = "エラー", Content = "MusicKeyboardが見つかりません", Time = 5 })
             end
         else
             PlayOpenCloseSound()
@@ -2503,7 +2299,6 @@ do
             if SH.PianoConfig.Enabled then _G.togglePiano(false) end
             if SH.VerticalBigHeartConfig.Enabled then _G.toggleVerticalBigHeart(false) end
             if SH.SuperRingConfig.Enabled then _G.toggleSuperRing(false) end
-            
             SH.verticalHeartToys = findObjects()
             if #SH.verticalHeartToys == 0 then
                 PlayErrorSound()
@@ -2511,7 +2306,6 @@ do
                 SH.VerticalHeartConfig.Enabled = false
                 return
             end
-            
             local count = math.min(#SH.verticalHeartToys, SH.VerticalHeartConfig.ObjectCount)
             SH.verticalHeartPoints = {}
             for i = 1, count do
@@ -2520,7 +2314,6 @@ do
                 part.Size = Vector3.new(4, 1, 4); part.Parent = workspace
                 SH.verticalHeartPoints[i] = { angle = (i - 1) * (2 * math.pi / count), part = part, assignedToy = nil }
             end
-            
             SH.verticalHeartAssignedToys = {}
             for i = 1, math.min(#SH.verticalHeartToys, #SH.verticalHeartPoints) do
                 local toy = SH.verticalHeartToys[i]
@@ -2535,7 +2328,6 @@ do
                     end
                 end
             end
-            
             SH.verticalHeartTime = 0
             if SH.verticalHeartLoopConn then SH.verticalHeartLoopConn:Disconnect() end
             SH.verticalHeartLoopConn = RunService.RenderStepped:Connect(function(dt)
@@ -2611,7 +2403,6 @@ do
             if SH.PianoConfig.Enabled then _G.togglePiano(false) end
             if SH.VerticalHeartConfig.Enabled then _G.toggleVerticalHeart(false) end
             if SH.SuperRingConfig.Enabled then _G.toggleSuperRing(false) end
-            
             SH.verticalBigHeartToys = findObjects()
             if #SH.verticalBigHeartToys == 0 then
                 PlayErrorSound()
@@ -2619,7 +2410,6 @@ do
                 SH.VerticalBigHeartConfig.Enabled = false
                 return
             end
-            
             local count = math.min(#SH.verticalBigHeartToys, SH.VerticalBigHeartConfig.ObjectCount)
             SH.verticalBigHeartPoints = {}
             for i = 1, count do
@@ -2628,7 +2418,6 @@ do
                 part.Size = Vector3.new(4, 1, 4); part.Parent = workspace
                 SH.verticalBigHeartPoints[i] = { angle = (i - 1) * (2 * math.pi / count), part = part, assignedToy = nil }
             end
-            
             SH.verticalBigHeartAssignedToys = {}
             for i = 1, math.min(#SH.verticalBigHeartToys, #SH.verticalBigHeartPoints) do
                 local toy = SH.verticalBigHeartToys[i]
@@ -2643,7 +2432,6 @@ do
                     end
                 end
             end
-            
             SH.verticalBigHeartTime = 0
             if SH.verticalBigHeartLoopConn then SH.verticalBigHeartLoopConn:Disconnect() end
             SH.verticalBigHeartLoopConn = RunService.RenderStepped:Connect(function(dt)
@@ -2843,7 +2631,6 @@ do
             if SH.PianoConfig.Enabled then _G.togglePiano(false) end
             if SH.VerticalHeartConfig.Enabled then _G.toggleVerticalHeart(false) end
             if SH.VerticalBigHeartConfig.Enabled then _G.toggleVerticalBigHeart(false) end
-
             SH.superRingToys = findObjects()
             if #SH.superRingToys == 0 then
                 PlayErrorSound()
@@ -2851,11 +2638,9 @@ do
                 SH.SuperRingConfig.Enabled = false
                 return
             end
-
             SH.superRingPoints = createSuperRingPoints(math.min(#SH.superRingToys, SH.SuperRingConfig.ObjectCount))
             assignSuperRingToysToPoints()
             startSuperRingLoop()
-
             OrionLib:MakeNotification({
                 Name = "竜巻トイMOD 起動",
                 Content = "半径: " .. SH.SuperRingConfig.Radius .. " / 高さ: " .. SH.SuperRingConfig.Height .. " / 数: " .. SH.SuperRingConfig.ObjectCount,
@@ -2890,23 +2675,12 @@ do
     local Theme = _G.Theme
     local SH = _G.SH
 
-    local MITab = Window:MakeTab({ 
-        Name = "Me(=^・^=)", 
-        Icon = "rbxassetid://4483362458", 
-        PremiumOnly = false 
-    })
-
+    local MITab = Window:MakeTab({ Name = "Me(=^・^=)", Icon = "rbxassetid://4483362458", PremiumOnly = false })
     MITab:AddSection({ Name = "移動機能" })
 
     local UtilityConfig = {
-        InfiniteJump = false,
-        Noclip = false,
-        TPWalk = false,
-        TPWalkSpeed = 50,
-        ESP = false,
-        FOV = 70,
-        OriginalFOV = 70,
-        ThirdPerson = false
+        InfiniteJump = false, Noclip = false, TPWalk = false, TPWalkSpeed = 50,
+        ESP = false, FOV = 70, OriginalFOV = 70, ThirdPerson = false
     }
 
     local NoclipConnection = nil
@@ -2919,12 +2693,15 @@ do
     local function toggleInfiniteJump(state)
         UtilityConfig.InfiniteJump = state
         if state then
+            PlayActionSound()
             UserInputService.JumpRequest:Connect(function()
                 if UtilityConfig.InfiniteJump and LocalPlayer.Character then
                     local humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
                     if humanoid then humanoid:ChangeState("Jumping") end
                 end
             end)
+        else
+            PlayOpenCloseSound()
         end
         OrionLib:MakeNotification({ Name = "無限ジャンプ", Content = state and "有効" or "無効", Time = 2 })
     end
@@ -2958,7 +2735,7 @@ do
 
     local function toggleNoclip(state)
         UtilityConfig.Noclip = state
-        if state then enableNoclip() else disableNoclip() end
+        if state then PlayActionSound(); enableNoclip() else PlayOpenCloseSound(); disableNoclip() end
         OrionLib:MakeNotification({ Name = "ノークリップ", Content = state and "有効" or "無効", Time = 2 })
     end
 
@@ -2968,43 +2745,25 @@ do
             local humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
             if humanoid then OriginalWalkSpeed = humanoid.WalkSpeed end
         end
-
         TPWalkConnection = RunService.RenderStepped:Connect(function(dt)
             if not UtilityConfig.TPWalk or not LocalPlayer.Character then return end
-
             local humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
             local humanoidRootPart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-
             if humanoid and humanoidRootPart then
                 humanoid.WalkSpeed = UtilityConfig.TPWalkSpeed
-
                 local moveDirection = Vector3.new(0, 0, 0)
                 local moveVector = humanoid.MoveDirection
-
                 if moveVector.Magnitude > 0 then
                     moveDirection = moveVector
                 else
-                    if UserInputService:IsKeyDown(Enum.KeyCode.W) then
-                        moveDirection = moveDirection + humanoidRootPart.CFrame.LookVector
-                    end
-                    if UserInputService:IsKeyDown(Enum.KeyCode.S) then
-                        moveDirection = moveDirection - humanoidRootPart.CFrame.LookVector
-                    end
-                    if UserInputService:IsKeyDown(Enum.KeyCode.A) then
-                        moveDirection = moveDirection - humanoidRootPart.CFrame.RightVector
-                    end
-                    if UserInputService:IsKeyDown(Enum.KeyCode.D) then
-                        moveDirection = moveDirection + humanoidRootPart.CFrame.RightVector
-                    end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.W) then moveDirection = moveDirection + humanoidRootPart.CFrame.LookVector end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.S) then moveDirection = moveDirection - humanoidRootPart.CFrame.LookVector end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.A) then moveDirection = moveDirection - humanoidRootPart.CFrame.RightVector end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.D) then moveDirection = moveDirection + humanoidRootPart.CFrame.RightVector end
                 end
-
                 if moveDirection.Magnitude > 0 then
                     moveDirection = moveDirection.Unit
-                    humanoidRootPart.Velocity = Vector3.new(
-                        moveDirection.X * UtilityConfig.TPWalkSpeed,
-                        humanoidRootPart.Velocity.Y,
-                        moveDirection.Z * UtilityConfig.TPWalkSpeed
-                    )
+                    humanoidRootPart.Velocity = Vector3.new(moveDirection.X * UtilityConfig.TPWalkSpeed, humanoidRootPart.Velocity.Y, moveDirection.Z * UtilityConfig.TPWalkSpeed)
                 else
                     humanoidRootPart.Velocity = Vector3.new(0, humanoidRootPart.Velocity.Y, 0)
                 end
@@ -3022,7 +2781,7 @@ do
 
     local function toggleTPWalk(state)
         UtilityConfig.TPWalk = state
-        if state then enableTPWalk() else disableTPWalk() end
+        if state then PlayActionSound(); enableTPWalk() else PlayOpenCloseSound(); disableTPWalk() end
         OrionLib:MakeNotification({ Name = "TPWalk", Content = state and "有効" or "無効", Time = 2 })
     end
 
@@ -3030,10 +2789,8 @@ do
         if ESPConnection then ESPConnection:Disconnect(); ESPConnection = nil end
         for _, label in pairs(ESPLabels) do if label then label:Destroy() end end
         ESPLabels = {}
-
         ESPConnection = RunService.RenderStepped:Connect(function()
             if not UtilityConfig.ESP then return end
-
             for _, player in ipairs(Players:GetPlayers()) do
                 if player ~= LocalPlayer and player.Character then
                     local humanoidRootPart = player.Character:FindFirstChild("HumanoidRootPart")
@@ -3045,7 +2802,6 @@ do
                             label.AlwaysOnTop = true
                             label.Size = UDim2.new(0, 200, 0, 50)
                             label.StudsOffset = Vector3.new(0, 3, 0)
-
                             local textLabel = Instance.new("TextLabel")
                             textLabel.Size = UDim2.new(1, 0, 1, 0)
                             textLabel.BackgroundTransparency = 1
@@ -3056,14 +2812,10 @@ do
                             textLabel.Font = Enum.Font.SourceSansBold
                             textLabel.TextSize = 20
                             textLabel.Parent = label
-
                             label.Parent = humanoidRootPart
                             ESPLabels[player] = label
                         end
-
-                        local distance = (LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")) and
-                            (humanoidRootPart.Position - LocalPlayer.Character.HumanoidRootPart.Position).Magnitude or 0
-
+                        local distance = (LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")) and (humanoidRootPart.Position - LocalPlayer.Character.HumanoidRootPart.Position).Magnitude or 0
                         local label = ESPLabels[player]
                         if label and label:FindFirstChildOfClass("TextLabel") then
                             label:FindFirstChildOfClass("TextLabel").Text = string.format("%s\n[%.1f studs]", player.Name, distance)
@@ -3071,7 +2823,6 @@ do
                     end
                 end
             end
-
             for player, label in pairs(ESPLabels) do
                 if not Players:FindFirstChild(player.Name) then
                     label:Destroy()
@@ -3089,17 +2840,19 @@ do
 
     local function toggleESP(state)
         UtilityConfig.ESP = state
-        if state then enableESP() else disableESP() end
+        if state then PlayActionSound(); enableESP() else PlayOpenCloseSound(); disableESP() end
         OrionLib:MakeNotification({ Name = "ESP", Content = state and "有効" or "無効", Time = 2 })
     end
 
     local function toggleThirdPerson(state)
         UtilityConfig.ThirdPerson = state
         if state then
+            PlayActionSound()
             LocalPlayer.CameraMode = Enum.CameraMode.Classic
             LocalPlayer.CameraMaxZoomDistance = 100
             LocalPlayer.CameraMinZoomDistance = 0.5
         else
+            PlayOpenCloseSound()
             LocalPlayer.CameraMode = Enum.CameraMode.LockFirstPerson
             LocalPlayer.CameraMaxZoomDistance = 0.5
             LocalPlayer.CameraMinZoomDistance = 0.5
@@ -3109,45 +2862,28 @@ do
     MITab:AddToggle({ Name = "無限ジャンプ", Default = false, Callback = toggleInfiniteJump })
     MITab:AddToggle({ Name = "ノークリップ", Default = false, Callback = toggleNoclip })
     MITab:AddToggle({ Name = "TPWalk", Default = false, Callback = toggleTPWalk })
-    MITab:AddSlider({
-        Name = "TPWalk速度",
-        Min = 16, Max = 500,
-        Default = UtilityConfig.TPWalkSpeed,
-        Color = Theme.SliderColor,
-        Increment = 5,
-        ValueName = "速度",
-        Callback = function(v) UtilityConfig.TPWalkSpeed = v end
-    })
+    MITab:AddSlider({ Name = "TPWalk速度", Min = 16, Max = 500, Default = UtilityConfig.TPWalkSpeed, Color = Theme.SliderColor, Increment = 5, ValueName = "速度", Callback = function(v) UtilityConfig.TPWalkSpeed = v end })
 
     MITab:AddSection({ Name = "視覚機能" })
     MITab:AddToggle({ Name = "ESP", Default = false, Callback = toggleESP })
     MITab:AddToggle({ Name = "三人称視点", Default = false, Callback = toggleThirdPerson })
-    MITab:AddSlider({
-        Name = "FOV",
-        Min = -5, Max = 180,
-        Default = UtilityConfig.FOV,
-        Color = Theme.SliderColor,
-        Increment = 1,
-        ValueName = "度",
-        Callback = function(v)
-            UtilityConfig.FOV = v
-            if Camera then Camera.FieldOfView = v end
+    MITab:AddSlider({ Name = "FOV", Min = -5, Max = 180, Default = UtilityConfig.FOV, Color = Theme.SliderColor, Increment = 1, ValueName = "度", Callback = function(v)
+        UtilityConfig.FOV = v
+        if Camera then Camera.FieldOfView = v end
+    end })
+    MITab:AddButton({ Name = "FOVリセット", Callback = function()
+        PlayActionSound()
+        if Camera then
+            Camera.FieldOfView = UtilityConfig.OriginalFOV
+            UtilityConfig.FOV = UtilityConfig.OriginalFOV
         end
-    })
-    MITab:AddButton({
-        Name = "FOVリセット",
-        Callback = function()
-            if Camera then
-                Camera.FieldOfView = UtilityConfig.OriginalFOV
-                UtilityConfig.FOV = UtilityConfig.OriginalFOV
-            end
-        end
-    })
+    end })
 
     MITab:AddSection({ Name = "制御" })
     MITab:AddButton({
         Name = "全機能停止",
         Callback = function()
+            PlayActionSound()
             if SH.FeatherConfig.Enabled then _G.toggleFeather(false) end
             if SH.MagicCircleConfig.Enabled then _G.toggleMagicCircle(false) end
             if SH.HeartConfig.Enabled then _G.toggleHeart(false) end
@@ -3195,6 +2931,7 @@ do
     GUITab:AddButton({
         Name = "固定gui",
         Callback = function()
+            PlayActionSound()
             local Player = LocalPlayer
             local Camera = Camera
             local RunService = RunService
@@ -3291,9 +3028,7 @@ do
                 local raycastParams = RaycastParams.new()
                 raycastParams.FilterType = Enum.RaycastFilterType.Exclude
                 raycastParams.FilterDescendantsInstances = {Player.Character}
-
                 local result = workspace:Raycast(unitRay.Origin, unitRay.Direction * 500, raycastParams)
-
                 if result and result.Instance:IsA("BasePart") then
                     local obj = result.Instance
                     if obj.Size.X < 100 and obj.Size.Z < 100 and obj ~= fixedPart then
@@ -3327,11 +3062,7 @@ do
                 end
             end)
 
-            OrionLib:MakeNotification({
-                Name = "固定gui",
-                Content = "起動しました（MENUボタンを押して表示）",
-                Time = 3
-            })
+            OrionLib:MakeNotification({ Name = "固定gui", Content = "起動しました（MENUボタンを押して表示）", Time = 3 })
         end
     })
 
@@ -3339,12 +3070,9 @@ do
     GUITab:AddButton({
         Name = "TTP GUI",
         Callback = function()
+            PlayActionSound()
             loadstring(game:HttpGet("https://pastefy.app/h6uDbIIz/raw"))()
-            OrionLib:MakeNotification({
-                Name = "TTP GUI",
-                Content = "読み込み完了！\\キーでTP / 固定機能付き",
-                Time = 3
-            })
+            OrionLib:MakeNotification({ Name = "TTP GUI", Content = "読み込み完了！\\キーでTP / 固定機能付き", Time = 3 })
         end
     })
 
@@ -3356,6 +3084,7 @@ do
                 loadstring(game:HttpGet("https://pastefy.app/PWUVVdb3/raw"))()
             end)
             if success then
+                PlayActionSound()
                 OrionLib:MakeNotification({ Name = "SaluraHUB-keyboard.GUI", Content = "読み込み成功！", Time = 3 })
             else
                 PlayErrorSound()
@@ -3395,7 +3124,10 @@ do
     AntiTab:AddToggle({
         Name = "掴まれても脱出 (シンプル)",
         Default = false,
-        Callback = function(Value) AntiGrabEnabled = Value end
+        Callback = function(Value)
+            AntiGrabEnabled = Value
+            if Value then PlayActionSound() else PlayOpenCloseSound() end
+        end
     })
 
     RunService.Heartbeat:Connect(function()
@@ -3429,20 +3161,16 @@ do
         if heldConnectionV2 then heldConnectionV2:Disconnect() end
         local isHeld = LocalPlayer:FindFirstChild("IsHeld")
         if not isHeld then return end
-        
         heldConnectionV2 = isHeld:GetPropertyChangedSignal("Value"):Connect(function()
             if not antiGrabV2Enabled or not isHeld.Value then return end
             local Char = LocalPlayer.Character
             if not Char then return end
-            
             local Root = Char:FindFirstChild("HumanoidRootPart")
             local Hum = Char:FindFirstChildOfClass("Humanoid")
             if not (Root and Hum) then return end
-
             for _, part in pairs(Char:GetDescendants()) do 
                 if part:IsA("BasePart") then part.CanCollide = false end 
             end
-
             task.spawn(function()
                 while antiGrabV2Enabled and isHeld.Value do
                     pcall(function()
@@ -3453,7 +3181,6 @@ do
                     task.wait(0.03)
                 end
             end)
-
             task.spawn(function()
                 while antiGrabV2Enabled and isHeld.Value do
                     pcall(function()
@@ -3471,7 +3198,6 @@ do
                 if Root then Root.Anchored = false end
             end)
         end)
-        
         if isHeld.Value then
             local Char = LocalPlayer.Character
             local Root = Char and Char:FindFirstChild("HumanoidRootPart")
@@ -3492,9 +3218,11 @@ do
         Callback = function(Value)
             antiGrabV2Enabled = Value
             if Value then
+                PlayActionSound()
                 StartAntiGrabV2()
                 OrionLib:MakeNotification({ Name = "Anti Grab V2", Content = "有効化されました", Time = 3 })
             else
+                PlayOpenCloseSound()
                 StopAntiGrabV2()
                 OrionLib:MakeNotification({ Name = "Anti Grab V2", Content = "無効化されました", Time = 3 })
             end
@@ -3528,12 +3256,10 @@ do
         if not SpawnToyRemote then return nil end
         local inv = Workspace:FindFirstChild(LocalPlayer.Name .. "SpawnedInToys")
         if not inv then return nil end
-        
         local spawnCF = hrp.CFrame * CFrame.new(0, 14, 20)
         task.spawn(function()
             pcall(function() SpawnToyRemote:InvokeServer(toyName, spawnCF, Vector3.zero) end)
         end)
-
         local t = tick()
         local spawnedToy = nil
         repeat
@@ -3545,25 +3271,18 @@ do
 
     local function StartGucci()
         if autoGucciConn then autoGucciConn:Disconnect() end
-        
         local GucciThing = nil
         local isActive = false
-        
         local function gucci()
             if not autoGucciActive then return end
             isActive = true
-            
             local char = LocalPlayer.Character
             if not char then isActive = false return end
-            
             local hrp = char:FindFirstChild("HumanoidRootPart")
             local hum = char:FindFirstChild("Humanoid")
             local inv = Workspace:FindFirstChild(LocalPlayer.Name .. "SpawnedInToys")
-            
             if not (hrp and hum and inv) then isActive = false return end
-
             cleanupGucciTasks()
-            
             if DestroyToy then
                 for _, v in pairs(inv:GetChildren()) do
                     if v.Name == "AutoGucci" or v.Name == "TractorGreen" then
@@ -3571,25 +3290,19 @@ do
                     end
                 end
             end
-            
             local isHeld = LocalPlayer:FindFirstChild("IsHeld")
             while isHeld and isHeld.Value do task.wait() end
-            
             hum.Sit = false
             task.wait(0.1)
-            
             GucciThing = SpawnGucciToy("TractorGreen", hrp)
             while not GucciThing and autoGucciActive do
                 task.wait(0.25)
                 GucciThing = SpawnGucciToy("TractorGreen", hrp)
             end
-            
             if not GucciThing then isActive = false return end
             GucciThing.Name = "AutoGucci"
-            
             local seat = GucciThing:FindFirstChild("VehicleSeat")
             if not seat then isActive = false return end
-            
             autoGucciSpamTask = task.spawn(function()
                 while isActive and autoGucciActive do
                     if RagdollRemote then pcall(function() RagdollRemote:FireServer(hrp, 0) end) end
@@ -3597,17 +3310,14 @@ do
                     task.wait(0.05)
                 end
             end)
-            
             local t0 = tick()
             while not hum.SeatPart and autoGucciActive and tick() - t0 < 3 do
                 seat:Sit(hum)
                 task.wait(0.1)
             end
-            
             hum.Sit = false
             hum:ChangeState(Enum.HumanoidStateType.Jumping)
             hrp.Anchored = true
-            
             task.spawn(function()
                 task.wait(0.3)
                 GucciThing:PivotTo(CFrame.new(0, 1e6, 0))
@@ -3615,22 +3325,17 @@ do
                     if p:IsA("BasePart") then p.Anchored = true end
                 end
             end)
-            
             hrp.Anchored = false
             isActive = false
         end
-        
         gucci()
-        
         autoGucciConn = RunService.Heartbeat:Connect(function()
             if not autoGucciActive then return end
             if isActive then return end
-            
             local char = LocalPlayer.Character
             local hrp = char and char:FindFirstChild("HumanoidRootPart")
             local hum = char and char:FindFirstChild("Humanoid")
             local isHeld = LocalPlayer:FindFirstChild("IsHeld")
-            
             if not (hrp and hum) or hum.Health <= 0 then
                 isActive = true
                 LocalPlayer.CharacterAdded:Wait()
@@ -3638,10 +3343,7 @@ do
                 gucci()
                 return
             end
-            
-            if (isHeld and isHeld.Value) or hum.Sit then
-                gucci()
-            end
+            if (isHeld and isHeld.Value) or hum.Sit then gucci() end
         end)
     end
 
@@ -3651,9 +3353,11 @@ do
         Callback = function(Value)
             autoGucciActive = Value
             if Value then
+                PlayActionSound()
                 StartGucci()
                 OrionLib:MakeNotification({ Name = "Anti Gucci", Content = "有効化されました", Time = 3 })
             else
+                PlayOpenCloseSound()
                 cleanupGucciTasks()
                 if autoGucciConn then autoGucciConn:Disconnect() autoGucciConn = nil end
                 local inv = Workspace:FindFirstChild(LocalPlayer.Name .. "SpawnedInToys")
@@ -3675,9 +3379,11 @@ do
         Default = false,
         Callback = function(Value)
             if Value then
+                PlayActionSound()
                 Workspace.FallenPartsDestroyHeight = 0/0
                 OrionLib:MakeNotification({ Name = "Anti Void", Content = "有効化されました", Time = 3 })
             else
+                PlayOpenCloseSound()
                 Workspace.FallenPartsDestroyHeight = -100
                 OrionLib:MakeNotification({ Name = "Anti Void", Content = "無効化されました", Time = 3 })
             end
@@ -3699,11 +3405,9 @@ do
     local RunService = _G.RunService
     local Workspace = _G.Workspace
     local UserInputService = _G.UserInputService
-    local Theme = _G.Theme   -- ★ Line 4906 エラー修正のため追加
+    local Theme = _G.Theme
 
-    -- ============================================================================
-    -- スフィアオービットキックV1 (Sphere Orbit Kick V1)
-    -- ============================================================================
+    -- スフィアオービットキックV1
     local SphereOrbitKick = {}
     do
         local ORBIT_RADIUS = 12
@@ -3713,7 +3417,6 @@ do
         local SPHERE_COMPLEXITY = 0.7
         local EFFECTS_ENABLED = true
         local PARTICLE_COUNT = 50
-
         local orbitRunning = false
         local orbitAngle = 0
         local effectParts = {}
@@ -3754,9 +3457,7 @@ do
             trailPart.Transparency = 0.3
             trailPart.Parent = workspace
             game:GetService("Debris"):AddItem(trailPart, 0.3)
-            if #effectParts < PARTICLE_COUNT then
-                table.insert(effectParts, trailPart)
-            end
+            if #effectParts < PARTICLE_COUNT then table.insert(effectParts, trailPart) end
         end
 
         local function getBlobman()
@@ -3818,12 +3519,10 @@ do
                 OrionLib:MakeNotification({ Name = "エラー", Content = "既に実行中です", Time = 3 })
                 return false
             end
-
             orbitRunning = true
             currentLoopId = currentLoopId + 1
             local myLoopId = currentLoopId
             local targetPlayer = target
-
             task.spawn(function()
                 local blobman = getBlobman()
                 if not blobman then
@@ -3835,79 +3534,58 @@ do
                         return
                     end
                 end
-
                 if not sitOnBlobman(blobman) then
                     PlayErrorSound()
                     OrionLib:MakeNotification({ Name = "エラー", Content = "ブロブマンに座れませんでした", Time = 3 })
                     orbitRunning = false
                     return
                 end
-
                 local scriptObj = blobman:FindFirstChild("BlobmanSeatAndOwnerScript")
                 if not scriptObj then
                     PlayErrorSound()
-                    OrionLib:MakeNotification({ Name = "エラー", Content = "BlobmanSeatAndOwnerScriptが見つかりません", Time = 3 })
                     orbitRunning = false
                     return
                 end
-
                 local grabRemote = scriptObj:FindFirstChild("CreatureGrab")
                 local dropRemote = scriptObj:FindFirstChild("CreatureDrop")
                 local GE = ReplicatedStorage:FindFirstChild("GrabEvents")
-
                 if not (grabRemote and dropRemote and GE) then
                     PlayErrorSound()
-                    OrionLib:MakeNotification({ Name = "エラー", Content = "必要なRemoteが見つかりません", Time = 3 })
                     orbitRunning = false
                     return
                 end
-
                 local lDet = blobman:FindFirstChild("LeftDetector")
                 local rDet = blobman:FindFirstChild("RightDetector")
                 local lWeld = lDet and (lDet:FindFirstChild("LeftWeld") or lDet:FindFirstChild("RigidConstraint"))
                 local rWeld = rDet and (rDet:FindFirstChild("RightWeld") or rDet:FindFirstChild("RigidConstraint"))
-
                 if not ((lDet and lWeld) or (rDet and rWeld)) then
                     PlayErrorSound()
-                    OrionLib:MakeNotification({ Name = "エラー", Content = "検出器またはWeldが見つかりません", Time = 3 })
                     orbitRunning = false
                     return
                 end
-
                 local Det = rDet or lDet
                 local Weld = rWeld or lWeld
                 local blobRoot = blobman:FindFirstChild("HumanoidRootPart") or blobman.PrimaryPart
-
                 if not blobRoot then
                     PlayErrorSound()
-                    OrionLib:MakeNotification({ Name = "エラー", Content = "ブロブマンのルートパーツが見つかりません", Time = 3 })
                     orbitRunning = false
                     return
                 end
-
                 local targetChar = targetPlayer.Character
                 if not targetChar then
                     PlayErrorSound()
-                    OrionLib:MakeNotification({ Name = "エラー", Content = "ターゲットにキャラクターがありません", Time = 3 })
                     orbitRunning = false
                     return
                 end
-
                 local targetRoot = targetChar:FindFirstChild("HumanoidRootPart")
                 if not targetRoot then
                     PlayErrorSound()
-                    OrionLib:MakeNotification({ Name = "エラー", Content = "ターゲットにHumanoidRootPartがありません", Time = 3 })
                     orbitRunning = false
                     return
                 end
-
-                -- 引き寄せフェーズ
                 local bringStart = tick()
                 while tick() - bringStart < 0.35 do
-                    if myLoopId ~= currentLoopId or not orbitRunning then
-                        orbitRunning = false
-                        return
-                    end
+                    if myLoopId ~= currentLoopId or not orbitRunning then orbitRunning = false return end
                     if targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
                         local currentTRoot = targetPlayer.Character.HumanoidRootPart
                         blobRoot.CFrame = currentTRoot.CFrame
@@ -3920,28 +3598,19 @@ do
                     end
                     RunService.Heartbeat:Wait()
                 end
-
                 local SavedPos = targetRoot.CFrame
                 local targetCenterCFrame = SavedPos + Vector3.new(0, ORBIT_HEIGHT, 0)
                 local lastTime = tick()
                 local lastDropTime = tick()
                 local dropCount = 0
                 local effectTimer = 0
-
-                OrionLib:MakeNotification({
-                    Name = "スフィアオービットキック",
-                    Content = targetPlayer.Name .. " を実行中",
-                    Time = 2
-                })
-
+                OrionLib:MakeNotification({ Name = "スフィアオービットキック", Content = targetPlayer.Name .. " を実行中", Time = 2 })
                 while orbitRunning and blobman and blobman.Parent do
                     if myLoopId ~= currentLoopId then break end
                     if not targetPlayer or not targetPlayer.Parent or not targetPlayer.Character then break end
-
                     local tChar = targetPlayer.Character
                     local tRoot = tChar:FindFirstChild("HumanoidRootPart")
                     local tHum = tChar:FindFirstChild("Humanoid")
-
                     if dropCount < 3 and (tick() - lastDropTime) > 0.6 then
                         dropCount = dropCount + 1
                         pcall(function()
@@ -3952,7 +3621,6 @@ do
                         blobRoot.CFrame = SavedPos
                         blobRoot.AssemblyLinearVelocity = Vector3.zero
                         task.wait(0.05)
-
                         local reCaptureStart = tick()
                         while tick() - reCaptureStart < 0.25 do
                             if myLoopId ~= currentLoopId or not orbitRunning or not blobman or not blobman.Parent then break end
@@ -3971,24 +3639,19 @@ do
                         lastTime = tick()
                         lastDropTime = tick()
                     end
-
                     if tRoot and tHum and tHum.Health > 0 and blobRoot then
                         local currentTime = tick()
                         local dt = currentTime - lastTime
                         lastTime = currentTime
-
                         orbitAngle = orbitAngle + (ORBIT_SPEED * dt)
                         local offset = calculateSpherePosition(orbitAngle, ORBIT_RADIUS, ORBIT_HEIGHT, SPHERE_TILT, SPHERE_COMPLEXITY)
                         local blobPos = targetCenterCFrame.Position + offset
-
                         blobRoot.CFrame = CFrame.new(blobPos, targetCenterCFrame.Position)
                         blobRoot.AssemblyLinearVelocity = Vector3.zero
                         blobRoot.AssemblyAngularVelocity = Vector3.zero
-
                         tRoot.CFrame = targetCenterCFrame
                         tRoot.AssemblyLinearVelocity = Vector3.zero
                         tRoot.AssemblyAngularVelocity = Vector3.zero
-
                         effectTimer = effectTimer + dt
                         if EFFECTS_ENABLED and effectTimer > 0.05 then
                             effectTimer = 0
@@ -3996,7 +3659,6 @@ do
                             local colors = {"Bright violet", "Bright blue", "Bright red", "Bright yellow", "Bright green", "Bright orange", "Bright pink", "Cyan", "Magenta", "White"}
                             createOrbitEffect(blobPos, colors[colorIdx + 1] or "Bright violet")
                         end
-
                         pcall(function()
                             tHum.PlatformStand = true
                             tHum.Sit = true
@@ -4012,7 +3674,6 @@ do
                     end
                     RunService.Heartbeat:Wait()
                 end
-
                 if blobRoot and SavedPos then
                     pcall(function()
                         local currentWeld = Det:FindFirstChild("RightWeld") or Det:FindFirstChild("LeftWeld") or Det:FindFirstChildWhichIsA("Weld") or Det:FindFirstChild("RigidConstraint")
@@ -4024,20 +3685,13 @@ do
                     blobRoot.CFrame = SavedPos
                     blobRoot.AssemblyLinearVelocity = Vector3.zero
                 end
-
                 for _, part in ipairs(effectParts) do
                     if part and part.Parent then part:Destroy() end
                 end
                 effectParts = {}
-
                 orbitRunning = false
-                OrionLib:MakeNotification({
-                    Name = "スフィアオービットキック",
-                    Content = "終了しました",
-                    Time = 2
-                })
+                OrionLib:MakeNotification({ Name = "スフィアオービットキック", Content = "終了しました", Time = 2 })
             end)
-
             return true
         end
 
@@ -4066,24 +3720,17 @@ do
         _G.SphereOrbitKick = SphereOrbitKick
     end
 
-    -- ============================================================================
-    -- 攻撃系タブ UI
-    -- ============================================================================
     local AttackTab = Window:MakeTab({ Name = "攻撃系", Icon = "rbxassetid://4483345998", PremiumOnly = false })
-    
     AttackTab:AddParagraph("⚠️ 注意！", "悪用厳禁！")
-    
     AttackTab:AddSection({ Name = "キックV1 (ブロブ掴み)" })
-    
+
     local kickLoopEnabled = false
     local selectedKickPlayer = nil
 
     local function getPlayerTable()
         local players = {}
         for _, player in ipairs(Players:GetPlayers()) do 
-            if player ~= LocalPlayer then 
-                table.insert(players, player.Name) 
-            end 
+            if player ~= LocalPlayer then table.insert(players, player.Name) end 
         end
         return players
     end
@@ -4102,6 +3749,7 @@ do
     AttackTab:AddButton({
         Name = "プレイヤーリスト更新",
         Callback = function()
+            PlayActionSound()
             playerDropdown:Refresh(getPlayerTable())
             OrionLib:MakeNotification({ Name = "プレイヤーリスト", Content = "リストを更新しました！", Time = 1 })
         end
@@ -4128,33 +3776,27 @@ do
                 return
             end
             if not on then
+                PlayOpenCloseSound()
                 kickLoopEnabled = false
                 OrionLib:MakeNotification({ Name = "ループキックV1", Content = "ループキックを停止しました", Time = 1.5 })
                 return
             end
-
+            PlayActionSound()
             OrionLib:MakeNotification({ Name = "ループキックV1", Content = "開始: " .. selectedKickPlayer.Name, Time = 2 })
-
             task.spawn(function()
                 local RS = ReplicatedStorage
                 local GE = RS:WaitForChild("GrabEvents")
                 local RunServiceLocal = RunService
-
                 local blob = seat.Parent
                 local blobRoot = blob:FindFirstChild("HumanoidRootPart") or blob.PrimaryPart
                 local scriptObj = blob:FindFirstChild("BlobmanSeatAndOwnerScript")
-
                 local CG = scriptObj and scriptObj:FindFirstChild("CreatureGrab")
                 local CD = scriptObj and scriptObj:FindFirstChild("CreatureDrop")
-
                 local R_Det = blob:FindFirstChild("RightDetector")
                 local R_Weld = R_Det and (R_Det:FindFirstChild("RightWeld") or R_Det:FindFirstChildWhichIsA("Weld"))
-
                 local SavedPos = blobRoot.CFrame
-
                 local tChar = selectedKickPlayer.Character
                 local tRoot = tChar and tChar:FindFirstChild("HumanoidRootPart")
-
                 if tRoot and blobRoot then
                     local bringStart = tick()
                     while tick() - bringStart < 0.35 do
@@ -4172,16 +3814,12 @@ do
                     blobRoot.Velocity = Vector3.zero
                     task.wait(0.05)
                 end
-
                 local packetTimer = 0
-
                 while kickLoopEnabled do
                     if not selectedKickPlayer or not selectedKickPlayer.Parent or not selectedKickPlayer.Character then break end
-
                     tChar = selectedKickPlayer.Character
                     tRoot = tChar and tChar:FindFirstChild("HumanoidRootPart")
                     local tHum = tChar and tChar:FindFirstChild("Humanoid")
-
                     if tRoot and tHum and tHum.Health > 0 and blobRoot then
                         blobRoot.CFrame = SavedPos
                         blobRoot.Velocity = Vector3.zero
@@ -4189,7 +3827,6 @@ do
                         tRoot.CFrame = lockPos
                         tRoot.Velocity = Vector3.zero
                         tRoot.RotVelocity = Vector3.zero
-
                         if tick() - packetTimer > 0.05 then
                             packetTimer = tick()
                             pcall(function()
@@ -4209,19 +3846,15 @@ do
                         blobRoot.CFrame = SavedPos
                         blobRoot.Velocity = Vector3.zero
                     end
-
                     if not kickLoopEnabled then break end
                     RunServiceLocal.Heartbeat:Wait()
                 end
-
                 kickLoopEnabled = false
                 kickToggle:SetValue(false)
-
                 if blobRoot then
                     blobRoot.CFrame = SavedPos
                     blobRoot.Velocity = Vector3.zero
                 end
-
                 OrionLib:MakeNotification({ Name = "ループキックV1", Content = "停止しました", Time = 1.5 })
             end)
         end
@@ -4264,6 +3897,7 @@ do
     AttackTab:AddButton({
         Name = "プレイヤーリスト更新",
         Callback = function()
+            PlayActionSound()
             OrbitTargetDropdown:Refresh(getOrbitPlayerNamesV2(), true)
         end
     })
@@ -4275,16 +3909,16 @@ do
             orbitRunningV2 = v
             orbitCurrentLoopIdV2 = orbitCurrentLoopIdV2 + 1
             local myLoopId = orbitCurrentLoopIdV2
-
-            if not v then return end
-
+            if not v then
+                PlayOpenCloseSound()
+                return
+            end
+            PlayActionSound()
             local target = Players:FindFirstChild(selectedOrbitTargetName)
-            
             if target and target ~= LocalPlayer and target.Character and target.Character:FindFirstChild("HumanoidRootPart") and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
                 local blobman = nil
                 local spawned = Workspace:FindFirstChild(LocalPlayer.Name .. "SpawnedInToys")
                 if spawned then blobman = spawned:FindFirstChild("CreatureBlobman") end
-                
                 if not blobman then
                     local mt = ReplicatedStorage:FindFirstChild("MenuToys")
                     local st = mt and mt:FindFirstChild("SpawnToyRemoteFunction")
@@ -4297,7 +3931,6 @@ do
                         if spawned then blobman = spawned:FindFirstChild("CreatureBlobman") end
                     end
                 end
-
                 if not blobman then
                     for _, obj in ipairs(Workspace:GetChildren()) do
                         if obj.Name == "CreatureBlobman" and obj:FindFirstChild("VehicleSeat") then
@@ -4306,20 +3939,16 @@ do
                         end
                     end
                 end
-                
                 if blobman then
                     local scriptObj = blobman:FindFirstChild("BlobmanSeatAndOwnerScript")
                     local grabRemote = scriptObj and scriptObj:FindFirstChild("CreatureGrab")
                     local dropRemote = scriptObj and scriptObj:FindFirstChild("CreatureDrop")
-
                     local lDet = blobman:FindFirstChild("LeftDetector")
                     local rDet = blobman:FindFirstChild("RightDetector")
                     local lWeld = lDet and (lDet:FindFirstChild("LeftWeld") or lDet:FindFirstChild("RigidConstraint"))
                     local rWeld = rDet and (rDet:FindFirstChild("RightWeld") or rDet:FindFirstChild("RigidConstraint"))
-                    
                     local seat = blobman:FindFirstChild("VehicleSeat")
                     local hum = LocalPlayer.Character:FindFirstChild("Humanoid")
-                    
                     if seat and hum then
                         if seat.Occupant ~= hum then
                             LocalPlayer.Character.HumanoidRootPart.CFrame = seat.CFrame + Vector3.new(0, 2, 0)
@@ -4328,17 +3957,13 @@ do
                             task.wait(0.5)
                         end
                     end
-                    
                     local GE = ReplicatedStorage:FindFirstChild("GrabEvents")
-                    
                     if GE and grabRemote and dropRemote and ((lDet and lWeld) or (rDet and rWeld)) then
                         OrionLib:MakeNotification({ Name = "実行", Content = "ドリフトキックV2を開始します", Time = 3 })
-
                         task.spawn(function()
                             local blobRoot = blobman:FindFirstChild("HumanoidRootPart") or blobman.PrimaryPart
                             local Det = rDet or lDet
                             local Weld = rWeld or lWeld
-                            
                             local bringStart = tick()
                             while tick() - bringStart < 0.35 do
                                 if myLoopId ~= orbitCurrentLoopIdV2 or not orbitRunningV2 or not blobman or not blobman.Parent then return end
@@ -4354,24 +3979,18 @@ do
                                 end
                                 RunService.Heartbeat:Wait()
                             end
-                            
                             if not target.Character or not target.Character:FindFirstChild("HumanoidRootPart") then return end
-                            
                             local SavedPos = target.Character.HumanoidRootPart.CFrame
                             local targetCenterCFrame = SavedPos + Vector3.new(0, 30, 0)
-                            
                             local lastTime = tick()
                             local lastDropTime = tick()
                             local dropCount = 0
-                            
                             while orbitRunningV2 and blobman and blobman.Parent do
                                 if myLoopId ~= orbitCurrentLoopIdV2 then break end
                                 if not target or not target.Parent or not target.Character then break end
-                                
                                 local tChar = target.Character
                                 local tRoot = tChar:FindFirstChild("HumanoidRootPart")
                                 local tHum = tChar:FindFirstChild("Humanoid")
-                                
                                 if dropCount < 2 and (tick() - lastDropTime) > 0.8 then
                                     dropCount = dropCount + 1
                                     pcall(function()
@@ -4382,7 +4001,6 @@ do
                                     blobRoot.CFrame = SavedPos
                                     blobRoot.AssemblyLinearVelocity = Vector3.zero
                                     task.wait(0.1)
-                                    
                                     local reCaptureStart = tick()
                                     while tick() - reCaptureStart < 0.35 do
                                         if myLoopId ~= orbitCurrentLoopIdV2 or not orbitRunningV2 or not blobman or not blobman.Parent then break end
@@ -4401,25 +4019,20 @@ do
                                     lastTime = tick()
                                     lastDropTime = tick()
                                 end
-
                                 if tRoot and tHum and tHum.Health > 0 and blobRoot then
                                     local currentTime = tick()
                                     local dt = currentTime - lastTime
                                     lastTime = currentTime
-
                                     orbitAngleV2 = orbitAngleV2 + (orbitSpeed * dt)
                                     local offsetX = math.cos(orbitAngleV2) * orbitRadius
                                     local offsetZ = math.sin(orbitAngleV2) * orbitRadius
-                                    
                                     local blobPos = targetCenterCFrame.Position + Vector3.new(offsetX, orbitHeightOffset, offsetZ)
                                     blobRoot.CFrame = CFrame.new(blobPos, targetCenterCFrame.Position)
                                     blobRoot.AssemblyLinearVelocity = Vector3.zero
                                     blobRoot.AssemblyAngularVelocity = Vector3.zero
-                                    
                                     tRoot.CFrame = targetCenterCFrame
                                     tRoot.AssemblyLinearVelocity = Vector3.zero
                                     tRoot.AssemblyAngularVelocity = Vector3.zero
-
                                     pcall(function()
                                         tHum.PlatformStand = true
                                         tHum.Sit = true
@@ -4435,7 +4048,6 @@ do
                                 end
                                 RunService.Heartbeat:Wait()
                             end
-                            
                             if blobRoot and SavedPos then
                                 pcall(function()
                                     local currentWeld = Det:FindFirstChild("RightWeld") or Det:FindFirstChild("LeftWeld") or Det:FindFirstChildWhichIsA("Weld") or Det:FindFirstChild("RigidConstraint")
@@ -4469,7 +4081,6 @@ do
     AttackTab:AddSection({ Name = "ふっとばす" })
 
     local BlobmanBeta = {}
-
     function BlobmanBeta.getLocalChar() return LocalPlayer.Character end
     function BlobmanBeta.getLocalRoot()
         local char = BlobmanBeta.getLocalChar()
@@ -4480,15 +4091,12 @@ do
         return char and char:FindFirstChildOfClass("Humanoid")
     end
     function BlobmanBeta.getInv() return Workspace:FindFirstChild(LocalPlayer.Name .. "SpawnedInToys") end
-
     function BlobmanBeta.SetNetworkOwner(part)
         ReplicatedStorage.GrabEvents.SetNetworkOwner:FireServer(part, BlobmanBeta.getLocalRoot().CFrame)
     end
-
     function BlobmanBeta.ungrab(part)
         ReplicatedStorage.GrabEvents.DestroyGrabLine:FireServer(part)
     end
-
     function BlobmanBeta.getBlobman()
         local inv = BlobmanBeta.getInv()
         if inv then
@@ -4503,18 +4111,15 @@ do
         end
         return nil
     end
-
     function BlobmanBeta.spawnBlobman()
         ReplicatedStorage.MenuToys.SpawnToyRemoteFunction:InvokeServer("CreatureBlobman", BlobmanBeta.getLocalRoot().CFrame, Vector3.zero)
         task.wait(1.0)
         return BlobmanBeta.getBlobman()
     end
-
     function BlobmanBeta.destroyBlobman()
         local blob = BlobmanBeta.getBlobman()
         if blob then ReplicatedStorage.MenuToys.DestroyToy:FireServer(blob) end
     end
-
     function BlobmanBeta.isSittingOnBlobman()
         local hum = BlobmanBeta.getLocalHum()
         if not hum then return false end
@@ -4522,7 +4127,6 @@ do
         if not blob or not blob:FindFirstChild("VehicleSeat") then return false end
         return hum.Sit and hum.SeatPart == blob.VehicleSeat
     end
-
     function BlobmanBeta.ensureSitBlobman()
         local blob = BlobmanBeta.getBlobman()
         if not blob or not blob:FindFirstChild("VehicleSeat") then return false end
@@ -4534,7 +4138,6 @@ do
         end
         return BlobmanBeta.isSittingOnBlobman()
     end
-
     function BlobmanBeta.blobGrab(blob, target, side)
         if not blob then return end
         local detector = blob:FindFirstChild(side .. "Detector")
@@ -4546,7 +4149,6 @@ do
         local remote = script:FindFirstChild("CreatureGrab")
         if remote then pcall(function() remote:FireServer(detector, target, weld) end) end
     end
-
     function BlobmanBeta.blobDrop(blob, target, side)
         if not blob then return end
         local detector = blob:FindFirstChild(side .. "Detector")
@@ -4556,7 +4158,6 @@ do
         local remote = script:FindFirstChild("CreatureDrop")
         if remote then pcall(function() remote:FireServer(detector, target) end) end
     end
-
     function BlobmanBeta.blobKick(blob, targetRoot, side)
         BlobmanBeta.blobGrab(blob, BlobmanBeta.getLocalRoot(), side)
         task.wait(0.08)
@@ -4613,9 +4214,8 @@ do
             OrionLib:MakeNotification({Name = "エラー", Content = "ターゲットにHumanoidRootPartがありません", Time = 3})
             return
         end
-        
         isExecuting = true
-        
+        PlayActionSound()
         local function doKick()
             local blob = BlobmanBeta.getBlobman()
             if not blob then
@@ -4647,7 +4247,6 @@ do
             OrionLib:MakeNotification({Name = "成功", Content = targetPlayer.Name .. " をふっとばしました！", Time = 5})
             return true
         end
-        
         doKick()
         isExecuting = false
     end
@@ -4660,7 +4259,10 @@ do
 
     AttackTab:AddButton({
         Name = "プレイヤーリスト更新",
-        Callback = function() UpdateV3PlayerList(V3PlayerDropdown) end
+        Callback = function()
+            PlayActionSound()
+            UpdateV3PlayerList(V3PlayerDropdown)
+        end
     })
 
     AttackTab:AddButton({
@@ -4669,7 +4271,6 @@ do
     })
 
     AttackTab:AddSection({ Name = "ふっとばす 追加機能" })
-    
     local InfiniteJumpV3Enabled = false
     UserInputService.JumpRequest:Connect(function()
         if InfiniteJumpV3Enabled then
@@ -4681,7 +4282,10 @@ do
     AttackTab:AddToggle({
         Name = "無限ジャンプ",
         Default = false,
-        Callback = function(Value) InfiniteJumpV3Enabled = Value end
+        Callback = function(Value)
+            InfiniteJumpV3Enabled = Value
+            if Value then PlayActionSound() else PlayOpenCloseSound() end
+        end
     })
 
     AttackTab:AddToggle({
@@ -4689,9 +4293,11 @@ do
         Default = false,
         Callback = function(Value)
             if Value then
+                PlayActionSound()
                 LocalPlayer.CameraMaxZoomDistance = 100
                 LocalPlayer.CameraMinZoomDistance = 10
             else
+                PlayOpenCloseSound()
                 LocalPlayer.CameraMaxZoomDistance = 12.5
                 LocalPlayer.CameraMinZoomDistance = 0.5
             end
@@ -4732,31 +4338,23 @@ do
     local function KickAll()
         if isKickAllActive then return end
         isKickAllActive = true
-        
         local allPlayers = GetAllPlayers()
         if #allPlayers == 0 then 
             PlayErrorSound()
-            OrionLib:MakeNotification({
-                Name = "対象がいません",
-                Content = "キックできるプレイヤーがいません。",
-                Image = "rbxassetid://4483345998",
-                Time = 3
-            })
+            OrionLib:MakeNotification({ Name = "対象がいません", Content = "キックできるプレイヤーがいません。", Image = "rbxassetid://4483345998", Time = 3 })
             isKickAllActive = false
             return 
         end
-
+        PlayActionSound()
         for _, targetPlayer in ipairs(allPlayers) do
             playerStatus[targetPlayer.UserId] = "標的中"
         end
-        
         local rootPart = GetMyRoot()
         if rootPart then
             local spawnPos = rootPart.CFrame * CFrame.new(0, 0, -5)
             ReplicatedStorage.MenuToys.SpawnToyRemoteFunction:InvokeServer("CreatureBlobman", spawnPos, Vector3.new(0, 127, 0))
         end
         task.wait(0.5)
-        
         local toyFolder = workspace:FindFirstChild(LocalPlayer.Name .. "SpawnedInToys")
         currentBlob = toyFolder and toyFolder:FindFirstChild("CreatureBlobman")
         if not currentBlob then 
@@ -4765,13 +4363,11 @@ do
             isKickAllActive = false
             return 
         end
-        
         local vehicleSeat = currentBlob:FindFirstChild("VehicleSeat")
         if vehicleSeat and LocalPlayer.Character then
             vehicleSeat:Sit(LocalPlayer.Character:FindFirstChildOfClass("Humanoid"))
         end
         task.wait(0.3)
-        
         local myRoot = GetMyRoot()
         if not myRoot then 
             PlayErrorSound()
@@ -4779,7 +4375,6 @@ do
             isKickAllActive = false
             return 
         end
-        
         for _, targetPlayer in ipairs(allPlayers) do
             local targetRoot = targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart")
             if targetRoot then
@@ -4794,15 +4389,12 @@ do
                 end
             end
         end
-        
         myRoot.CFrame = CFrame.new(0, 100, 0)
         task.wait(0.1)
-        
         for _, part in ipairs(currentBlob:GetDescendants()) do
             if part:IsA("BasePart") then pcall(function() part.Anchored = true end) end
         end
         task.wait(0.1)
-        
         local radius = 15
         for i, targetPlayer in ipairs(allPlayers) do
             local targetRoot = targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart")
@@ -4814,7 +4406,6 @@ do
             end
         end
         task.wait(0.1)
-        
         for _ = 1, 2 do
             for _, targetPlayer in ipairs(allPlayers) do
                 local targetRoot = targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart")
@@ -4829,9 +4420,7 @@ do
             end
             task.wait(0.1)
         end
-        
         task.wait(0.3)
-        
         for _, targetPlayer in ipairs(allPlayers) do
             local targetRoot = targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart")
             if targetRoot then
@@ -4843,21 +4432,16 @@ do
                 end)
             end
         end
-        
         task.wait(0.1)
-
         for _, targetPlayer in ipairs(allPlayers) do
             if targetPlayer and targetPlayer.Parent == Players then
                 playerStatus[targetPlayer.UserId] = "キック済み"
             end
         end
-
         myRoot.CFrame = CFrame.new(0, -50000, 0)
-        
         for _, part in ipairs(currentBlob:GetDescendants()) do
             if part:IsA("BasePart") then pcall(function() part.Anchored = false end) end
         end
-        
         task.wait(1)
         isKickAllActive = false
     end
@@ -4867,7 +4451,10 @@ do
     AttackTab:AddToggle({
         Name = "フレンドを除外",
         Default = false,
-        Callback = function(Value) whitelistFriends = Value end    
+        Callback = function(Value)
+            whitelistFriends = Value
+            if Value then PlayActionSound() else PlayOpenCloseSound() end
+        end    
     })
 
     AttackTab:AddParagraph("ステータス", "現在の状態情報")
@@ -4885,9 +4472,6 @@ do
         end
     end)
 
-    -- ============================================================================
-    -- スフィアオービットキックV1 セクション（新規追加）
-    -- ============================================================================
     AttackTab:AddSection({ Name = "スフィアオービットキックV1" })
 
     local sphereTargetMap = {}
@@ -4918,6 +4502,7 @@ do
     AttackTab:AddButton({
         Name = "プレイヤーリスト更新",
         Callback = function()
+            PlayActionSound()
             sphereTargetDropdown:Refresh(getSpherePlayerNames(), true)
         end
     })
@@ -4937,64 +4522,21 @@ do
 
     AttackTab:AddButton({
         Name = "⏹ 停止",
-        Callback = function() SphereOrbitKick.stop() end
+        Callback = function()
+            PlayOpenCloseSound()
+            SphereOrbitKick.stop()
+        end
     })
 
-    AttackTab:AddSlider({
-        Name = "軌道半径",
-        Min = 5, Max = 30,
-        Default = 12,
-        Color = Theme.SliderColor,
-        Increment = 1,
-        ValueName = "スタッド",
-        Callback = function(v) SphereOrbitKick.setRadius(v) end
-    })
-
-    AttackTab:AddSlider({
-        Name = "軌道速度",
-        Min = 10, Max = 150,
-        Default = 60,
-        Color = Theme.SliderColor,
-        Increment = 5,
-        ValueName = "速度",
-        Callback = function(v) SphereOrbitKick.setSpeed(v) end
-    })
-
-    AttackTab:AddSlider({
-        Name = "浮遊高さ",
-        Min = 2, Max = 30,
-        Default = 10,
-        Color = Theme.SliderColor,
-        Increment = 1,
-        ValueName = "スタッド",
-        Callback = function(v) SphereOrbitKick.setHeight(v) end
-    })
-
-    AttackTab:AddSlider({
-        Name = "球体傾き",
-        Min = 0.1, Max = 1.5,
-        Default = 0.9,
-        Color = Theme.SliderColor,
-        Increment = 0.1,
-        ValueName = "傾き",
-        Callback = function(v) SphereOrbitKick.setTilt(v) end
-    })
-
-    AttackTab:AddSlider({
-        Name = "軌道複雑さ",
-        Min = 0.1, Max = 2.0,
-        Default = 0.7,
-        Color = Theme.SliderColor,
-        Increment = 0.1,
-        ValueName = "複雑さ",
-        Callback = function(v) SphereOrbitKick.setComplexity(v) end
-    })
-
-    AttackTab:AddToggle({
-        Name = "エフェクト表示",
-        Default = true,
-        Callback = function(v) SphereOrbitKick.setEffects(v) end
-    })
+    AttackTab:AddSlider({ Name = "軌道半径", Min = 5, Max = 30, Default = 12, Color = Theme.SliderColor, Increment = 1, ValueName = "スタッド", Callback = function(v) SphereOrbitKick.setRadius(v) end })
+    AttackTab:AddSlider({ Name = "軌道速度", Min = 10, Max = 150, Default = 60, Color = Theme.SliderColor, Increment = 5, ValueName = "速度", Callback = function(v) SphereOrbitKick.setSpeed(v) end })
+    AttackTab:AddSlider({ Name = "浮遊高さ", Min = 2, Max = 30, Default = 10, Color = Theme.SliderColor, Increment = 1, ValueName = "スタッド", Callback = function(v) SphereOrbitKick.setHeight(v) end })
+    AttackTab:AddSlider({ Name = "球体傾き", Min = 0.1, Max = 1.5, Default = 0.9, Color = Theme.SliderColor, Increment = 0.1, ValueName = "傾き", Callback = function(v) SphereOrbitKick.setTilt(v) end })
+    AttackTab:AddSlider({ Name = "軌道複雑さ", Min = 0.1, Max = 2.0, Default = 0.7, Color = Theme.SliderColor, Increment = 0.1, ValueName = "複雑さ", Callback = function(v) SphereOrbitKick.setComplexity(v) end })
+    AttackTab:AddToggle({ Name = "エフェクト表示", Default = true, Callback = function(v)
+        SphereOrbitKick.setEffects(v)
+        if v then PlayActionSound() else PlayOpenCloseSound() end
+    end })
 
     AttackTab:AddParagraph("説明", 
         "球体軌道キック V1\n" ..
@@ -5015,17 +4557,12 @@ do
     local Workspace = _G.Workspace
     local LocalPlayer = _G.LocalPlayer
 
-    local TrainTab = Window:MakeTab({
-        Name = "汽車を乗っ取る",
-        Icon = "rbxassetid://4483345998",
-        PremiumOnly = false
-    })
+    local TrainTab = Window:MakeTab({ Name = "汽車を乗っ取る", Icon = "rbxassetid://4483345998", PremiumOnly = false })
 
     local AutomationEnabled = false
     local AutomationConnection = nil
     local TargetItemName = "InstrumentWoodwindOcarina"
     local SecondItemName = "FoodMayonnaise"
-
     local occupiedSeats = {}
     local seatConnections = {}
     local firstTimeRiders = {}
@@ -5040,12 +4577,7 @@ do
                     local item = holdPart.Parent
                     if item then
                         local dropRemote = holdPart:FindFirstChild("DropItemRemoteFunction")
-                        table.insert(items, {
-                            Name = item.Name,
-                            Object = item,
-                            RemoteFunction = obj,
-                            DropRemoteFunction = dropRemote,
-                        })
+                        table.insert(items, { Name = item.Name, Object = item, RemoteFunction = obj, DropRemoteFunction = dropRemote })
                     end
                 end
             end
@@ -5054,9 +4586,7 @@ do
     end
 
     local function getPlayerCharacter()
-        return Workspace:FindFirstChild(LocalPlayer.Name .. "_sub") or
-               Workspace:FindFirstChild(LocalPlayer.Name) or
-               LocalPlayer.Character
+        return Workspace:FindFirstChild(LocalPlayer.Name .. "_sub") or Workspace:FindFirstChild(LocalPlayer.Name) or LocalPlayer.Character
     end
 
     local function holdItem(itemData)
@@ -5082,11 +4612,7 @@ do
             local root = char:FindFirstChild("HumanoidRootPart")
             if root then
                 pcall(function()
-                    itemData.DropRemoteFunction:InvokeServer(
-                        itemData.Object,
-                        root.CFrame * CFrame.new(0, 900, 0),
-                        Vector3.new(0, 900, 0)
-                    )
+                    itemData.DropRemoteFunction:InvokeServer(itemData.Object, root.CFrame * CFrame.new(0, 900, 0), Vector3.new(0, 900, 0))
                 end)
             end
         end
@@ -5097,17 +4623,12 @@ do
         if not char then return end
         local root = char:FindFirstChild("HumanoidRootPart")
         if not root then return end
-
         pcall(function()
             local SpawnToyRemote = ReplicatedStorage:FindFirstChild("MenuToys")
             if SpawnToyRemote then
                 local SpawnFunc = SpawnToyRemote:FindFirstChild("SpawnToyRemoteFunction")
                 if SpawnFunc then
-                    SpawnFunc:InvokeServer(
-                        itemName,
-                        CFrame.new(root.Position + Vector3.new(0, 900, 0)),
-                        Vector3.new(0, 0, 0)
-                    )
+                    SpawnFunc:InvokeServer(itemName, CFrame.new(root.Position + Vector3.new(0, 900, 0)), Vector3.new(0, 0, 0))
                 end
             end
         end)
@@ -5132,10 +4653,8 @@ do
             if not findTargetItem() then spawnItem(TargetItemName) end
             if not findSecondItem() then spawnItem(SecondItemName) end
             task.wait(1.0)
-
             local target = findTargetItem()
             local second = findSecondItem()
-
             if target then holdItem(target) task.wait(0.1) end
             if second then holdItem(second) task.wait(0.1) end
             if target then useItem(target) task.wait(0.1) end
@@ -5195,22 +4714,20 @@ do
     local function sitOnRandomEmptySeat()
         local empty = {}
         for _, seat in pairs(allSeats) do
-            if seat and seat.Parent and seat:IsA("Seat") and not seat.Occupant then
-                table.insert(empty, seat)
-            end
+            if seat and seat.Parent and seat:IsA("Seat") and not seat.Occupant then table.insert(empty, seat) end
         end
         if #empty == 0 then
             PlayErrorSound()
             OrionLib:MakeNotification({ Name = "座席なし", Content = "空いている座席がありません", Time = 2 })
             return
         end
-
         local seat = empty[math.random(1, #empty)]
         local char = getPlayerCharacter()
         if char then
             local hum = char:FindFirstChildOfClass("Humanoid")
             local root = char:FindFirstChild("HumanoidRootPart")
             if hum and root then
+                PlayActionSound()
                 hum.Sit = false
                 task.wait(0.2)
                 root.CFrame = seat.CFrame + Vector3.new(0, 3, 0)
@@ -5227,14 +4744,12 @@ do
         if not char then return end
         local hum = char:FindFirstChildOfClass("Humanoid")
         if not hum then return end
-
         AutomationConnection = hum.Seated:Connect(function(active, seat)
             if AutomationEnabled then
                 task.wait(0.1)
                 performAutoAction(active)
             end
         end)
-
         if AutomationEnabled and hum.SeatPart then performAutoAction(true) end
     end
 
@@ -5255,10 +4770,12 @@ do
         Callback = function(value)
             AutomationEnabled = value
             if value then
+                PlayActionSound()
                 startAutomation()
                 startSeatDetection()
                 OrionLib:MakeNotification({ Name = "自動化ON", Content = "乗車/降車時に" .. TargetItemName .. "を自動操作", Time = 3 })
             else
+                PlayOpenCloseSound()
                 stopAutomation()
                 OrionLib:MakeNotification({ Name = "自動化OFF", Content = "停止しました", Time = 2 })
             end
@@ -5271,6 +4788,7 @@ do
     TrainTab:AddButton({
         Name = "vFly GUI起動",
         Callback = function()
+            PlayActionSound()
             pcall(function()
                 loadstring(game:HttpGet('https://raw.githubusercontent.com/makkurokurosukescript/VFly-gui/refs/heads/main/VFly%20gui'))()
             end)
@@ -5323,6 +4841,7 @@ do
     PianoControlSec:AddToggle({ Name = "ピアノ機能を有効化", Default = false, Callback = _G.togglePiano })
     PianoControlSec:AddToggle({ Name = "プレイヤー追従", Default = true, Callback = function(v)
         SH.PianoConfig.FollowPlayer = v
+        if v then PlayActionSound() else PlayOpenCloseSound() end
         if SH.PianoConfig.Enabled and SH.PianoConfig.Keyboard and SH.PianoConfig.Keyboard.Parent then
             if v then _G.setupPianoFollow() else _G.stopPiano() end
         elseif SH.PianoConfig.Enabled and v then
@@ -5347,13 +4866,19 @@ do
             OrionLib:MakeNotification({Name = "エラー", Content = "JSONデータを入力してください", Time = 5})
             return 
         end
+        PlayActionSound()
         _G.playSongFromJSONString(SH.PianoConfig.SongData)
         OrionLib:MakeNotification({ Name = "自動演奏", Content = "再生を開始しました", Time = 3 })
     end })
-    PianoSongSec:AddButton({ Name = "再生を停止", Callback = function() _G.stopSong(); OrionLib:MakeNotification({ Name = "停止", Content = "曲の再生を停止しました", Time = 3 }) end })
+    PianoSongSec:AddButton({ Name = "再生を停止", Callback = function()
+        PlayOpenCloseSound()
+        _G.stopSong()
+        OrionLib:MakeNotification({ Name = "停止", Content = "曲の再生を停止しました", Time = 3 })
+    end })
 
     local ConverterSec = PianoTab:AddSection({ Name = "MIDI→JSON コンバーター" })
     ConverterSec:AddButton({ Name = "🌐 コンバーターを開く (ブラウザ)", Callback = function()
+        PlayActionSound()
         local url = "https://saturngroup02.github.io/piano-MIDI-or-key/"
         local success, err = pcall(function()
             if syn and syn.open_url then syn.open_url(url)
@@ -5362,6 +4887,7 @@ do
         if not success then setclipboard(url); OrionLib:MakeNotification({ Name = "URLをコピーしました", Content = "ブラウザで開いてください: " .. url, Time = 8 }) end
     end })
     ConverterSec:AddButton({ Name = "📋 URLをコピー", Callback = function()
+        PlayActionSound()
         setclipboard("https://saturngroup02.github.io/piano-MIDI-or-key/")
         OrionLib:MakeNotification({ Name = "URLをコピーしました", Content = "クリップボードにコピーしました", Time = 4 })
     end })
@@ -5383,7 +4909,6 @@ do
     SRBMTab:AddParagraph("注意", "SRBM機能は自分のオブジェクトしか取得できません！")
 
     SRBMTab:AddSection({ Name = "HUD表示" })
-    
     local hudActive = false
     local hudScreenGui = nil
     local hudImageLabel = nil
@@ -5394,22 +4919,18 @@ do
     local function CreateHUD()
         if hudScreenGui then hudScreenGui:Destroy(); hudScreenGui = nil end
         if hudCoordGui then hudCoordGui:Destroy(); hudCoordGui = nil end
-
         hudScreenGui = Instance.new("ScreenGui")
         hudScreenGui.Name = "SRBM_HUD"
         hudScreenGui.Parent = LocalPlayer.PlayerGui
-
         hudImageLabel = Instance.new("ImageLabel")
         hudImageLabel.Size = UDim2.new(0, 200, 0, 200)
         hudImageLabel.Position = UDim2.new(0.5, -100, 0.5, -100)
         hudImageLabel.BackgroundTransparency = 1
         hudImageLabel.Image = "rbxassetid://133111892922392"
         hudImageLabel.Parent = hudScreenGui
-
         hudCoordGui = Instance.new("ScreenGui")
         hudCoordGui.Name = "SRBM_Coord"
         hudCoordGui.Parent = LocalPlayer.PlayerGui
-
         hudCoordLabel = Instance.new("TextLabel")
         hudCoordLabel.Size = UDim2.new(0, 250, 0, 30)
         hudCoordLabel.Position = UDim2.new(0, 10, 0, 10)
@@ -5420,7 +4941,6 @@ do
         hudCoordLabel.Font = Enum.Font.GothamBold
         hudCoordLabel.TextXAlignment = Enum.TextXAlignment.Left
         hudCoordLabel.Parent = hudCoordGui
-
         hudVisible = true
     end
 
@@ -5436,21 +4956,17 @@ do
         if hudActive then return end
         hudActive = true
         CreateHUD()
-
         if coordUpdateConnection then coordUpdateConnection:Disconnect() end
         coordUpdateConnection = RunService.Heartbeat:Connect(function()
             if not hudActive then return end
             local char = LocalPlayer.Character
             if char and char:FindFirstChild("HumanoidRootPart") then
                 local pos = char.HumanoidRootPart.Position
-                if hudCoordLabel then
-                    hudCoordLabel.Text = string.format("座標: %.1f, %.1f, %.1f", pos.X, pos.Y, pos.Z)
-                end
+                if hudCoordLabel then hudCoordLabel.Text = string.format("座標: %.1f, %.1f, %.1f", pos.X, pos.Y, pos.Z) end
             else
                 if hudCoordLabel then hudCoordLabel.Text = "座標: 取得中..." end
             end
         end)
-
         UserInputService.InputBegan:Connect(function(input, gameProcessed)
             if gameProcessed then return end
             if input.KeyCode == Enum.KeyCode.P then
@@ -5458,7 +4974,6 @@ do
                 OrionLib:MakeNotification({ Name = "HUD", Content = hudVisible and "表示" or "非表示", Time = 1 })
             end
         end)
-
         OrionLib:MakeNotification({ Name = "HUD表示", Content = "有効化 (Pキーで表示切替)", Time = 3 })
     end
 
@@ -5476,13 +4991,14 @@ do
         Name = "HUD表示 (画像+座標)",
         Default = false,
         Callback = function(Value)
-            if Value then StartHUD() else StopHUD() end
+            if Value then PlayActionSound(); StartHUD() else PlayOpenCloseSound(); StopHUD() end
         end
     })
 
     SRBMTab:AddButton({
         Name = "Pキーで表示切替 (説明)",
         Callback = function()
+            PlayActionSound()
             OrionLib:MakeNotification({ Name = "操作方法", Content = "Pキーで画像と座標の表示/非表示を切り替え", Time = 4 })
         end
     })
@@ -5505,23 +5021,17 @@ do
         keysDown[input.KeyCode] = false
     end)
 
-    local toys = {
-        missileRotationOffset = -135,
-        mod = nil,
-        isMoving = false
-    }
+    local toys = { missileRotationOffset = -135, mod = nil, isMoving = false }
 
     local function createBodyMovers(part)
         local bp = part:FindFirstChild("BP") or Instance.new("BodyPosition")
         bp.Name = "BP"; bp.P = 20000; bp.D = 200
         bp.MaxForce = Vector3.new(5e6, 5e6, 5e6)
         bp.Position = part.Position; bp.Parent = part
-
         local bg = part:FindFirstChild("BG") or Instance.new("BodyGyro")
         bg.Name = "BG"; bg.P = 20000; bg.D = 200
         bg.MaxTorque = Vector3.new(5e6, 5e6, 5e6)
         bg.CFrame = part.CFrame; bg.Parent = part
-
         part.Anchored = false
     end
 
@@ -5551,7 +5061,6 @@ do
         if target == "meobject" then
             local meFolder = workspace:FindFirstChild(LocalPlayer.Name .. "SpawnedInToys")
             if meFolder then collectModelsInFolder(meFolder) end
-
             local plotsFolder = workspace:FindFirstChild("Plots")
             if plotsFolder then
                 for i = 1, 5 do
@@ -5705,6 +5214,7 @@ do
         Callback = function(state)
             toys.isMoving = state
             toys.mod = state and "BombMissile" or nil
+            if state then PlayActionSound() else PlayOpenCloseSound() end
             toggleEffect()
         end
     })
@@ -5714,10 +5224,12 @@ do
         Default = false,
         Callback = function(state)
             if state then
+                PlayActionSound()
                 LocalPlayer.CameraMode = Enum.CameraMode.Classic
                 LocalPlayer.CameraMaxZoomDistance = 100
                 LocalPlayer.CameraMinZoomDistance = 0.5
             else
+                PlayOpenCloseSound()
                 LocalPlayer.CameraMode = Enum.CameraMode.LockFirstPerson
                 LocalPlayer.CameraMaxZoomDistance = 0.5
                 LocalPlayer.CameraMinZoomDistance = 0.5
@@ -5732,6 +5244,7 @@ do
         Callback = function(state)
             toys.isMoving = state
             toys.mod = state and "Helicopter" or nil
+            if state then PlayActionSound() else PlayOpenCloseSound() end
             toggleEffect()
         end
     })
@@ -5742,6 +5255,7 @@ do
         Options = {"meobject"},
         Callback = function(sel)
             selectedTarget = sel
+            PlayActionSound()
             addToysToAura(selectedTarget)
         end
     })
@@ -5764,6 +5278,7 @@ do
                 loadstring(game:HttpGet("https://pastefy.app/XNJSi96W/raw"))()
             end)
             if success then
+                PlayActionSound()
                 OrionLib:MakeNotification({ Name = "リソースパックV1", Content = "読み込み成功！ TractorGreenの見た目を置き換えました", Time = 4 })
             else
                 PlayErrorSound()
@@ -5779,16 +5294,14 @@ do
 end
 
 -- ============================================================================
--- ブロック36: スクリプトhubタブ（樱花AI と かめはめ波GUI 削除済み）
+-- ブロック36: スクリプトhubタブ
 -- ============================================================================
 do
     local Window = _G.Window
     local OrionLib = _G.OrionLib
 
     local ScriptHubTab = Window:MakeTab({ Name = "スクリプトhub", Icon = "rbxassetid://4483362458", PremiumOnly = false })
-    
     ScriptHubTab:AddParagraph("⚠️ 注意", "一部外部スクリプトはさくらhub外の開発です 保証なし")
-    
     ScriptHubTab:AddSection({ Name = "外部スクリプト読み込み" })
 
     local function executeScript(url, name)
@@ -5796,6 +5309,7 @@ do
             loadstring(game:HttpGet(url))()
         end)
         if success then
+            PlayActionSound()
             OrionLib:MakeNotification({ Name = name, Content = "読み込み成功！", Time = 3 })
         else
             PlayErrorSound()
@@ -5858,7 +5372,7 @@ do
                 OrionLib:MakeNotification({ Name = "Error", Content = "Character not ready", Time = 4 })
                 return
             end
-
+            PlayActionSound()
             local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
             local originalWalkSpeed, originalJumpPower
             if humanoid then
@@ -5869,15 +5383,12 @@ do
                     humanoid.JumpPower = 0
                 end)
             end
-
             local success, err = pcall(function()
                 local MenuToys = ReplicatedStorage:WaitForChild("MenuToys")
                 local hrp = player.Character.HumanoidRootPart
                 local originalCFrame = hrp.CFrame
-
                 hrp.CFrame = CFrame.new(246.052, -7.35, 431.821)
                 task.wait(0.05)
-
                 MenuToys.SpawnToyRemoteFunction:InvokeServer(
                     "InstrumentWoodwindOcarina",
                     CFrame.new(184.148834, -5.54824972, 498.136749,
@@ -5887,23 +5398,18 @@ do
                     Vector3.new(0, 34, 0)
                 )
                 task.wait(0.2)
-
                 local toyFolder = workspace:FindFirstChild(player.Name .. "SpawnedInToys")
                 if not toyFolder then error("SpawnedInToys folder not found") end
-
                 local ocarina = toyFolder:FindFirstChild("InstrumentWoodwindOcarina")
                 if not ocarina then error("InstrumentWoodwindOcarina not found") end
-
                 if ocarina:FindFirstChild("HoldPart") and ocarina.HoldPart:FindFirstChild("HoldItemRemoteFunction") then
                     pcall(function()
                         ocarina.HoldPart.HoldItemRemoteFunction:InvokeServer(ocarina, player.Character)
                     end)
                     task.wait(0.2)
                 end
-
                 player.Character.HumanoidRootPart.CFrame = CFrame.new(304.06, 25.77, 488.54)
                 task.wait(0.05)
-
                 local destroyEv = ReplicatedStorage:FindFirstChild("MenuToys") and ReplicatedStorage.MenuToys:FindFirstChild("DestroyToy")
                 if destroyEv then
                     destroyEv:FireServer(ocarina)
@@ -5911,21 +5417,17 @@ do
                     error("DestroyToy event not found")
                 end
                 task.wait(0.05)
-
                 if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
                     player.Character.HumanoidRootPart.CFrame = originalCFrame
                 end
-
                 OrionLib:MakeNotification({ Name = "Success", Content = "Barrier break executed", Time = 3 })
             end)
-
             if humanoid then
                 pcall(function()
                     if originalWalkSpeed then humanoid.WalkSpeed = originalWalkSpeed end
                     if originalJumpPower then humanoid.JumpPower = originalJumpPower end
                 end)
             end
-
             if not success then
                 PlayErrorSound()
                 OrionLib:MakeNotification({ Name = "Error", Content = tostring(err), Time = 6 })
@@ -5994,6 +5496,7 @@ do
             elseif Value == "球体（立体）" then SH.SaturnConfig.Mode = "sphere"
             elseif Value == "リング（平面）" then SH.SaturnConfig.Mode = "ring"
             elseif Value == "Plot（地面展開）" then SH.SaturnConfig.Mode = "plot" end
+            PlayActionSound()
         end
     })
     SaturnTab:AddSlider({ Name = "ベース高さ", Min = 0, Max = 20, Default = SH.SaturnConfig.BaseHeight, Color = Theme.SliderColor, Increment = 0.5, ValueName = "スタッド", Callback = function(v) SH.SaturnConfig.BaseHeight = v end })
@@ -6009,7 +5512,13 @@ do
     SaturnTab:AddSlider({ Name = "Plot展開半径", Min = 5, Max = 50, Default = SH.SaturnConfig.PlotRadius, Color = Theme.SliderColor, Increment = 1, ValueName = "スタッド", Callback = function(v) SH.SaturnConfig.PlotRadius = v end })
     SaturnTab:AddSlider({ Name = "浮遊高さ", Min = 0, Max = 10, Default = SH.SaturnConfig.PlotHeight, Color = Theme.SliderColor, Increment = 0.5, ValueName = "スタッド", Callback = function(v) SH.SaturnConfig.PlotHeight = v end })
     SaturnTab:AddSection({ Name = "ユーティリティ" })
-    SaturnTab:AddButton({ Name = "再スキャン", Callback = function() if _G.rescanSaturn then _G.rescanSaturn(); OrionLib:MakeNotification({ Name = "再スキャン完了", Content = string.format("スパークラーを%d個検出しました", #SH.saturnList), Time = 2 }) end end })
+    SaturnTab:AddButton({ Name = "再スキャン", Callback = function()
+        PlayActionSound()
+        if _G.rescanSaturn then
+            _G.rescanSaturn()
+            OrionLib:MakeNotification({ Name = "再スキャン完了", Content = string.format("スパークラーを%d個検出しました", #SH.saturnList), Time = 2 })
+        end
+    end })
 end
 
 -- ============================================================================
@@ -6022,8 +5531,12 @@ do
 
     local MagicCircleTab = Window:MakeTab({ Name = "魔法陣", Icon = "rbxassetid://4483362458", PremiumOnly = false })
     MagicCircleTab:AddToggle({ Name = "魔法陣起動", Default = false, Callback = _G.toggleMagicCircle })
-    MagicCircleTab:AddDropdown({ Name = "シンボルタイプ", Default = SH.MagicCircleConfig.SymbolType, Options = {"Ring", "Circle", "Hexagram"}, Callback = function(v) SH.MagicCircleConfig.SymbolType = v end })
-    MagicCircleTab:AddToggle({ Name = "発光効果", Default = SH.MagicCircleConfig.GlowEffect, Callback = function(v) SH.MagicCircleConfig.GlowEffect = v; if SH.MagicCircleConfig.Enabled then _G.toggleMagicCircle(false); task.wait(0.1); _G.toggleMagicCircle(true) end end })
+    MagicCircleTab:AddDropdown({ Name = "シンボルタイプ", Default = SH.MagicCircleConfig.SymbolType, Options = {"Ring", "Circle", "Hexagram"}, Callback = function(v) SH.MagicCircleConfig.SymbolType = v; PlayActionSound() end })
+    MagicCircleTab:AddToggle({ Name = "発光効果", Default = SH.MagicCircleConfig.GlowEffect, Callback = function(v)
+        SH.MagicCircleConfig.GlowEffect = v
+        if v then PlayActionSound() else PlayOpenCloseSound() end
+        if SH.MagicCircleConfig.Enabled then _G.toggleMagicCircle(false); task.wait(0.1); _G.toggleMagicCircle(true) end
+    end })
     MagicCircleTab:AddSlider({ Name = "高さ", Min = 0, Max = 50, Default = SH.MagicCircleConfig.Height, Color = Theme.SliderColor, Increment = 1, ValueName = "スタッド", Callback = function(v) SH.MagicCircleConfig.Height = v end })
     MagicCircleTab:AddSlider({ Name = "直径", Min = 5, Max = 50, Default = SH.MagicCircleConfig.Diameter, Color = Theme.SliderColor, Increment = 1, ValueName = "スタッド", Callback = function(v) SH.MagicCircleConfig.Diameter = v end })
     MagicCircleTab:AddSlider({ Name = "オブジェクト数", Min = 3, Max = 100, Default = SH.MagicCircleConfig.ObjectCount, Color = Theme.SliderColor, Increment = 1, ValueName = "個", Callback = function(v) SH.MagicCircleConfig.ObjectCount = v end })
@@ -6031,7 +5544,7 @@ do
 end
 
 -- ============================================================================
--- ブロック43: 竜巻トイMOD（SuperRing）タブ - 魔法陣の次
+-- ブロック43: 竜巻トイMOD（SuperRing）タブ
 -- ============================================================================
 do
     local Window = _G.Window
@@ -6047,8 +5560,14 @@ do
 
     SuperRingTab:AddSection({ Name = "基本設定" })
     SuperRingTab:AddToggle({ Name = "竜巻トイMOD 起動", Default = false, Callback = _G.toggleSuperRing })
-    SuperRingTab:AddToggle({ Name = "プレイヤー追従", Default = SH.SuperRingConfig.FollowPlayer, Callback = function(v) SH.SuperRingConfig.FollowPlayer = v end })
-    SuperRingTab:AddToggle({ Name = "竜巻効果（渦巻き）", Default = SH.SuperRingConfig.TornadoEffect, Callback = function(v) SH.SuperRingConfig.TornadoEffect = v end })
+    SuperRingTab:AddToggle({ Name = "プレイヤー追従", Default = SH.SuperRingConfig.FollowPlayer, Callback = function(v)
+        SH.SuperRingConfig.FollowPlayer = v
+        if v then PlayActionSound() else PlayOpenCloseSound() end
+    end })
+    SuperRingTab:AddToggle({ Name = "竜巻効果（渦巻き）", Default = SH.SuperRingConfig.TornadoEffect, Callback = function(v)
+        SH.SuperRingConfig.TornadoEffect = v
+        if v then PlayActionSound() else PlayOpenCloseSound() end
+    end })
 
     SuperRingTab:AddSection({ Name = "サイズ設定" })
     SuperRingTab:AddSlider({ Name = "基本半径", Min = 1, Max = 10, Default = SH.SuperRingConfig.Radius, Color = Theme.SliderColor, Increment = 0.5, ValueName = "スタッド", Callback = function(v) SH.SuperRingConfig.Radius = v end })
@@ -6089,6 +5608,7 @@ do
         Name = "花火を再検出",
         Callback = function()
             if SH.SuperRingConfig.Enabled then
+                PlayActionSound()
                 _G.toggleSuperRing(false)
                 task.wait(0.1)
                 _G.toggleSuperRing(true)
@@ -6111,9 +5631,9 @@ do
 
     local FerrisWheelTab = Window:MakeTab({ Name = "観覧車", Icon = "rbxassetid://4483362458", PremiumOnly = false })
     FerrisWheelTab:AddToggle({ Name = "観覧車起動", Default = false, Callback = _G.toggleFerrisWheel })
-    FerrisWheelTab:AddToggle({ Name = "プレイヤー追従", Default = SH.FerrisWheelConfig.FollowPlayer, Callback = function(v) SH.FerrisWheelConfig.FollowPlayer = v end })
-    FerrisWheelTab:AddToggle({ Name = "縦方向円", Default = SH.FerrisWheelConfig.VerticalCircle, Callback = function(v) SH.FerrisWheelConfig.VerticalCircle = v end })
-    FerrisWheelTab:AddToggle({ Name = "固定方向を使用", Default = SH.FerrisWheelConfig.FixedDirection, Callback = function(v) SH.FerrisWheelConfig.FixedDirection = v end })
+    FerrisWheelTab:AddToggle({ Name = "プレイヤー追従", Default = SH.FerrisWheelConfig.FollowPlayer, Callback = function(v) SH.FerrisWheelConfig.FollowPlayer = v; if v then PlayActionSound() else PlayOpenCloseSound() end end })
+    FerrisWheelTab:AddToggle({ Name = "縦方向円", Default = SH.FerrisWheelConfig.VerticalCircle, Callback = function(v) SH.FerrisWheelConfig.VerticalCircle = v; if v then PlayActionSound() else PlayOpenCloseSound() end end })
+    FerrisWheelTab:AddToggle({ Name = "固定方向を使用", Default = SH.FerrisWheelConfig.FixedDirection, Callback = function(v) SH.FerrisWheelConfig.FixedDirection = v; if v then PlayActionSound() else PlayOpenCloseSound() end end })
     FerrisWheelTab:AddSlider({ Name = "固定ヨー角", Min = -180, Max = 180, Default = SH.FerrisWheelConfig.FixedYaw, Color = Theme.SliderColor, Increment = 5, ValueName = "度", Callback = function(v) SH.FerrisWheelConfig.FixedYaw = v end })
     FerrisWheelTab:AddSlider({ Name = "固定ピッチ角", Min = -90, Max = 90, Default = SH.FerrisWheelConfig.FixedPitch, Color = Theme.SliderColor, Increment = 5, ValueName = "度", Callback = function(v) SH.FerrisWheelConfig.FixedPitch = v end })
     FerrisWheelTab:AddSlider({ Name = "固定ロール角", Min = -180, Max = 180, Default = SH.FerrisWheelConfig.FixedRoll, Color = Theme.SliderColor, Increment = 5, ValueName = "度", Callback = function(v) SH.FerrisWheelConfig.FixedRoll = v end })
@@ -6133,7 +5653,7 @@ do
 
     local HeartTab = Window:MakeTab({ Name = "♡ハート//", Icon = "rbxassetid://4483362458", PremiumOnly = false })
     HeartTab:AddToggle({ Name = "ハート起動", Default = false, Callback = _G.toggleHeart })
-    HeartTab:AddToggle({ Name = "プレイヤー追従", Default = SH.HeartConfig.FollowPlayer, Callback = function(v) SH.HeartConfig.FollowPlayer = v end })
+    HeartTab:AddToggle({ Name = "プレイヤー追従", Default = SH.HeartConfig.FollowPlayer, Callback = function(v) SH.HeartConfig.FollowPlayer = v; if v then PlayActionSound() else PlayOpenCloseSound() end end })
     HeartTab:AddSlider({ Name = "ハートサイズ", Min = 2, Max = 50, Default = SH.HeartConfig.Size, Color = Theme.SliderColor, Increment = 1, ValueName = "スタッド", Callback = function(v) SH.HeartConfig.Size = v end })
     HeartTab:AddSlider({ Name = "基本高さ", Min = 0, Max = 50, Default = SH.HeartConfig.Height, Color = Theme.SliderColor, Increment = 1, ValueName = "スタッド", Callback = function(v) SH.HeartConfig.Height = v end })
     HeartTab:AddSlider({ Name = "オブジェクト数", Min = 6, Max = 100, Default = SH.HeartConfig.ObjectCount, Color = Theme.SliderColor, Increment = 2, ValueName = "個", Callback = function(v) SH.HeartConfig.ObjectCount = v end })
@@ -6152,7 +5672,7 @@ do
 
     local VerticalHeartTab = Window:MakeTab({ Name = "縦ハート//", Icon = "rbxassetid://4483362458", PremiumOnly = false })
     VerticalHeartTab:AddToggle({ Name = "縦ハート起動", Default = false, Callback = _G.toggleVerticalHeart })
-    VerticalHeartTab:AddToggle({ Name = "プレイヤー追従", Default = SH.VerticalHeartConfig.FollowPlayer, Callback = function(v) SH.VerticalHeartConfig.FollowPlayer = v end })
+    VerticalHeartTab:AddToggle({ Name = "プレイヤー追従", Default = SH.VerticalHeartConfig.FollowPlayer, Callback = function(v) SH.VerticalHeartConfig.FollowPlayer = v; if v then PlayActionSound() else PlayOpenCloseSound() end end })
     VerticalHeartTab:AddSlider({ Name = "ハートサイズ", Min = 2, Max = 50, Default = SH.VerticalHeartConfig.Size, Color = Theme.SliderColor, Increment = 1, ValueName = "スタッド", Callback = function(v) SH.VerticalHeartConfig.Size = v end })
     VerticalHeartTab:AddSlider({ Name = "基本高さ", Min = 0, Max = 50, Default = SH.VerticalHeartConfig.Height, Color = Theme.SliderColor, Increment = 1, ValueName = "スタッド", Callback = function(v) SH.VerticalHeartConfig.Height = v end })
     VerticalHeartTab:AddSlider({ Name = "オブジェクト数", Min = 6, Max = 100, Default = SH.VerticalHeartConfig.ObjectCount, Color = Theme.SliderColor, Increment = 2, ValueName = "個", Callback = function(v) SH.VerticalHeartConfig.ObjectCount = v end })
@@ -6171,7 +5691,7 @@ do
 
     local BigHeartTab = Window:MakeTab({ Name = "おっきぃ♡", Icon = "rbxassetid://4483362458", PremiumOnly = false })
     BigHeartTab:AddToggle({ Name = "おっきぃハート起動", Default = false, Callback = _G.toggleBigHeart })
-    BigHeartTab:AddToggle({ Name = "プレイヤー追従", Default = SH.BigHeartConfig.FollowPlayer, Callback = function(v) SH.BigHeartConfig.FollowPlayer = v end })
+    BigHeartTab:AddToggle({ Name = "プレイヤー追従", Default = SH.BigHeartConfig.FollowPlayer, Callback = function(v) SH.BigHeartConfig.FollowPlayer = v; if v then PlayActionSound() else PlayOpenCloseSound() end end })
     BigHeartTab:AddSlider({ Name = "基本サイズ", Min = 5, Max = 50, Default = SH.BigHeartConfig.Size, Color = Theme.SliderColor, Increment = 1, ValueName = "スタッド", Callback = function(v) SH.BigHeartConfig.Size = v end })
     BigHeartTab:AddSlider({ Name = "拡大率", Min = 1.0, Max = 10.0, Default = SH.BigHeartConfig.HeartScale, Color = Theme.SliderColor, Increment = 0.1, ValueName = "倍", Callback = function(v) SH.BigHeartConfig.HeartScale = v end })
     BigHeartTab:AddSlider({ Name = "縦方向引き伸ばし", Min = 1.0, Max = 5.0, Default = SH.BigHeartConfig.VerticalStretch, Color = Theme.SliderColor, Increment = 0.1, ValueName = "倍", Callback = function(v) SH.BigHeartConfig.VerticalStretch = v end })
@@ -6192,7 +5712,7 @@ do
 
     local VerticalBigHeartTab = Window:MakeTab({ Name = "縦おっきぃ♡", Icon = "rbxassetid://4483362458", PremiumOnly = false })
     VerticalBigHeartTab:AddToggle({ Name = "縦おっきぃ♡起動", Default = false, Callback = _G.toggleVerticalBigHeart })
-    VerticalBigHeartTab:AddToggle({ Name = "プレイヤー追従", Default = SH.VerticalBigHeartConfig.FollowPlayer, Callback = function(v) SH.VerticalBigHeartConfig.FollowPlayer = v end })
+    VerticalBigHeartTab:AddToggle({ Name = "プレイヤー追従", Default = SH.VerticalBigHeartConfig.FollowPlayer, Callback = function(v) SH.VerticalBigHeartConfig.FollowPlayer = v; if v then PlayActionSound() else PlayOpenCloseSound() end end })
     VerticalBigHeartTab:AddSlider({ Name = "基本サイズ", Min = 5, Max = 50, Default = SH.VerticalBigHeartConfig.Size, Color = Theme.SliderColor, Increment = 1, ValueName = "スタッド", Callback = function(v) SH.VerticalBigHeartConfig.Size = v end })
     VerticalBigHeartTab:AddSlider({ Name = "拡大率", Min = 1.0, Max = 10.0, Default = SH.VerticalBigHeartConfig.HeartScale, Color = Theme.SliderColor, Increment = 0.1, ValueName = "倍", Callback = function(v) SH.VerticalBigHeartConfig.HeartScale = v end })
     VerticalBigHeartTab:AddSlider({ Name = "基本高さ", Min = 5, Max = 50, Default = SH.VerticalBigHeartConfig.Height, Color = Theme.SliderColor, Increment = 1, ValueName = "スタッド", Callback = function(v) SH.VerticalBigHeartConfig.Height = v end })
@@ -6278,8 +5798,8 @@ do
             return
         end
         isRunning = true
+        PlayActionSound()
         OrionLib:MakeNotification({ Name = "卍", Content = "開始（両方往復）", Time = 2 })
-
         loopTask = task.spawn(function()
             local total = 20
             while isRunning do
@@ -6294,7 +5814,6 @@ do
                         step2 = step2 + speed * dir2
                         if step2 >= total then step2 = total; dir2 = -1
                         elseif step2 <= 0 then step2 = 0; dir2 = 1 end
-
                         local p1 = sparklers[1]
                         if p1 and p1.Parent then
                             local pos1 = GetHalfManji(step1, size)
@@ -6317,6 +5836,7 @@ do
     local function StopManjiLoop()
         isRunning = false
         if loopTask then task.cancel(loopTask); loopTask = nil end
+        PlayOpenCloseSound()
         OrionLib:MakeNotification({ Name = "卍", Content = "停止", Time = 2 })
     end
 
@@ -6335,6 +5855,7 @@ do
     ManjiTab:AddButton({
         Name = "スパークラーを再スキャン",
         Callback = function()
+            PlayActionSound()
             sparklers = GetSparklers()
             OrionLib:MakeNotification({ Name = "再スキャン", Content = string.format("スパークラーを %d 個検出しました", #sparklers), Time = 2 })
         end
@@ -6357,7 +5878,7 @@ do
 
     local SphereTab = Window:MakeTab({ Name = "球体◯", Icon = "rbxassetid://4483362458", PremiumOnly = false })
     SphereTab:AddToggle({ Name = "球体起動", Default = false, Callback = _G.toggleSphere })
-    SphereTab:AddToggle({ Name = "プレイヤー追従", Default = SH.SphereConfig.FollowPlayer, Callback = function(v) SH.SphereConfig.FollowPlayer = v end })
+    SphereTab:AddToggle({ Name = "プレイヤー追従", Default = SH.SphereConfig.FollowPlayer, Callback = function(v) SH.SphereConfig.FollowPlayer = v; if v then PlayActionSound() else PlayOpenCloseSound() end end })
     SphereTab:AddSlider({ Name = "球体半径", Min = 2, Max = 50, Default = SH.SphereConfig.Radius, Color = Theme.SliderColor, Increment = 1, ValueName = "スタッド", Callback = function(v) SH.SphereConfig.Radius = v end })
     SphereTab:AddSlider({ Name = "緯度線の数", Min = 2, Max = 16, Default = SH.SphereConfig.Latitudes, Color = Theme.SliderColor, Increment = 1, ValueName = "本", Callback = function(v) SH.SphereConfig.Latitudes = v end })
     SphereTab:AddSlider({ Name = "経度線の数", Min = 4, Max = 24, Default = SH.SphereConfig.Longitudes, Color = Theme.SliderColor, Increment = 2, ValueName = "本", Callback = function(v) SH.SphereConfig.Longitudes = v end })
@@ -6378,7 +5899,7 @@ do
 
     local StarOfDavidTab = Window:MakeTab({ Name = "ダビデの星✡", Icon = "rbxassetid://4483362458", PremiumOnly = false })
     StarOfDavidTab:AddToggle({ Name = "ダビデの星起動", Default = false, Callback = _G.toggleStarOfDavid })
-    StarOfDavidTab:AddToggle({ Name = "プレイヤー追従", Default = SH.StarOfDavidConfig.FollowPlayer, Callback = function(v) SH.StarOfDavidConfig.FollowPlayer = v end })
+    StarOfDavidTab:AddToggle({ Name = "プレイヤー追従", Default = SH.StarOfDavidConfig.FollowPlayer, Callback = function(v) SH.StarOfDavidConfig.FollowPlayer = v; if v then PlayActionSound() else PlayOpenCloseSound() end end })
     StarOfDavidTab:AddSlider({ Name = "星のサイズ", Min = 2, Max = 50, Default = SH.StarOfDavidConfig.Size, Color = Theme.SliderColor, Increment = 1, ValueName = "スタッド", Callback = function(v) SH.StarOfDavidConfig.Size = v end })
     StarOfDavidTab:AddSlider({ Name = "基本高さ", Min = 0, Max = 50, Default = SH.StarOfDavidConfig.Height, Color = Theme.SliderColor, Increment = 1, ValueName = "スタッド", Callback = function(v) SH.StarOfDavidConfig.Height = v end })
     StarOfDavidTab:AddSlider({ Name = "三角形の高さ", Min = 0, Max = 20, Default = SH.StarOfDavidConfig.TriangleHeight, Color = Theme.SliderColor, Increment = 0.1, ValueName = "スタッド", Callback = function(v) SH.StarOfDavidConfig.TriangleHeight = v end })
@@ -6397,7 +5918,7 @@ do
 
     local StarTab = Window:MakeTab({ Name = "スター★", Icon = "rbxassetid://4483362458", PremiumOnly = false })
     StarTab:AddToggle({ Name = "スター起動", Default = false, Callback = _G.toggleStar })
-    StarTab:AddToggle({ Name = "プレイヤー追従", Default = SH.StarConfig.FollowPlayer, Callback = function(v) SH.StarConfig.FollowPlayer = v end })
+    StarTab:AddToggle({ Name = "プレイヤー追従", Default = SH.StarConfig.FollowPlayer, Callback = function(v) SH.StarConfig.FollowPlayer = v; if v then PlayActionSound() else PlayOpenCloseSound() end end })
     StarTab:AddSlider({ Name = "外側半径", Min = 2, Max = 50, Default = SH.StarConfig.OuterRadius, Color = Theme.SliderColor, Increment = 1, ValueName = "スタッド", Callback = function(v) SH.StarConfig.OuterRadius = v end })
     StarTab:AddSlider({ Name = "内側半径", Min = 1, Max = 30, Default = SH.StarConfig.InnerRadius, Color = Theme.SliderColor, Increment = 1, ValueName = "スタッド", Callback = function(v) SH.StarConfig.InnerRadius = v end })
     StarTab:AddSlider({ Name = "基本高さ", Min = 0, Max = 50, Default = SH.StarConfig.Height, Color = Theme.SliderColor, Increment = 1, ValueName = "スタッド", Callback = function(v) SH.StarConfig.Height = v end })
@@ -6416,7 +5937,7 @@ do
 
     local Star2Tab = Window:MakeTab({ Name = "スター2✫", Icon = "rbxassetid://4483362458", PremiumOnly = false })
     Star2Tab:AddToggle({ Name = "スター2起動", Default = false, Callback = _G.toggleStar2 })
-    Star2Tab:AddToggle({ Name = "プレイヤー追従", Default = SH.Star2Config.FollowPlayer, Callback = function(v) SH.Star2Config.FollowPlayer = v end })
+    Star2Tab:AddToggle({ Name = "プレイヤー追従", Default = SH.Star2Config.FollowPlayer, Callback = function(v) SH.Star2Config.FollowPlayer = v; if v then PlayActionSound() else PlayOpenCloseSound() end end })
     Star2Tab:AddSlider({ Name = "基本サイズ", Min = 5, Max = 30, Default = SH.Star2Config.Size, Color = Theme.SliderColor, Increment = 1, ValueName = "スタッド", Callback = function(v) SH.Star2Config.Size = v end })
     Star2Tab:AddSlider({ Name = "光線の長さ", Min = 1, Max = 10, Default = SH.Star2Config.RayLength, Color = Theme.SliderColor, Increment = 0.5, ValueName = "スタッド", Callback = function(v) SH.Star2Config.RayLength = v end })
     Star2Tab:AddSlider({ Name = "基本高さ", Min = 5, Max = 50, Default = SH.Star2Config.Height, Color = Theme.SliderColor, Increment = 1, ValueName = "スタッド", Callback = function(v) SH.Star2Config.Height = v end })
@@ -6439,7 +5960,7 @@ do
 
     local AnimN1Tab = Window:MakeTab({ Name = "N1: カオス・サークル", Icon = "rbxassetid://4483362458", PremiumOnly = false })
     AnimN1Tab:AddToggle({ Name = "N1起動", Default = false, Callback = _G.toggleAnimN1 })
-    AnimN1Tab:AddToggle({ Name = "プレイヤー追従", Default = SH.AnimN1Config.FollowPlayer, Callback = function(v) SH.AnimN1Config.FollowPlayer = v end })
+    AnimN1Tab:AddToggle({ Name = "プレイヤー追従", Default = SH.AnimN1Config.FollowPlayer, Callback = function(v) SH.AnimN1Config.FollowPlayer = v; if v then PlayActionSound() else PlayOpenCloseSound() end end })
     AnimN1Tab:AddSlider({ Name = "半径", Min = 5, Max = 50, Default = SH.AnimN1Config.Radius, Color = Theme.SliderColor, Increment = 1, ValueName = "スタッド", Callback = function(v) SH.AnimN1Config.Radius = v end })
     AnimN1Tab:AddSlider({ Name = "基本高さ", Min = 0, Max = 50, Default = SH.AnimN1Config.Height, Color = Theme.SliderColor, Increment = 1, ValueName = "スタッド", Callback = function(v) SH.AnimN1Config.Height = v end })
     AnimN1Tab:AddSlider({ Name = "オブジェクト数", Min = 10, Max = 100, Default = SH.AnimN1Config.ObjectCount, Color = Theme.SliderColor, Increment = 2, ValueName = "個", Callback = function(v) SH.AnimN1Config.ObjectCount = v end })
@@ -6449,7 +5970,7 @@ do
 
     local AnimN2Tab = Window:MakeTab({ Name = "N2: トルネード・スパイラル", Icon = "rbxassetid://4483362458", PremiumOnly = false })
     AnimN2Tab:AddToggle({ Name = "N2起動", Default = false, Callback = _G.toggleAnimN2 })
-    AnimN2Tab:AddToggle({ Name = "プレイヤー追従", Default = SH.AnimN2Config.FollowPlayer, Callback = function(v) SH.AnimN2Config.FollowPlayer = v end })
+    AnimN2Tab:AddToggle({ Name = "プレイヤー追従", Default = SH.AnimN2Config.FollowPlayer, Callback = function(v) SH.AnimN2Config.FollowPlayer = v; if v then PlayActionSound() else PlayOpenCloseSound() end end })
     AnimN2Tab:AddSlider({ Name = "半径", Min = 3, Max = 30, Default = SH.AnimN2Config.Radius, Color = Theme.SliderColor, Increment = 1, ValueName = "スタッド", Callback = function(v) SH.AnimN2Config.Radius = v end })
     AnimN2Tab:AddSlider({ Name = "最高高さ", Min = 10, Max = 100, Default = SH.AnimN2Config.TopHeight, Color = Theme.SliderColor, Increment = 1, ValueName = "スタッド", Callback = function(v) SH.AnimN2Config.TopHeight = v end })
     AnimN2Tab:AddSlider({ Name = "オブジェクト数", Min = 10, Max = 100, Default = SH.AnimN2Config.ObjectCount, Color = Theme.SliderColor, Increment = 2, ValueName = "個", Callback = function(v) SH.AnimN2Config.ObjectCount = v end })
@@ -6459,7 +5980,7 @@ do
 
     local AnimN3Tab = Window:MakeTab({ Name = "N3: ハイパー・エクスプロージョン", Icon = "rbxassetid://4483362458", PremiumOnly = false })
     AnimN3Tab:AddToggle({ Name = "N3起動", Default = false, Callback = _G.toggleAnimN3 })
-    AnimN3Tab:AddToggle({ Name = "プレイヤー追従", Default = SH.AnimN3Config.FollowPlayer, Callback = function(v) SH.AnimN3Config.FollowPlayer = v end })
+    AnimN3Tab:AddToggle({ Name = "プレイヤー追従", Default = SH.AnimN3Config.FollowPlayer, Callback = function(v) SH.AnimN3Config.FollowPlayer = v; if v then PlayActionSound() else PlayOpenCloseSound() end end })
     AnimN3Tab:AddSlider({ Name = "爆発半径", Min = 5, Max = 100, Default = SH.AnimN3Config.ExplosionRadius, Color = Theme.SliderColor, Increment = 1, ValueName = "スタッド", Callback = function(v) SH.AnimN3Config.ExplosionRadius = v end })
     AnimN3Tab:AddSlider({ Name = "オブジェクト数", Min = 10, Max = 100, Default = SH.AnimN3Config.ObjectCount, Color = Theme.SliderColor, Increment = 2, ValueName = "個", Callback = function(v) SH.AnimN3Config.ObjectCount = v end })
     AnimN3Tab:AddSlider({ Name = "サイクル速度", Min = 0, Max = 5, Default = SH.AnimN3Config.CycleSpeed, Color = Theme.SliderColor, Increment = 0.1, ValueName = "速度", Callback = function(v) SH.AnimN3Config.CycleSpeed = v end })
@@ -6475,14 +5996,16 @@ do
 
     local InfoTab = Window:MakeTab({ Name = "情報とサポート", Icon = "rbxassetid://4483362458", PremiumOnly = false })
     InfoTab:AddSection({ Name = "詳細" })
-    InfoTab:AddLabel("バージョン: V0.7.2.138")
+    InfoTab:AddLabel("バージョン: V0.7.2.139")
     InfoTab:AddLabel("開発グループ: 土星グループ")
     InfoTab:AddSection({ Name = "リンク" })
     InfoTab:AddButton({ Name = "サポートサーバーに参加[ディスコードグローバル]", Callback = function()
+        PlayActionSound()
         setclipboard("https://discord.gg/qFQTe7rcyE")
         OrionLib:MakeNotification({ Name = "リンクコピー", Content = "クリップボードにコピーしました", Time = 2 })
     end })
     InfoTab:AddButton({ Name = "サポートサーバーに参加[ラインオープンチャット日本専用]", Callback = function()
+        PlayActionSound()
         setclipboard("https://line.me/ti/g2/-CBPty1N0v2XuNPqaJm5xLmCBt0wBr3_vxrOqQ?utm_source=invitation&utm_medium=link_copy&utm_campaign=default")
         OrionLib:MakeNotification({ Name = "リンクコピー", Content = "クリップボードにコピーしました", Time = 2 })
     end })
@@ -6497,11 +6020,11 @@ do
     PlayActionSound()
     OrionLib:MakeNotification({
         Name = "🌸さくらhubV0.7🌸起動完了",
-        Content = "v0.7.2.138",
+        Content = "v0.7.2.139",
         Image = "rbxassetid://4483362458",
         Time = 5
     })
     print("==========================================")
-    print("🌸さくらhubV0.7🌸 v0.7.2.138")
+    print("🌸さくらhubV0.7🌸 v0.7.2.139")
     print("==========================================")
 end
