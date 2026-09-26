@@ -1,5 +1,5 @@
 -- ============================================================================
--- 🌸さくらhubV0.7🌸 (v0.7.2.139)
+-- 🌸さくらhubV0.7🌸 (v0.7.2.140)
 -- ============================================================================
 
 -- ============================================================================
@@ -128,6 +128,52 @@ do
     })
 
     _G.Window = Window
+end
+
+-- ============================================================================
+-- ブロック3.5: OrionLibウィンドウ開閉音の接続
+-- ============================================================================
+do
+    task.spawn(function()
+        local CoreGui = game:GetService("CoreGui")
+        local PlayerGui = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+
+        local function tryConnect(gui)
+            for _, obj in ipairs(gui:GetDescendants()) do
+                if obj:IsA("TextButton") or obj:IsA("ImageButton") then
+                    local name = string.lower(obj.Name)
+                    if name:find("close") or name:find("minimize") or name:find("exit")
+                       or name:find("hide") or name:find("open") or name:find("toggle") then
+                        if not obj:GetAttribute("SakuraOpenCloseConnected") then
+                            obj:SetAttribute("SakuraOpenCloseConnected", true)
+                            obj.MouseButton1Click:Connect(function()
+                                PlayOpenCloseSound()
+                            end)
+                        end
+                    end
+                end
+            end
+        end
+
+        task.wait(1.5)
+
+        pcall(function() tryConnect(CoreGui) end)
+        pcall(function() tryConnect(PlayerGui) end)
+
+        CoreGui.DescendantAdded:Connect(function(desc)
+            if desc:IsA("TextButton") or desc:IsA("ImageButton") then
+                local name = string.lower(desc.Name)
+                if name:find("close") or name:find("minimize") or name:find("exit") then
+                    if not desc:GetAttribute("SakuraOpenCloseConnected") then
+                        desc:SetAttribute("SakuraOpenCloseConnected", true)
+                        desc.MouseButton1Click:Connect(function()
+                            PlayOpenCloseSound()
+                        end)
+                    end
+                end
+            end
+        end)
+    end)
 end
 
 -- ============================================================================
@@ -642,7 +688,6 @@ do
             end)
             OrionLib:MakeNotification({ Name = "フェザー開始", Content = "オブジェクト数: " .. #SH.featherAssignedToys, Time = 3 })
         else
-            PlayOpenCloseSound()
             if SH.featherLoopConn then SH.featherLoopConn:Disconnect(); SH.featherLoopConn = nil end
             for _, point in ipairs(SH.featherRowPoints) do
                 if point.part then point.part:Destroy() end
@@ -748,7 +793,6 @@ do
             end)
             OrionLib:MakeNotification({ Name = "魔法陣開始", Content = "高さ: " .. SH.MagicCircleConfig.Height, Time = 3 })
         else
-            PlayOpenCloseSound()
             if SH.magicCircleLoopConn then SH.magicCircleLoopConn:Disconnect(); SH.magicCircleLoopConn = nil end
             for _, rec in ipairs(SH.magicCircleList) do
                 if rec.part then
@@ -852,7 +896,6 @@ do
             end)
             OrionLib:MakeNotification({ Name = "ハート開始", Content = "サイズ: " .. SH.HeartConfig.Size, Time = 3 })
         else
-            PlayOpenCloseSound()
             if SH.heartLoopConn then SH.heartLoopConn:Disconnect(); SH.heartLoopConn = nil end
             for _, point in ipairs(SH.heartPoints) do
                 if point.part then point.part:Destroy() end
@@ -956,7 +999,6 @@ do
             end)
             OrionLib:MakeNotification({ Name = "ビッグハート開始", Content = "サイズ: " .. SH.BigHeartConfig.Size, Time = 3 })
         else
-            PlayOpenCloseSound()
             if SH.bigHeartLoopConn then SH.bigHeartLoopConn:Disconnect(); SH.bigHeartLoopConn = nil end
             for _, point in ipairs(SH.bigHeartPoints) do
                 if point.part then point.part:Destroy() end
@@ -1060,7 +1102,6 @@ do
             end)
             OrionLib:MakeNotification({ Name = "ダビデの星開始", Content = "サイズ: " .. SH.StarOfDavidConfig.Size, Time = 3 })
         else
-            PlayOpenCloseSound()
             if SH.starOfDavidLoopConn then SH.starOfDavidLoopConn:Disconnect(); SH.starOfDavidLoopConn = nil end
             for _, point in ipairs(SH.starOfDavidPoints) do
                 if point.part then point.part:Destroy() end
@@ -1165,7 +1206,6 @@ do
             end)
             OrionLib:MakeNotification({ Name = "スター開始", Content = "外側半径: " .. SH.StarConfig.OuterRadius, Time = 3 })
         else
-            PlayOpenCloseSound()
             if SH.starLoopConn then SH.starLoopConn:Disconnect(); SH.starLoopConn = nil end
             for _, point in ipairs(SH.starPoints) do
                 if point.part then point.part:Destroy() end
@@ -1279,7 +1319,6 @@ do
             end)
             OrionLib:MakeNotification({ Name = "スター2開始", Content = "サイズ: " .. SH.Star2Config.Size, Time = 3 })
         else
-            PlayOpenCloseSound()
             if SH.star2LoopConn then SH.star2LoopConn:Disconnect(); SH.star2LoopConn = nil end
             for _, point in ipairs(SH.star2Points) do
                 if point.part then point.part:Destroy() end
@@ -1389,7 +1428,6 @@ do
             end)
             OrionLib:MakeNotification({ Name = "球体開始", Content = "半径: " .. SH.SphereConfig.Radius, Time = 3 })
         else
-            PlayOpenCloseSound()
             if SH.sphereLoopConn then SH.sphereLoopConn:Disconnect(); SH.sphereLoopConn = nil end
             for _, point in ipairs(SH.spherePoints) do
                 if point.part then point.part:Destroy() end
@@ -1504,7 +1542,6 @@ do
             end)
             OrionLib:MakeNotification({ Name = "観覧車開始", Content = "半径: " .. SH.FerrisWheelConfig.Radius, Time = 3 })
         else
-            PlayOpenCloseSound()
             if SH.ferrisWheelLoopConn then SH.ferrisWheelLoopConn:Disconnect(); SH.ferrisWheelLoopConn = nil end
             for _, point in ipairs(SH.ferrisWheelPoints) do
                 if point.part then point.part:Destroy() end
@@ -1612,7 +1649,6 @@ do
             end)
             OrionLib:MakeNotification({ Name = "N1開始", Content = "オブジェクト数: " .. #SH.animN1AssignedToys, Time = 3 })
         else
-            PlayOpenCloseSound()
             if SH.animN1LoopConn then SH.animN1LoopConn:Disconnect(); SH.animN1LoopConn = nil end
             for _, point in ipairs(SH.animN1Points) do
                 if point.part then point.part:Destroy() end
@@ -1705,7 +1741,6 @@ do
             end)
             OrionLib:MakeNotification({ Name = "N2開始", Content = "オブジェクト数: " .. #SH.animN2AssignedToys, Time = 3 })
         else
-            PlayOpenCloseSound()
             if SH.animN2LoopConn then SH.animN2LoopConn:Disconnect(); SH.animN2LoopConn = nil end
             for _, point in ipairs(SH.animN2Points) do
                 if point.part then point.part:Destroy() end
@@ -1796,7 +1831,6 @@ do
             end)
             OrionLib:MakeNotification({ Name = "N3開始", Content = "オブジェクト数: " .. #SH.animN3AssignedToys, Time = 3 })
         else
-            PlayOpenCloseSound()
             if SH.animN3LoopConn then SH.animN3LoopConn:Disconnect(); SH.animN3LoopConn = nil end
             for _, point in ipairs(SH.animN3Points) do
                 if point.part then point.part:Destroy() end
@@ -1946,7 +1980,6 @@ do
             end)
             OrionLib:MakeNotification({ Name = "羽V2開始", Content = "オブジェクト数: " .. #SH.wingList, Time = 3 })
         else
-            PlayOpenCloseSound()
             if SH.wingLoopConn then SH.wingLoopConn:Disconnect(); SH.wingLoopConn = nil end
             for _, rec in ipairs(SH.wingList) do
                 if rec.part then
@@ -2183,7 +2216,6 @@ do
                 Time = 3
             })
         else
-            PlayOpenCloseSound()
             if SH.saturnLoopConn then SH.saturnLoopConn:Disconnect(); SH.saturnLoopConn = nil end
             for _, rec in ipairs(SH.saturnList) do
                 local p = rec.part
@@ -2257,7 +2289,6 @@ do
                 OrionLib:MakeNotification({ Name = "エラー", Content = "MusicKeyboardが見つかりません", Time = 5 })
             end
         else
-            PlayOpenCloseSound()
             stopSong()
             stopPiano()
             OrionLib:MakeNotification({ Name = "ピアノ機能停止", Content = "ピアノ機能を無効化しました", Time = 2 })
@@ -2354,7 +2385,6 @@ do
             end)
             OrionLib:MakeNotification({ Name = "縦ハート開始", Content = "サイズ: " .. SH.VerticalHeartConfig.Size, Time = 3 })
         else
-            PlayOpenCloseSound()
             if SH.verticalHeartLoopConn then SH.verticalHeartLoopConn:Disconnect(); SH.verticalHeartLoopConn = nil end
             for _, point in ipairs(SH.verticalHeartPoints) do
                 if point.part then point.part:Destroy() end
@@ -2458,7 +2488,6 @@ do
             end)
             OrionLib:MakeNotification({ Name = "縦ビッグハート開始", Content = "サイズ: " .. SH.VerticalBigHeartConfig.Size, Time = 3 })
         else
-            PlayOpenCloseSound()
             if SH.verticalBigHeartLoopConn then SH.verticalBigHeartLoopConn:Disconnect(); SH.verticalBigHeartLoopConn = nil end
             for _, point in ipairs(SH.verticalBigHeartPoints) do
                 if point.part then point.part:Destroy() end
@@ -2648,7 +2677,6 @@ do
                 Time = 3
             })
         else
-            PlayOpenCloseSound()
             stopSuperRingLoop()
             OrionLib:MakeNotification({
                 Name = "竜巻トイMOD 停止",
@@ -2700,8 +2728,6 @@ do
                     if humanoid then humanoid:ChangeState("Jumping") end
                 end
             end)
-        else
-            PlayOpenCloseSound()
         end
         OrionLib:MakeNotification({ Name = "無限ジャンプ", Content = state and "有効" or "無効", Time = 2 })
     end
@@ -2735,7 +2761,7 @@ do
 
     local function toggleNoclip(state)
         UtilityConfig.Noclip = state
-        if state then PlayActionSound(); enableNoclip() else PlayOpenCloseSound(); disableNoclip() end
+        if state then PlayActionSound(); enableNoclip() else disableNoclip() end
         OrionLib:MakeNotification({ Name = "ノークリップ", Content = state and "有効" or "無効", Time = 2 })
     end
 
@@ -2781,7 +2807,7 @@ do
 
     local function toggleTPWalk(state)
         UtilityConfig.TPWalk = state
-        if state then PlayActionSound(); enableTPWalk() else PlayOpenCloseSound(); disableTPWalk() end
+        if state then PlayActionSound(); enableTPWalk() else disableTPWalk() end
         OrionLib:MakeNotification({ Name = "TPWalk", Content = state and "有効" or "無効", Time = 2 })
     end
 
@@ -2840,7 +2866,7 @@ do
 
     local function toggleESP(state)
         UtilityConfig.ESP = state
-        if state then PlayActionSound(); enableESP() else PlayOpenCloseSound(); disableESP() end
+        if state then PlayActionSound(); enableESP() else disableESP() end
         OrionLib:MakeNotification({ Name = "ESP", Content = state and "有効" or "無効", Time = 2 })
     end
 
@@ -2852,7 +2878,6 @@ do
             LocalPlayer.CameraMaxZoomDistance = 100
             LocalPlayer.CameraMinZoomDistance = 0.5
         else
-            PlayOpenCloseSound()
             LocalPlayer.CameraMode = Enum.CameraMode.LockFirstPerson
             LocalPlayer.CameraMaxZoomDistance = 0.5
             LocalPlayer.CameraMinZoomDistance = 0.5
@@ -3126,7 +3151,7 @@ do
         Default = false,
         Callback = function(Value)
             AntiGrabEnabled = Value
-            if Value then PlayActionSound() else PlayOpenCloseSound() end
+            if Value then PlayActionSound() end
         end
     })
 
@@ -3222,7 +3247,6 @@ do
                 StartAntiGrabV2()
                 OrionLib:MakeNotification({ Name = "Anti Grab V2", Content = "有効化されました", Time = 3 })
             else
-                PlayOpenCloseSound()
                 StopAntiGrabV2()
                 OrionLib:MakeNotification({ Name = "Anti Grab V2", Content = "無効化されました", Time = 3 })
             end
@@ -3357,7 +3381,6 @@ do
                 StartGucci()
                 OrionLib:MakeNotification({ Name = "Anti Gucci", Content = "有効化されました", Time = 3 })
             else
-                PlayOpenCloseSound()
                 cleanupGucciTasks()
                 if autoGucciConn then autoGucciConn:Disconnect() autoGucciConn = nil end
                 local inv = Workspace:FindFirstChild(LocalPlayer.Name .. "SpawnedInToys")
@@ -3383,7 +3406,6 @@ do
                 Workspace.FallenPartsDestroyHeight = 0/0
                 OrionLib:MakeNotification({ Name = "Anti Void", Content = "有効化されました", Time = 3 })
             else
-                PlayOpenCloseSound()
                 Workspace.FallenPartsDestroyHeight = -100
                 OrionLib:MakeNotification({ Name = "Anti Void", Content = "無効化されました", Time = 3 })
             end
@@ -3394,7 +3416,7 @@ do
 end
 
 -- ============================================================================
--- ブロック31: 攻撃系タブ（Theme修正 + 日本語化 + スフィアオービットキックV1）
+-- ブロック31: 攻撃系タブ
 -- ============================================================================
 do
     local Window = _G.Window
@@ -3776,7 +3798,6 @@ do
                 return
             end
             if not on then
-                PlayOpenCloseSound()
                 kickLoopEnabled = false
                 OrionLib:MakeNotification({ Name = "ループキックV1", Content = "ループキックを停止しました", Time = 1.5 })
                 return
@@ -3909,10 +3930,7 @@ do
             orbitRunningV2 = v
             orbitCurrentLoopIdV2 = orbitCurrentLoopIdV2 + 1
             local myLoopId = orbitCurrentLoopIdV2
-            if not v then
-                PlayOpenCloseSound()
-                return
-            end
+            if not v then return end
             PlayActionSound()
             local target = Players:FindFirstChild(selectedOrbitTargetName)
             if target and target ~= LocalPlayer and target.Character and target.Character:FindFirstChild("HumanoidRootPart") and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
@@ -4284,7 +4302,7 @@ do
         Default = false,
         Callback = function(Value)
             InfiniteJumpV3Enabled = Value
-            if Value then PlayActionSound() else PlayOpenCloseSound() end
+            if Value then PlayActionSound() end
         end
     })
 
@@ -4297,7 +4315,6 @@ do
                 LocalPlayer.CameraMaxZoomDistance = 100
                 LocalPlayer.CameraMinZoomDistance = 10
             else
-                PlayOpenCloseSound()
                 LocalPlayer.CameraMaxZoomDistance = 12.5
                 LocalPlayer.CameraMinZoomDistance = 0.5
             end
@@ -4453,7 +4470,7 @@ do
         Default = false,
         Callback = function(Value)
             whitelistFriends = Value
-            if Value then PlayActionSound() else PlayOpenCloseSound() end
+            if Value then PlayActionSound() end
         end    
     })
 
@@ -4523,7 +4540,6 @@ do
     AttackTab:AddButton({
         Name = "⏹ 停止",
         Callback = function()
-            PlayOpenCloseSound()
             SphereOrbitKick.stop()
         end
     })
@@ -4535,7 +4551,7 @@ do
     AttackTab:AddSlider({ Name = "軌道複雑さ", Min = 0.1, Max = 2.0, Default = 0.7, Color = Theme.SliderColor, Increment = 0.1, ValueName = "複雑さ", Callback = function(v) SphereOrbitKick.setComplexity(v) end })
     AttackTab:AddToggle({ Name = "エフェクト表示", Default = true, Callback = function(v)
         SphereOrbitKick.setEffects(v)
-        if v then PlayActionSound() else PlayOpenCloseSound() end
+        if v then PlayActionSound() end
     end })
 
     AttackTab:AddParagraph("説明", 
@@ -4775,7 +4791,6 @@ do
                 startSeatDetection()
                 OrionLib:MakeNotification({ Name = "自動化ON", Content = "乗車/降車時に" .. TargetItemName .. "を自動操作", Time = 3 })
             else
-                PlayOpenCloseSound()
                 stopAutomation()
                 OrionLib:MakeNotification({ Name = "自動化OFF", Content = "停止しました", Time = 2 })
             end
@@ -4841,7 +4856,7 @@ do
     PianoControlSec:AddToggle({ Name = "ピアノ機能を有効化", Default = false, Callback = _G.togglePiano })
     PianoControlSec:AddToggle({ Name = "プレイヤー追従", Default = true, Callback = function(v)
         SH.PianoConfig.FollowPlayer = v
-        if v then PlayActionSound() else PlayOpenCloseSound() end
+        if v then PlayActionSound() end
         if SH.PianoConfig.Enabled and SH.PianoConfig.Keyboard and SH.PianoConfig.Keyboard.Parent then
             if v then _G.setupPianoFollow() else _G.stopPiano() end
         elseif SH.PianoConfig.Enabled and v then
@@ -4871,7 +4886,6 @@ do
         OrionLib:MakeNotification({ Name = "自動演奏", Content = "再生を開始しました", Time = 3 })
     end })
     PianoSongSec:AddButton({ Name = "再生を停止", Callback = function()
-        PlayOpenCloseSound()
         _G.stopSong()
         OrionLib:MakeNotification({ Name = "停止", Content = "曲の再生を停止しました", Time = 3 })
     end })
@@ -4991,7 +5005,7 @@ do
         Name = "HUD表示 (画像+座標)",
         Default = false,
         Callback = function(Value)
-            if Value then PlayActionSound(); StartHUD() else PlayOpenCloseSound(); StopHUD() end
+            if Value then PlayActionSound(); StartHUD() else StopHUD() end
         end
     })
 
@@ -5214,7 +5228,7 @@ do
         Callback = function(state)
             toys.isMoving = state
             toys.mod = state and "BombMissile" or nil
-            if state then PlayActionSound() else PlayOpenCloseSound() end
+            if state then PlayActionSound() end
             toggleEffect()
         end
     })
@@ -5229,7 +5243,6 @@ do
                 LocalPlayer.CameraMaxZoomDistance = 100
                 LocalPlayer.CameraMinZoomDistance = 0.5
             else
-                PlayOpenCloseSound()
                 LocalPlayer.CameraMode = Enum.CameraMode.LockFirstPerson
                 LocalPlayer.CameraMaxZoomDistance = 0.5
                 LocalPlayer.CameraMinZoomDistance = 0.5
@@ -5244,7 +5257,7 @@ do
         Callback = function(state)
             toys.isMoving = state
             toys.mod = state and "Helicopter" or nil
-            if state then PlayActionSound() else PlayOpenCloseSound() end
+            if state then PlayActionSound() end
             toggleEffect()
         end
     })
@@ -5534,7 +5547,7 @@ do
     MagicCircleTab:AddDropdown({ Name = "シンボルタイプ", Default = SH.MagicCircleConfig.SymbolType, Options = {"Ring", "Circle", "Hexagram"}, Callback = function(v) SH.MagicCircleConfig.SymbolType = v; PlayActionSound() end })
     MagicCircleTab:AddToggle({ Name = "発光効果", Default = SH.MagicCircleConfig.GlowEffect, Callback = function(v)
         SH.MagicCircleConfig.GlowEffect = v
-        if v then PlayActionSound() else PlayOpenCloseSound() end
+        if v then PlayActionSound() end
         if SH.MagicCircleConfig.Enabled then _G.toggleMagicCircle(false); task.wait(0.1); _G.toggleMagicCircle(true) end
     end })
     MagicCircleTab:AddSlider({ Name = "高さ", Min = 0, Max = 50, Default = SH.MagicCircleConfig.Height, Color = Theme.SliderColor, Increment = 1, ValueName = "スタッド", Callback = function(v) SH.MagicCircleConfig.Height = v end })
@@ -5562,11 +5575,11 @@ do
     SuperRingTab:AddToggle({ Name = "竜巻トイMOD 起動", Default = false, Callback = _G.toggleSuperRing })
     SuperRingTab:AddToggle({ Name = "プレイヤー追従", Default = SH.SuperRingConfig.FollowPlayer, Callback = function(v)
         SH.SuperRingConfig.FollowPlayer = v
-        if v then PlayActionSound() else PlayOpenCloseSound() end
+        if v then PlayActionSound() end
     end })
     SuperRingTab:AddToggle({ Name = "竜巻効果（渦巻き）", Default = SH.SuperRingConfig.TornadoEffect, Callback = function(v)
         SH.SuperRingConfig.TornadoEffect = v
-        if v then PlayActionSound() else PlayOpenCloseSound() end
+        if v then PlayActionSound() end
     end })
 
     SuperRingTab:AddSection({ Name = "サイズ設定" })
@@ -5631,9 +5644,9 @@ do
 
     local FerrisWheelTab = Window:MakeTab({ Name = "観覧車", Icon = "rbxassetid://4483362458", PremiumOnly = false })
     FerrisWheelTab:AddToggle({ Name = "観覧車起動", Default = false, Callback = _G.toggleFerrisWheel })
-    FerrisWheelTab:AddToggle({ Name = "プレイヤー追従", Default = SH.FerrisWheelConfig.FollowPlayer, Callback = function(v) SH.FerrisWheelConfig.FollowPlayer = v; if v then PlayActionSound() else PlayOpenCloseSound() end end })
-    FerrisWheelTab:AddToggle({ Name = "縦方向円", Default = SH.FerrisWheelConfig.VerticalCircle, Callback = function(v) SH.FerrisWheelConfig.VerticalCircle = v; if v then PlayActionSound() else PlayOpenCloseSound() end end })
-    FerrisWheelTab:AddToggle({ Name = "固定方向を使用", Default = SH.FerrisWheelConfig.FixedDirection, Callback = function(v) SH.FerrisWheelConfig.FixedDirection = v; if v then PlayActionSound() else PlayOpenCloseSound() end end })
+    FerrisWheelTab:AddToggle({ Name = "プレイヤー追従", Default = SH.FerrisWheelConfig.FollowPlayer, Callback = function(v) SH.FerrisWheelConfig.FollowPlayer = v; if v then PlayActionSound() end end })
+    FerrisWheelTab:AddToggle({ Name = "縦方向円", Default = SH.FerrisWheelConfig.VerticalCircle, Callback = function(v) SH.FerrisWheelConfig.VerticalCircle = v; if v then PlayActionSound() end end })
+    FerrisWheelTab:AddToggle({ Name = "固定方向を使用", Default = SH.FerrisWheelConfig.FixedDirection, Callback = function(v) SH.FerrisWheelConfig.FixedDirection = v; if v then PlayActionSound() end end })
     FerrisWheelTab:AddSlider({ Name = "固定ヨー角", Min = -180, Max = 180, Default = SH.FerrisWheelConfig.FixedYaw, Color = Theme.SliderColor, Increment = 5, ValueName = "度", Callback = function(v) SH.FerrisWheelConfig.FixedYaw = v end })
     FerrisWheelTab:AddSlider({ Name = "固定ピッチ角", Min = -90, Max = 90, Default = SH.FerrisWheelConfig.FixedPitch, Color = Theme.SliderColor, Increment = 5, ValueName = "度", Callback = function(v) SH.FerrisWheelConfig.FixedPitch = v end })
     FerrisWheelTab:AddSlider({ Name = "固定ロール角", Min = -180, Max = 180, Default = SH.FerrisWheelConfig.FixedRoll, Color = Theme.SliderColor, Increment = 5, ValueName = "度", Callback = function(v) SH.FerrisWheelConfig.FixedRoll = v end })
@@ -5653,7 +5666,7 @@ do
 
     local HeartTab = Window:MakeTab({ Name = "♡ハート//", Icon = "rbxassetid://4483362458", PremiumOnly = false })
     HeartTab:AddToggle({ Name = "ハート起動", Default = false, Callback = _G.toggleHeart })
-    HeartTab:AddToggle({ Name = "プレイヤー追従", Default = SH.HeartConfig.FollowPlayer, Callback = function(v) SH.HeartConfig.FollowPlayer = v; if v then PlayActionSound() else PlayOpenCloseSound() end end })
+    HeartTab:AddToggle({ Name = "プレイヤー追従", Default = SH.HeartConfig.FollowPlayer, Callback = function(v) SH.HeartConfig.FollowPlayer = v; if v then PlayActionSound() end end })
     HeartTab:AddSlider({ Name = "ハートサイズ", Min = 2, Max = 50, Default = SH.HeartConfig.Size, Color = Theme.SliderColor, Increment = 1, ValueName = "スタッド", Callback = function(v) SH.HeartConfig.Size = v end })
     HeartTab:AddSlider({ Name = "基本高さ", Min = 0, Max = 50, Default = SH.HeartConfig.Height, Color = Theme.SliderColor, Increment = 1, ValueName = "スタッド", Callback = function(v) SH.HeartConfig.Height = v end })
     HeartTab:AddSlider({ Name = "オブジェクト数", Min = 6, Max = 100, Default = SH.HeartConfig.ObjectCount, Color = Theme.SliderColor, Increment = 2, ValueName = "個", Callback = function(v) SH.HeartConfig.ObjectCount = v end })
@@ -5672,7 +5685,7 @@ do
 
     local VerticalHeartTab = Window:MakeTab({ Name = "縦ハート//", Icon = "rbxassetid://4483362458", PremiumOnly = false })
     VerticalHeartTab:AddToggle({ Name = "縦ハート起動", Default = false, Callback = _G.toggleVerticalHeart })
-    VerticalHeartTab:AddToggle({ Name = "プレイヤー追従", Default = SH.VerticalHeartConfig.FollowPlayer, Callback = function(v) SH.VerticalHeartConfig.FollowPlayer = v; if v then PlayActionSound() else PlayOpenCloseSound() end end })
+    VerticalHeartTab:AddToggle({ Name = "プレイヤー追従", Default = SH.VerticalHeartConfig.FollowPlayer, Callback = function(v) SH.VerticalHeartConfig.FollowPlayer = v; if v then PlayActionSound() end end })
     VerticalHeartTab:AddSlider({ Name = "ハートサイズ", Min = 2, Max = 50, Default = SH.VerticalHeartConfig.Size, Color = Theme.SliderColor, Increment = 1, ValueName = "スタッド", Callback = function(v) SH.VerticalHeartConfig.Size = v end })
     VerticalHeartTab:AddSlider({ Name = "基本高さ", Min = 0, Max = 50, Default = SH.VerticalHeartConfig.Height, Color = Theme.SliderColor, Increment = 1, ValueName = "スタッド", Callback = function(v) SH.VerticalHeartConfig.Height = v end })
     VerticalHeartTab:AddSlider({ Name = "オブジェクト数", Min = 6, Max = 100, Default = SH.VerticalHeartConfig.ObjectCount, Color = Theme.SliderColor, Increment = 2, ValueName = "個", Callback = function(v) SH.VerticalHeartConfig.ObjectCount = v end })
@@ -5691,7 +5704,7 @@ do
 
     local BigHeartTab = Window:MakeTab({ Name = "おっきぃ♡", Icon = "rbxassetid://4483362458", PremiumOnly = false })
     BigHeartTab:AddToggle({ Name = "おっきぃハート起動", Default = false, Callback = _G.toggleBigHeart })
-    BigHeartTab:AddToggle({ Name = "プレイヤー追従", Default = SH.BigHeartConfig.FollowPlayer, Callback = function(v) SH.BigHeartConfig.FollowPlayer = v; if v then PlayActionSound() else PlayOpenCloseSound() end end })
+    BigHeartTab:AddToggle({ Name = "プレイヤー追従", Default = SH.BigHeartConfig.FollowPlayer, Callback = function(v) SH.BigHeartConfig.FollowPlayer = v; if v then PlayActionSound() end end })
     BigHeartTab:AddSlider({ Name = "基本サイズ", Min = 5, Max = 50, Default = SH.BigHeartConfig.Size, Color = Theme.SliderColor, Increment = 1, ValueName = "スタッド", Callback = function(v) SH.BigHeartConfig.Size = v end })
     BigHeartTab:AddSlider({ Name = "拡大率", Min = 1.0, Max = 10.0, Default = SH.BigHeartConfig.HeartScale, Color = Theme.SliderColor, Increment = 0.1, ValueName = "倍", Callback = function(v) SH.BigHeartConfig.HeartScale = v end })
     BigHeartTab:AddSlider({ Name = "縦方向引き伸ばし", Min = 1.0, Max = 5.0, Default = SH.BigHeartConfig.VerticalStretch, Color = Theme.SliderColor, Increment = 0.1, ValueName = "倍", Callback = function(v) SH.BigHeartConfig.VerticalStretch = v end })
@@ -5712,7 +5725,7 @@ do
 
     local VerticalBigHeartTab = Window:MakeTab({ Name = "縦おっきぃ♡", Icon = "rbxassetid://4483362458", PremiumOnly = false })
     VerticalBigHeartTab:AddToggle({ Name = "縦おっきぃ♡起動", Default = false, Callback = _G.toggleVerticalBigHeart })
-    VerticalBigHeartTab:AddToggle({ Name = "プレイヤー追従", Default = SH.VerticalBigHeartConfig.FollowPlayer, Callback = function(v) SH.VerticalBigHeartConfig.FollowPlayer = v; if v then PlayActionSound() else PlayOpenCloseSound() end end })
+    VerticalBigHeartTab:AddToggle({ Name = "プレイヤー追従", Default = SH.VerticalBigHeartConfig.FollowPlayer, Callback = function(v) SH.VerticalBigHeartConfig.FollowPlayer = v; if v then PlayActionSound() end end })
     VerticalBigHeartTab:AddSlider({ Name = "基本サイズ", Min = 5, Max = 50, Default = SH.VerticalBigHeartConfig.Size, Color = Theme.SliderColor, Increment = 1, ValueName = "スタッド", Callback = function(v) SH.VerticalBigHeartConfig.Size = v end })
     VerticalBigHeartTab:AddSlider({ Name = "拡大率", Min = 1.0, Max = 10.0, Default = SH.VerticalBigHeartConfig.HeartScale, Color = Theme.SliderColor, Increment = 0.1, ValueName = "倍", Callback = function(v) SH.VerticalBigHeartConfig.HeartScale = v end })
     VerticalBigHeartTab:AddSlider({ Name = "基本高さ", Min = 5, Max = 50, Default = SH.VerticalBigHeartConfig.Height, Color = Theme.SliderColor, Increment = 1, ValueName = "スタッド", Callback = function(v) SH.VerticalBigHeartConfig.Height = v end })
@@ -5836,7 +5849,6 @@ do
     local function StopManjiLoop()
         isRunning = false
         if loopTask then task.cancel(loopTask); loopTask = nil end
-        PlayOpenCloseSound()
         OrionLib:MakeNotification({ Name = "卍", Content = "停止", Time = 2 })
     end
 
@@ -5878,7 +5890,7 @@ do
 
     local SphereTab = Window:MakeTab({ Name = "球体◯", Icon = "rbxassetid://4483362458", PremiumOnly = false })
     SphereTab:AddToggle({ Name = "球体起動", Default = false, Callback = _G.toggleSphere })
-    SphereTab:AddToggle({ Name = "プレイヤー追従", Default = SH.SphereConfig.FollowPlayer, Callback = function(v) SH.SphereConfig.FollowPlayer = v; if v then PlayActionSound() else PlayOpenCloseSound() end end })
+    SphereTab:AddToggle({ Name = "プレイヤー追従", Default = SH.SphereConfig.FollowPlayer, Callback = function(v) SH.SphereConfig.FollowPlayer = v; if v then PlayActionSound() end end })
     SphereTab:AddSlider({ Name = "球体半径", Min = 2, Max = 50, Default = SH.SphereConfig.Radius, Color = Theme.SliderColor, Increment = 1, ValueName = "スタッド", Callback = function(v) SH.SphereConfig.Radius = v end })
     SphereTab:AddSlider({ Name = "緯度線の数", Min = 2, Max = 16, Default = SH.SphereConfig.Latitudes, Color = Theme.SliderColor, Increment = 1, ValueName = "本", Callback = function(v) SH.SphereConfig.Latitudes = v end })
     SphereTab:AddSlider({ Name = "経度線の数", Min = 4, Max = 24, Default = SH.SphereConfig.Longitudes, Color = Theme.SliderColor, Increment = 2, ValueName = "本", Callback = function(v) SH.SphereConfig.Longitudes = v end })
@@ -5899,7 +5911,7 @@ do
 
     local StarOfDavidTab = Window:MakeTab({ Name = "ダビデの星✡", Icon = "rbxassetid://4483362458", PremiumOnly = false })
     StarOfDavidTab:AddToggle({ Name = "ダビデの星起動", Default = false, Callback = _G.toggleStarOfDavid })
-    StarOfDavidTab:AddToggle({ Name = "プレイヤー追従", Default = SH.StarOfDavidConfig.FollowPlayer, Callback = function(v) SH.StarOfDavidConfig.FollowPlayer = v; if v then PlayActionSound() else PlayOpenCloseSound() end end })
+    StarOfDavidTab:AddToggle({ Name = "プレイヤー追従", Default = SH.StarOfDavidConfig.FollowPlayer, Callback = function(v) SH.StarOfDavidConfig.FollowPlayer = v; if v then PlayActionSound() end end })
     StarOfDavidTab:AddSlider({ Name = "星のサイズ", Min = 2, Max = 50, Default = SH.StarOfDavidConfig.Size, Color = Theme.SliderColor, Increment = 1, ValueName = "スタッド", Callback = function(v) SH.StarOfDavidConfig.Size = v end })
     StarOfDavidTab:AddSlider({ Name = "基本高さ", Min = 0, Max = 50, Default = SH.StarOfDavidConfig.Height, Color = Theme.SliderColor, Increment = 1, ValueName = "スタッド", Callback = function(v) SH.StarOfDavidConfig.Height = v end })
     StarOfDavidTab:AddSlider({ Name = "三角形の高さ", Min = 0, Max = 20, Default = SH.StarOfDavidConfig.TriangleHeight, Color = Theme.SliderColor, Increment = 0.1, ValueName = "スタッド", Callback = function(v) SH.StarOfDavidConfig.TriangleHeight = v end })
@@ -5918,7 +5930,7 @@ do
 
     local StarTab = Window:MakeTab({ Name = "スター★", Icon = "rbxassetid://4483362458", PremiumOnly = false })
     StarTab:AddToggle({ Name = "スター起動", Default = false, Callback = _G.toggleStar })
-    StarTab:AddToggle({ Name = "プレイヤー追従", Default = SH.StarConfig.FollowPlayer, Callback = function(v) SH.StarConfig.FollowPlayer = v; if v then PlayActionSound() else PlayOpenCloseSound() end end })
+    StarTab:AddToggle({ Name = "プレイヤー追従", Default = SH.StarConfig.FollowPlayer, Callback = function(v) SH.StarConfig.FollowPlayer = v; if v then PlayActionSound() end end })
     StarTab:AddSlider({ Name = "外側半径", Min = 2, Max = 50, Default = SH.StarConfig.OuterRadius, Color = Theme.SliderColor, Increment = 1, ValueName = "スタッド", Callback = function(v) SH.StarConfig.OuterRadius = v end })
     StarTab:AddSlider({ Name = "内側半径", Min = 1, Max = 30, Default = SH.StarConfig.InnerRadius, Color = Theme.SliderColor, Increment = 1, ValueName = "スタッド", Callback = function(v) SH.StarConfig.InnerRadius = v end })
     StarTab:AddSlider({ Name = "基本高さ", Min = 0, Max = 50, Default = SH.StarConfig.Height, Color = Theme.SliderColor, Increment = 1, ValueName = "スタッド", Callback = function(v) SH.StarConfig.Height = v end })
@@ -5937,7 +5949,7 @@ do
 
     local Star2Tab = Window:MakeTab({ Name = "スター2✫", Icon = "rbxassetid://4483362458", PremiumOnly = false })
     Star2Tab:AddToggle({ Name = "スター2起動", Default = false, Callback = _G.toggleStar2 })
-    Star2Tab:AddToggle({ Name = "プレイヤー追従", Default = SH.Star2Config.FollowPlayer, Callback = function(v) SH.Star2Config.FollowPlayer = v; if v then PlayActionSound() else PlayOpenCloseSound() end end })
+    Star2Tab:AddToggle({ Name = "プレイヤー追従", Default = SH.Star2Config.FollowPlayer, Callback = function(v) SH.Star2Config.FollowPlayer = v; if v then PlayActionSound() end end })
     Star2Tab:AddSlider({ Name = "基本サイズ", Min = 5, Max = 30, Default = SH.Star2Config.Size, Color = Theme.SliderColor, Increment = 1, ValueName = "スタッド", Callback = function(v) SH.Star2Config.Size = v end })
     Star2Tab:AddSlider({ Name = "光線の長さ", Min = 1, Max = 10, Default = SH.Star2Config.RayLength, Color = Theme.SliderColor, Increment = 0.5, ValueName = "スタッド", Callback = function(v) SH.Star2Config.RayLength = v end })
     Star2Tab:AddSlider({ Name = "基本高さ", Min = 5, Max = 50, Default = SH.Star2Config.Height, Color = Theme.SliderColor, Increment = 1, ValueName = "スタッド", Callback = function(v) SH.Star2Config.Height = v end })
@@ -5960,7 +5972,7 @@ do
 
     local AnimN1Tab = Window:MakeTab({ Name = "N1: カオス・サークル", Icon = "rbxassetid://4483362458", PremiumOnly = false })
     AnimN1Tab:AddToggle({ Name = "N1起動", Default = false, Callback = _G.toggleAnimN1 })
-    AnimN1Tab:AddToggle({ Name = "プレイヤー追従", Default = SH.AnimN1Config.FollowPlayer, Callback = function(v) SH.AnimN1Config.FollowPlayer = v; if v then PlayActionSound() else PlayOpenCloseSound() end end })
+    AnimN1Tab:AddToggle({ Name = "プレイヤー追従", Default = SH.AnimN1Config.FollowPlayer, Callback = function(v) SH.AnimN1Config.FollowPlayer = v; if v then PlayActionSound() end end })
     AnimN1Tab:AddSlider({ Name = "半径", Min = 5, Max = 50, Default = SH.AnimN1Config.Radius, Color = Theme.SliderColor, Increment = 1, ValueName = "スタッド", Callback = function(v) SH.AnimN1Config.Radius = v end })
     AnimN1Tab:AddSlider({ Name = "基本高さ", Min = 0, Max = 50, Default = SH.AnimN1Config.Height, Color = Theme.SliderColor, Increment = 1, ValueName = "スタッド", Callback = function(v) SH.AnimN1Config.Height = v end })
     AnimN1Tab:AddSlider({ Name = "オブジェクト数", Min = 10, Max = 100, Default = SH.AnimN1Config.ObjectCount, Color = Theme.SliderColor, Increment = 2, ValueName = "個", Callback = function(v) SH.AnimN1Config.ObjectCount = v end })
@@ -5970,7 +5982,7 @@ do
 
     local AnimN2Tab = Window:MakeTab({ Name = "N2: トルネード・スパイラル", Icon = "rbxassetid://4483362458", PremiumOnly = false })
     AnimN2Tab:AddToggle({ Name = "N2起動", Default = false, Callback = _G.toggleAnimN2 })
-    AnimN2Tab:AddToggle({ Name = "プレイヤー追従", Default = SH.AnimN2Config.FollowPlayer, Callback = function(v) SH.AnimN2Config.FollowPlayer = v; if v then PlayActionSound() else PlayOpenCloseSound() end end })
+    AnimN2Tab:AddToggle({ Name = "プレイヤー追従", Default = SH.AnimN2Config.FollowPlayer, Callback = function(v) SH.AnimN2Config.FollowPlayer = v; if v then PlayActionSound() end end })
     AnimN2Tab:AddSlider({ Name = "半径", Min = 3, Max = 30, Default = SH.AnimN2Config.Radius, Color = Theme.SliderColor, Increment = 1, ValueName = "スタッド", Callback = function(v) SH.AnimN2Config.Radius = v end })
     AnimN2Tab:AddSlider({ Name = "最高高さ", Min = 10, Max = 100, Default = SH.AnimN2Config.TopHeight, Color = Theme.SliderColor, Increment = 1, ValueName = "スタッド", Callback = function(v) SH.AnimN2Config.TopHeight = v end })
     AnimN2Tab:AddSlider({ Name = "オブジェクト数", Min = 10, Max = 100, Default = SH.AnimN2Config.ObjectCount, Color = Theme.SliderColor, Increment = 2, ValueName = "個", Callback = function(v) SH.AnimN2Config.ObjectCount = v end })
@@ -5980,7 +5992,7 @@ do
 
     local AnimN3Tab = Window:MakeTab({ Name = "N3: ハイパー・エクスプロージョン", Icon = "rbxassetid://4483362458", PremiumOnly = false })
     AnimN3Tab:AddToggle({ Name = "N3起動", Default = false, Callback = _G.toggleAnimN3 })
-    AnimN3Tab:AddToggle({ Name = "プレイヤー追従", Default = SH.AnimN3Config.FollowPlayer, Callback = function(v) SH.AnimN3Config.FollowPlayer = v; if v then PlayActionSound() else PlayOpenCloseSound() end end })
+    AnimN3Tab:AddToggle({ Name = "プレイヤー追従", Default = SH.AnimN3Config.FollowPlayer, Callback = function(v) SH.AnimN3Config.FollowPlayer = v; if v then PlayActionSound() end end })
     AnimN3Tab:AddSlider({ Name = "爆発半径", Min = 5, Max = 100, Default = SH.AnimN3Config.ExplosionRadius, Color = Theme.SliderColor, Increment = 1, ValueName = "スタッド", Callback = function(v) SH.AnimN3Config.ExplosionRadius = v end })
     AnimN3Tab:AddSlider({ Name = "オブジェクト数", Min = 10, Max = 100, Default = SH.AnimN3Config.ObjectCount, Color = Theme.SliderColor, Increment = 2, ValueName = "個", Callback = function(v) SH.AnimN3Config.ObjectCount = v end })
     AnimN3Tab:AddSlider({ Name = "サイクル速度", Min = 0, Max = 5, Default = SH.AnimN3Config.CycleSpeed, Color = Theme.SliderColor, Increment = 0.1, ValueName = "速度", Callback = function(v) SH.AnimN3Config.CycleSpeed = v end })
@@ -5988,27 +6000,97 @@ do
 end
 
 -- ============================================================================
--- ブロック55: 情報とサポートタブ
+-- ブロック55: 情報とサポートタブ（開発者一覧・公式リンク追加）
 -- ============================================================================
 do
     local Window = _G.Window
     local OrionLib = _G.OrionLib
 
-    local InfoTab = Window:MakeTab({ Name = "情報とサポート", Icon = "rbxassetid://4483362458", PremiumOnly = false })
+    local InfoTab = Window:MakeTab({ Name = "情報とサポート", Icon = "rbxassetid://3362458", PremiumOnly = false })
+
     InfoTab:AddSection({ Name = "詳細" })
-    InfoTab:AddLabel("バージョン: V0.7.2.139")
+    InfoTab:AddLabel("バージョン: V0.7.2.140")
     InfoTab:AddLabel("開発グループ: 土星グループ")
-    InfoTab:AddSection({ Name = "リンク" })
-    InfoTab:AddButton({ Name = "サポートサーバーに参加[ディスコードグローバル]", Callback = function()
-        PlayActionSound()
-        setclipboard("https://discord.gg/qFQTe7rcyE")
-        OrionLib:MakeNotification({ Name = "リンクコピー", Content = "クリップボードにコピーしました", Time = 2 })
-    end })
-    InfoTab:AddButton({ Name = "サポートサーバーに参加[ラインオープンチャット日本専用]", Callback = function()
-        PlayActionSound()
-        setclipboard("https://line.me/ti/g2/-CBPty1N0v2XuNPqaJm5xLmCBt0wBr3_vxrOqQ?utm_source=invitation&utm_medium=link_copy&utm_campaign=default")
-        OrionLib:MakeNotification({ Name = "リンクコピー", Content = "クリップボードにコピーしました", Time = 2 })
-    end })
+
+    -- 開発者一覧
+    InfoTab:AddSection({ Name = "開発者一覧（ボタンを押すとURLをコピー）" })
+
+    local developers = {
+        { name = "akkii", url = "https://saturngroup02.github.io/.akkiiProfile/" },
+        { name = "yuzu", url = "https://www.tiktok.com/@yuzkiiiii_?_r=1&_t=ZS-9803o3VdZfs" },
+        { name = "Siro", url = "https://www.tiktok.com/@siroiekitai.ikuiku?_r=1&_t=ZS-98056f8S1lX" },
+        { name = "雪見だいふくの空箱", url = "https://www.tiktok.com/@tsabuwbtcyf?_r=1&_t=ZS-9804U7vJSCN" },
+        { name = "Grok", url = "https://www.tiktok.com/@grok_chickenhubowner?_r=1&_t=ZS-9804Vo4gGUJ" },
+        { name = "Holon", url = "https://www.tiktok.com/@holoncalm?_r=1&_t=ZS-9804WWHIPH5" },
+        { name = "にゅずぴー", url = "https://www.tiktok.com/@nyuzupi?_r=1&_t=ZS-9804atmJ8p5" },
+        { name = "クロスケ", url = "https://www.tiktok.com/@kurosuke_zinnsei?_r=1&_t=ZS-9804mgREhQQ" },
+        { name = "Kame", url = "https://www.tiktok.com/@kame.dev?_r=1&_t=ZS-9804p27AnFC" },
+        { name = "BG_Hack", url = "https://www.tiktok.com/@logfeetst?_r=1&_t=ZS-9804uxBdDmS" },
+        { name = "imosuke", url = "https://www.tiktok.com/@imosuke923" },
+        { name = "きーち", url = "https://www.tiktok.com/@ki.chi582?lang=ja-JP" },
+        { name = "ポザーs", url = "https://www.tiktok.com/@pozasss?lang=ja-JP" },
+    }
+
+    for _, dev in ipairs(developers) do
+        InfoTab:AddButton({
+            Name = "👤 " .. dev.name,
+            Callback = function()
+                PlayActionSound()
+                pcall(function() setclipboard(dev.url) end)
+                OrionLib:MakeNotification({
+                    Name = "URLをコピーしました",
+                    Content = dev.name .. " のURLをクリップボードにコピーしました",
+                    Time = 3
+                })
+            end
+        })
+    end
+
+    -- 公式リンク
+    InfoTab:AddSection({ Name = "公式リンク（ボタンを押すとURLをコピー）" })
+
+    local officialLinks = {
+        { name = "開発元[土星グループ] 公式サイト", url = "https://saturngroup02.github.io/Official-Pages/" },
+        { name = "Sakurahub 公式サイト", url = "https://saturngroup02.github.io/SakuraHUB-HomePages/" },
+        { name = "Sakurahub関連レポジトリ１ (Sakura-Hub-main)", url = "https://github.com/SaturnGroup02/Sakura-Hub-main" },
+        { name = "Sakurahub関連レポジトリ２ (Sakurahub-ja-en-vn-123-)", url = "https://github.com/SaturnGroup02/Sakurahub-ja-en-vn-123-" },
+        { name = "Sakurahub関連レポジトリ３ (Sakurahub-SabuHUB)", url = "https://github.com/SaturnGroup02/Sakurahub-SabuHUB" },
+        { name = "Sakurahub関連レポジトリ４ (Sakurahub-beta)", url = "https://github.com/SaturnGroup02/Sakurahub-beta/tree/main" },
+    }
+
+    for _, link in ipairs(officialLinks) do
+        InfoTab:AddButton({
+            Name = "🔗 " .. link.name,
+            Callback = function()
+                PlayActionSound()
+                pcall(function() setclipboard(link.url) end)
+                OrionLib:MakeNotification({
+                    Name = "URLをコピーしました",
+                    Content = link.name .. " のURLをクリップボードにコピーしました",
+                    Time = 3
+                })
+            end
+        })
+    end
+
+    -- サポート
+    InfoTab:AddSection({ Name = "サポートサーバー" })
+    InfoTab:AddButton({
+        Name = "サポートサーバーに参加[ディスコードグローバル]",
+        Callback = function()
+            PlayActionSound()
+            setclipboard("https://discord.gg/qFQTe7rcyE")
+            OrionLib:MakeNotification({ Name = "リンクコピー", Content = "クリップボードにコピーしました", Time = 2 })
+        end
+    })
+    InfoTab:AddButton({
+        Name = "サポートサーバーに参加[ラインオープンチャット日本専用]",
+        Callback = function()
+            PlayActionSound()
+            setclipboard("https://line.me/ti/g2/-CBPty1N0v2XuNPqaJm5xLmCBt0wBr3_vxrOqQ?utm_source=invitation&utm_medium=link_copy&utm_campaign=default")
+            OrionLib:MakeNotification({ Name = "リンクコピー", Content = "クリップボードにコピーしました", Time = 2 })
+        end
+    })
 end
 
 -- ============================================================================
@@ -6020,11 +6102,11 @@ do
     PlayActionSound()
     OrionLib:MakeNotification({
         Name = "🌸さくらhubV0.7🌸起動完了",
-        Content = "v0.7.2.139",
+        Content = "v0.7.2.140",
         Image = "rbxassetid://4483362458",
         Time = 5
     })
     print("==========================================")
-    print("🌸さくらhubV0.7🌸 v0.7.2.139")
+    print("🌸さくらhubV0.7🌸 v0.7.2.140")
     print("==========================================")
 end
